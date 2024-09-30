@@ -6,30 +6,29 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		3F2882382CA6D69400ABB7D3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3F28822F2CA6D69400ABB7D3 /* Assets.xcassets */; };
+		3F28823A2CA6D69400ABB7D3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3F2882322CA6D69400ABB7D3 /* LaunchScreen.storyboard */; };
+		3F28823C2CA6D69400ABB7D3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F28822E2CA6D69400ABB7D3 /* AppDelegate.swift */; };
+		3F28823D2CA6D69400ABB7D3 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F2882352CA6D69400ABB7D3 /* SceneDelegate.swift */; };
+		3F28823E2CA6D69400ABB7D3 /* TrackerTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F2882362CA6D69400ABB7D3 /* TrackerTabBarController.swift */; };
+		3F2882412CA717A100ABB7D3 /* TrackersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F2882402CA717A100ABB7D3 /* TrackersViewController.swift */; };
+		3F2882442CA717C800ABB7D3 /* StatisticViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F2882432CA717C800ABB7D3 /* StatisticViewController.swift */; };
+		3F28825C2CA7CD8300ABB7D3 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F28825B2CA7CD8300ABB7D3 /* Constants.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		3F2881F52CA67F9A00ABB7D3 /* Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3F28822E2CA6D69400ABB7D3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		3F28822F2CA6D69400ABB7D3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		3F2882302CA6D69400ABB7D3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3F2882312CA6D69400ABB7D3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		3F2882352CA6D69400ABB7D3 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		3F2882362CA6D69400ABB7D3 /* TrackerTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerTabBarController.swift; sourceTree = "<group>"; };
+		3F2882402CA717A100ABB7D3 /* TrackersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackersViewController.swift; sourceTree = "<group>"; };
+		3F2882432CA717C800ABB7D3 /* StatisticViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticViewController.swift; sourceTree = "<group>"; };
+		3F28825B2CA7CD8300ABB7D3 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		3F2882072CA67F9B00ABB7D3 /* Exceptions for "Tracker" folder in "Tracker" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 3F2881F42CA67F9A00ABB7D3 /* Tracker */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		3F2881F72CA67F9A00ABB7D3 /* Tracker */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				3F2882072CA67F9B00ABB7D3 /* Exceptions for "Tracker" folder in "Tracker" target */,
-			);
-			path = Tracker;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		3F2881F22CA67F9A00ABB7D3 /* Frameworks */ = {
@@ -45,7 +44,7 @@
 		3F2881EC2CA67F9A00ABB7D3 = {
 			isa = PBXGroup;
 			children = (
-				3F2881F72CA67F9A00ABB7D3 /* Tracker */,
+				3F2882372CA6D69400ABB7D3 /* Tracker */,
 				3F2881F62CA67F9A00ABB7D3 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -56,6 +55,30 @@
 				3F2881F52CA67F9A00ABB7D3 /* Tracker.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		3F2882372CA6D69400ABB7D3 /* Tracker */ = {
+			isa = PBXGroup;
+			children = (
+				3F28822E2CA6D69400ABB7D3 /* AppDelegate.swift */,
+				3F2882352CA6D69400ABB7D3 /* SceneDelegate.swift */,
+				3F2882322CA6D69400ABB7D3 /* LaunchScreen.storyboard */,
+				3F28825B2CA7CD8300ABB7D3 /* Constants.swift */,
+				3F28823F2CA7176E00ABB7D3 /* TrackerTabBar */,
+				3F28822F2CA6D69400ABB7D3 /* Assets.xcassets */,
+				3F2882302CA6D69400ABB7D3 /* Info.plist */,
+			);
+			path = Tracker;
+			sourceTree = "<group>";
+		};
+		3F28823F2CA7176E00ABB7D3 /* TrackerTabBar */ = {
+			isa = PBXGroup;
+			children = (
+				3F2882362CA6D69400ABB7D3 /* TrackerTabBarController.swift */,
+				3F2882402CA717A100ABB7D3 /* TrackersViewController.swift */,
+				3F2882432CA717C800ABB7D3 /* StatisticViewController.swift */,
+			);
+			path = TrackerTabBar;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -72,9 +95,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				3F2881F72CA67F9A00ABB7D3 /* Tracker */,
 			);
 			name = Tracker;
 			packageProductDependencies = (
@@ -122,6 +142,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F2882382CA6D69400ABB7D3 /* Assets.xcassets in Resources */,
+				3F28823A2CA6D69400ABB7D3 /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -132,10 +154,27 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F28823C2CA6D69400ABB7D3 /* AppDelegate.swift in Sources */,
+				3F2882412CA717A100ABB7D3 /* TrackersViewController.swift in Sources */,
+				3F28823D2CA6D69400ABB7D3 /* SceneDelegate.swift in Sources */,
+				3F2882442CA717C800ABB7D3 /* StatisticViewController.swift in Sources */,
+				3F28823E2CA6D69400ABB7D3 /* TrackerTabBarController.swift in Sources */,
+				3F28825C2CA7CD8300ABB7D3 /* Constants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		3F2882322CA6D69400ABB7D3 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3F2882312CA6D69400ABB7D3 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		3F2882092CA67F9B00ABB7D3 /* Debug */ = {
@@ -150,9 +189,9 @@
 				INFOPLIST_FILE = Tracker/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -160,9 +199,13 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dmaximov.practicum.Tracker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -178,9 +221,9 @@
 				INFOPLIST_FILE = Tracker/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -188,9 +231,13 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dmaximov.practicum.Tracker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -246,7 +293,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -303,7 +350,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
