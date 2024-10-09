@@ -7,10 +7,7 @@
 
 import Foundation
 
-final class MockTrackersCategory {
-    
-    private init() {}
-    
+struct MockTrackersCategory {
     static let shared = [
         TrackerCategory(title: "Homework or just doing something good or bad i dont know",
                         trackers: [Tracker(

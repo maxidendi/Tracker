@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class SupplementaryView: UICollectionReusableView {
+final class TrackersSupplementaryView: UICollectionReusableView {
     
     //MARK: - Init
     

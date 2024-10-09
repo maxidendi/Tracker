@@ -79,9 +79,9 @@ final class TrackersViewController: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(TrackerCell.self, forCellWithReuseIdentifier: TrackerCell.reuseIdentifier)
-        collectionView.register(SupplementaryView.self,
+        collectionView.register(TrackersSupplementaryView.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-                                withReuseIdentifier: SupplementaryView.identifier)
+                                withReuseIdentifier: TrackersSupplementaryView.identifier)
         datePickerValueChanged(datePicker)
     }
     
@@ -176,8 +176,11 @@ extension TrackersViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        guard let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: SupplementaryView.identifier, for: indexPath) as? SupplementaryView
-        else {
+        guard let headerView = collectionView.dequeueReusableSupplementaryView(
+            ofKind: kind,
+            withReuseIdentifier: TrackersSupplementaryView.identifier,
+            for: indexPath)
+        as? TrackersSupplementaryView else {
             return UICollectionReusableView()
         }
         headerView.setTitle(visibleCategories[indexPath.section].title)
