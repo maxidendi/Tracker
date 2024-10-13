@@ -12,7 +12,7 @@ final class TrackersViewController: UIViewController {
     //MARK: - Properties
     
     private var visibleCategories: [TrackerCategory] = []
-    private var categories: [TrackerCategory] = MockTrackersCategory.shared
+    private var categories = TrackerCategoryProvider.shared
     private var completedTrackers: Set<TrackerRecord> = []
     private var currentDate = Date()
     private let geomParams = GeometricParams(
@@ -138,26 +138,26 @@ final class TrackersViewController: UIViewController {
         currentDate = sender.date
         let weekDay = Calendar.current.component(.weekday, from: currentDate)
         var visibleCategories: [TrackerCategory] = []
-        categories.forEach { category in
-            var visibleCategory: TrackerCategory = TrackerCategory(title: category.title, trackers: [])
+        categories.categoriesProvider.forEach { category in
+            var trackers: [Tracker] = []
             category.trackers.forEach { tracker in
                 tracker.schedule.forEach { schedule in
                     if schedule.toInt == weekDay {
-                        visibleCategory.trackers.append(tracker)
+                        trackers.append(tracker)
                     }
                 }
             }
+            let visibleCategory: TrackerCategory = TrackerCategory(title: category.title, trackers: trackers)
             if !visibleCategory.trackers.isEmpty {
                 visibleCategories.append(visibleCategory)
             }
         }
         self.visibleCategories = visibleCategories
-        sender.isSelected = false
         showStubsOrTrackers()
     }
     
     @objc private func didTapPlusButton() {
-        let createTrackerViewController = CreateTrackerViewController()
+        let createTrackerViewController = HabitOrEventViewController()
         createTrackerViewController.modalPresentationStyle = .popover
         present(createTrackerViewController, animated: true, completion: nil)
     }
@@ -235,9 +235,14 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         let indexPath = IndexPath(row: 0, section: section)
-        let headerView = self.collectionView(collectionView,
-                                             viewForSupplementaryElementOfKind: UICollectionView.elementKindSectionHeader,
-                                             at: indexPath)
+        let headerView: UICollectionReusableView
+        if #available(iOS 18.0, *) {
+            return CGSize(width: collectionView.bounds.width - 56, height: 18)
+        } else {
+            headerView = self.collectionView(collectionView,
+                                                 viewForSupplementaryElementOfKind: UICollectionView.elementKindSectionHeader,
+                                                 at: indexPath)
+        }
         return headerView.systemLayoutSizeFitting(CGSize(
             width: collectionView.frame.width,
             height: UIView.layoutFittingExpandedSize.height),
