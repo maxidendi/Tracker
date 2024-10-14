@@ -65,10 +65,10 @@ final class ColorCell: UICollectionViewCell {
             containerView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             colorView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
             colorView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
-            containerView.widthAnchor.constraint(equalToConstant: 52),
-            containerView.heightAnchor.constraint(equalToConstant: 52),
-            colorView.widthAnchor.constraint(equalToConstant: 40),
-            colorView.heightAnchor.constraint(equalToConstant: 40)
+            containerView.widthAnchor.constraint(equalTo: contentView.widthAnchor),
+            containerView.heightAnchor.constraint(equalTo: contentView.heightAnchor),
+            colorView.widthAnchor.constraint(equalTo: contentView.widthAnchor, constant: -12),
+            colorView.heightAnchor.constraint(equalTo: contentView.heightAnchor, constant: -12)
         ])
     }
 }

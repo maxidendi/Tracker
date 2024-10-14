@@ -26,6 +26,7 @@ final class NewTrackerViewController: UIViewController {
     
     //MARK: - Properties
     
+    weak var delegate: NewCategoryViewControllerDelegate?
     private var newTracker: Tracker?
     private var trackerCategoryIndex: Int?
     private var newTrackerTitle: String?
@@ -95,6 +96,7 @@ final class NewTrackerViewController: UIViewController {
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.isScrollEnabled = false
+        tableView.separatorColor = .ypGray
         tableView.separatorInset = UIEdgeInsets(
             top: 0,
             left: 16,
@@ -176,20 +178,18 @@ final class NewTrackerViewController: UIViewController {
     //MARK: - Methods
     
     @objc func cancelButtonTapped() {
-        dismiss(animated: true, completion: nil)
+        delegate?.dismissNewTrackerFlow()
     }
     
     @objc func createButtonTapped() {
         guard let newTracker, let trackerCategoryIndex else { return }
-        categories.categoriesProvider.forEach {
-            if $0.title == categories.categoriesProvider[trackerCategoryIndex].title {
-                var trackers = $0.trackers
-                trackers.append(newTracker)
-                let newCategory = TrackerCategory(title: $0.title, trackers: trackers)
-                categories.categoriesProvider[trackerCategoryIndex] = newCategory
-            }
-        }
-        presentingViewController?.dismiss(animated: true)
+        let changedCategory = categories.categoriesProvider[trackerCategoryIndex]
+        var changedTrackers = changedCategory.trackers
+        changedTrackers.append(newTracker)
+        let newCategory = TrackerCategory(title: changedCategory.title,
+                                          trackers: changedTrackers)
+        categories.categoriesProvider[trackerCategoryIndex] = newCategory
+        delegate?.dismissNewTrackerFlow()
     }
     
     private func isReadyToCreateTracker() {
@@ -244,38 +244,31 @@ final class NewTrackerViewController: UIViewController {
             titleLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             titleLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             titleLabel.heightAnchor.constraint(equalToConstant: 50),
-            
             scrollView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            
             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-            
             textField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             textField.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 24),
             textField.heightAnchor.constraint(equalToConstant: 75),
-            
             warningLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             warningLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             warningLabel.topAnchor.constraint(equalTo: textField.bottomAnchor),
-            
             tableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             tableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             tableView.topAnchor.constraint(equalTo: warningLabel.bottomAnchor, constant: 24),
             tableView.heightAnchor.constraint(equalToConstant: isHabit ? 149 : 74),
-            
             collectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             collectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             collectionView.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 32),
             collectionView.heightAnchor.constraint(greaterThanOrEqualToConstant: 500),
             collectionView.bottomAnchor.constraint(equalTo: buttonsStackView.topAnchor),
-            
             buttonsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             buttonsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             buttonsStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -24),
@@ -461,9 +454,8 @@ extension NewTrackerViewController: UITableViewDelegate {
             categoryVC.modalPresentationStyle = .popover
             present(categoryVC, animated: true)
         case 1:
-            let newScheduleVC = ScheduleViewController(
-                delegate: self)
-            newScheduleVC.schedule = Set(newTrackerSchedule)
+            let newScheduleVC = ScheduleViewController(delegate: self,
+                                                       schedule: newTrackerSchedule)
             newScheduleVC.modalPresentationStyle = .popover
             present(newScheduleVC, animated: true)
         default: break

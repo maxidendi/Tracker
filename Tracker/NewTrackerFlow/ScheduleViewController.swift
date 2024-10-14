@@ -11,9 +11,11 @@ final class ScheduleViewController: UIViewController {
     
     //MARK: - Init
     
-    init(delegate: ScheduleViewControllerDelegate? = nil) {
+    init(delegate: ScheduleViewControllerDelegate? = nil,
+         schedule: Set<WeekDay>) {
         super.init(nibName: nil, bundle: nil)
         self.delegate = delegate
+        self.schedule = schedule
         addObserver()
     }
     
@@ -24,7 +26,7 @@ final class ScheduleViewController: UIViewController {
     //MARK: - Properties
     
     weak var delegate: ScheduleViewControllerDelegate?
-    var schedule: Set<WeekDay> = [] {
+    private var schedule: Set<WeekDay> = [] {
         didSet {
             if schedule.isEmpty {
                 scheduleIsEmpty = true
@@ -44,45 +46,25 @@ final class ScheduleViewController: UIViewController {
         return label
     } ()
     
-    private lazy var scrollView: UIScrollView = {
-        let scrollView = UIScrollView()
-        scrollView.isScrollEnabled = true
-        scrollView.showsVerticalScrollIndicator = false
-        scrollView.showsHorizontalScrollIndicator = false
-        scrollView.backgroundColor = .clear
-        return scrollView
-    } ()
-    
-    private lazy var contentView: UIView = {
-        let contentView = UIView()
-        contentView.backgroundColor = .clear
-        return contentView
-    } ()
-    
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
-        tableView.isScrollEnabled = false
-        tableView.backgroundColor = .ypLightGray.withAlphaComponent(0.3)
+        tableView.isScrollEnabled = true
+        tableView.showsVerticalScrollIndicator = false
+        tableView.backgroundColor = .clear
+        tableView.separatorColor = .ypGray
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-        tableView.separatorInset = UIEdgeInsets(
-            top: 0,
-            left: 16,
-            bottom: 0,
-            right: 16)
-        tableView.layer.cornerRadius = 16
-        tableView.layer.masksToBounds = true
         return tableView
     } ()
     
     private lazy var doneButton: UIButton = {
         let button = UIButton(type: .system)
-        button.isEnabled = false
+        button.isEnabled = true
         button.backgroundColor = .ypGray
         button.setTitle("Готово", for: .normal)
+        button.setTitleColor(.ypWhite, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
-        button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 16
         button.layer.masksToBounds = true
         button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
@@ -127,42 +109,22 @@ final class ScheduleViewController: UIViewController {
     }
     
     private func addSubviews() {
-        [titleLabel, scrollView].forEach {
+        [titleLabel, tableView, doneButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
-        }
-        scrollView.addSubview(contentView)
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        [tableView, doneButton].forEach {
-            $0.translatesAutoresizingMaskIntoConstraints = false
-            contentView.addSubview($0)
         }
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 14),
             titleLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             titleLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             titleLabel.heightAnchor.constraint(equalToConstant: 50),
-            
-            scrollView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor),
-            scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            
-            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
-            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
-            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
-            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-            
-            tableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            tableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            tableView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            tableView.heightAnchor.constraint(equalToConstant: CGFloat((WeekDay.allCases.count * 75) - 1)),
+            tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            tableView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
             tableView.bottomAnchor.constraint(equalTo: doneButton.topAnchor, constant: -24),
-            
-            doneButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            doneButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            doneButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -24),
+            doneButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            doneButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            doneButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -24),
             doneButton.heightAnchor.constraint(equalToConstant: 60)
         ])
     }
@@ -178,18 +140,31 @@ extension ScheduleViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        cell.backgroundColor = .clear
-        let weekDay = WeekDay.allCases[indexPath.row]
-        cell.textLabel?.text = weekDay.rawValue
+        cell.backgroundColor = .ypLightGray.withAlphaComponent(0.3)
+        let weekDay = WeekDay.allCases
+        cell.textLabel?.text = weekDay[indexPath.row].rawValue
         cell.selectionStyle = .none
         let switcher = UISwitch()
         switcher.tag = indexPath.row
-        switcher.isOn = schedule.contains(weekDay) ? true : false
+        switcher.isOn = schedule.contains(weekDay[indexPath.row]) ? true : false
         switcher.onTintColor = .ypBlue
         switcher.addTarget(self,
                            action: #selector(appendWeekday),
                            for: .valueChanged)
         cell.accessoryView = switcher
+        if weekDay.count == 1 {
+            cell.layer.cornerRadius = 16
+        } else if indexPath.row == 0 {
+            cell.layer.cornerRadius = 16
+            cell.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+            cell.separatorInset = .init(top: 0, left: 16, bottom: 0, right: 16)
+        } else if indexPath.row == weekDay.count - 1 {
+            cell.layer.cornerRadius = 16
+            cell.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+            cell.separatorInset = .init(top: 0, left: 0, bottom: 0, right: tableView.bounds.width)
+        } else {
+            cell.separatorInset = .init(top: 0, left: 16, bottom: 0, right: 16)
+        }
         return cell
     }
     

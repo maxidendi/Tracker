@@ -14,22 +14,6 @@ final class TrackerCategoryProvider {
     static let shared = TrackerCategoryProvider()
     
     private init () {}
-//    
-//    //MARK: - Methods
-//    
-//    private enum Categories {
-//        
-//    }
-//    
-//    func addCategory(_ category: TrackerCategory) {
-//        categoriesProvider.append(category)
-//    }
-//    
-//    func addTrackerToCategory(_ tracker: Tracker, category cat: TrackerCategory) {
-//        categoriesProvider.forEach { category in
-//            guard
-//        }
-//    }
     
     //MARK: - Properties
     
@@ -55,10 +39,10 @@ final class TrackerCategoryProvider {
         return id
     }
     private var categories: [TrackerCategory] = [
-        TrackerCategory(title: "Homework or just doing something good or bad i dont know",
+        TrackerCategory(title: "Working or just doing something good or bad i dont know",
                         trackers: [Tracker(
                                     id: 1,
-                                    title: "Sprint 14",
+                                    title: "Work hard",
                                     color: .colorSelection13,
                                     emoji: "❤️",
                                     schedule: [.friday, .saturday]),
@@ -68,42 +52,16 @@ final class TrackerCategoryProvider {
                                     color: .colorSelection1,
                                     emoji: "😻",
                                     schedule: [.monday])]),
-        TrackerCategory(title: "Beer",
-                        trackers: [Tracker(
-                                    id: 3,
-                                    title: "Drink more beer",
-                                    color: .colorSelection17,
-                                    emoji: "❤️",
-                                    schedule: [.thursday, .friday, .saturday]),
-                                   Tracker(
-                                    id: 4,
-                                    title: "Play more videogames",
-                                    color: .colorSelection4,
-                                    emoji: "😻",
-                                    schedule: [.saturday, .monday])]),
-        TrackerCategory(title: "tertetr3",
-                        trackers: [Tracker(
-                                    id: 5,
-                                    title: "Drink beer oooooo beer",
-                                    color: .colorSelection17,
-                                    emoji: "❤️",
-                                    schedule: [.saturday, .monday, .thursday]),
-                                   Tracker(
-                                    id: 6,
-                                    title: "Play fucking videogames",
-                                    color: .colorSelection4,
-                                    emoji: "😻",
-                                    schedule: [.saturday, .monday])]),
         TrackerCategory(title: "Swift",
                         trackers: [Tracker(
                                     id: 7,
-                                    title: "Juuuuuust beer",
+                                    title: "Learning swift",
                                     color: .colorSelection17,
                                     emoji: "❤️",
                                     schedule: [.tuesday, .wednesday, .thursday, .friday, .saturday, .monday]),
                                    Tracker(
                                     id: 8,
-                                    title: "Juuuuust videogames",
+                                    title: "Sprint 14",
                                     color: .colorSelection4,
                                     emoji: "😻",
                                     schedule: [.tuesday]),
@@ -118,5 +76,5 @@ final class TrackerCategoryProvider {
                                     title: "Playing videogames",
                                     color: .colorSelection4,
                                     emoji: "😻",
-                                    schedule: [.tuesday, .wednesday, .thursday, .friday, .saturday, .monday])])]
+                                    schedule: [.tuesday, .wednesday, .thursday, .friday])])]
 }

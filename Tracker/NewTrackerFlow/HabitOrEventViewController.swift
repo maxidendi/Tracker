@@ -7,16 +7,23 @@
 
 import UIKit
 
+protocol NewCategoryViewControllerDelegate: AnyObject {
+    
+    func dismissNewTrackerFlow()
+}
+
 final class HabitOrEventViewController: UIViewController {
     
     //MARK: - Properties
     
+    weak var delegate: HabitOrEventViewControllerDelegate?
     private lazy var habitTrackerButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Привычка", for: .normal)
         button.addTarget(self,
                          action: #selector(showHabitOrEventViewController(_:)),
                          for: .touchUpInside)
+        button.setTitle("Привычка", for: .normal)
+        button.setTitleColor(.ypWhite, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = .ypBlack
         button.layer.cornerRadius = 16
@@ -31,6 +38,7 @@ final class HabitOrEventViewController: UIViewController {
                          action: #selector(showHabitOrEventViewController(_:)),
                          for: .touchUpInside)
         button.setTitle("Нерегулярное событие", for: .normal)
+        button.setTitleColor(.ypWhite, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = .ypBlack
         button.layer.cornerRadius = 16
@@ -69,6 +77,7 @@ final class HabitOrEventViewController: UIViewController {
     @objc private func showHabitOrEventViewController(_ sender: UIButton) {
         let vc = sender === habitTrackerButton ? NewTrackerViewController(isHabit: true) :
                                                  NewTrackerViewController(isHabit: false)
+        vc.delegate = self
         vc.modalPresentationStyle = .popover
         present(vc, animated: true)
     }
@@ -88,5 +97,13 @@ final class HabitOrEventViewController: UIViewController {
             stackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 32)
         ])
+    }
+}
+
+extension HabitOrEventViewController: NewCategoryViewControllerDelegate {
+    
+    func dismissNewTrackerFlow() {
+        dismiss(animated: true)
+        delegate?.needToReloadCollectionView()
     }
 }

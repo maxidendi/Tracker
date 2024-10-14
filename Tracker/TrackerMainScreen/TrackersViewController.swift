@@ -7,6 +7,11 @@
 
 import UIKit
 
+protocol HabitOrEventViewControllerDelegate: AnyObject {
+    
+    func needToReloadCollectionView()
+}
+
 final class TrackersViewController: UIViewController {
     
     //MARK: - Properties
@@ -65,7 +70,7 @@ final class TrackersViewController: UIViewController {
     
     private lazy var tabBarSeparatorView: UIView = {
         let separator = UIView()
-        separator.backgroundColor = .ypBackground
+        separator.backgroundColor = .ypGray
         return separator
     } ()
     
@@ -101,7 +106,7 @@ final class TrackersViewController: UIViewController {
             labelStub.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             labelStub.topAnchor.constraint(equalTo: imageStubView.bottomAnchor, constant: 8),
             datePicker.widthAnchor.constraint(equalToConstant: 100),
-            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 18),
+            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
@@ -141,11 +146,19 @@ final class TrackersViewController: UIViewController {
         categories.categoriesProvider.forEach { category in
             var trackers: [Tracker] = []
             category.trackers.forEach { tracker in
-                tracker.schedule.forEach { schedule in
-                    if schedule.toInt == weekDay {
-                        trackers.append(tracker)
+                guard tracker.schedule.isEmpty,
+                      !completedTrackers.contains(where: {
+                          $0.id == tracker.id &&
+                          $0.date != currentDate})
+                else {
+                    tracker.schedule.forEach { schedule in
+                        if schedule.toInt == weekDay {
+                            trackers.append(tracker)
+                        }
                     }
+                    return
                 }
+                trackers.append(tracker)
             }
             let visibleCategory: TrackerCategory = TrackerCategory(title: category.title, trackers: trackers)
             if !visibleCategory.trackers.isEmpty {
@@ -158,6 +171,7 @@ final class TrackersViewController: UIViewController {
     
     @objc private func didTapPlusButton() {
         let createTrackerViewController = HabitOrEventViewController()
+        createTrackerViewController.delegate = self
         createTrackerViewController.modalPresentationStyle = .popover
         present(createTrackerViewController, animated: true, completion: nil)
     }
@@ -267,5 +281,13 @@ extension TrackersViewController: TrackerCellDelegate {
             completedTrackers.remove(trackerRecord)
             completion()
         }
+    }
+}
+
+extension TrackersViewController: HabitOrEventViewControllerDelegate {
+    
+    func needToReloadCollectionView() {
+        dismiss(animated: true)
+        datePickerValueChanged(datePicker)
     }
 }

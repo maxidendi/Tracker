@@ -54,10 +54,10 @@ final class AddCategoryViewController: UIViewController {
     private lazy var doneButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Готово", for: .normal)
+        button.setTitleColor(.ypWhite, for: .normal)
         button.isEnabled = false
         button.backgroundColor = .ypGray
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
-        button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 16
         button.layer.masksToBounds = true
         button.addTarget(self, action: #selector(doneButtonuttonTapped), for: .touchUpInside)

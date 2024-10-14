@@ -53,6 +53,8 @@ final class CategoryViewController: UIViewController {
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
+        tableView.backgroundColor = .ypWhite
+        tableView.separatorColor = .ypGray
         tableView.isScrollEnabled = true
         tableView.showsVerticalScrollIndicator = false
         tableView.dataSource = self
@@ -64,9 +66,9 @@ final class CategoryViewController: UIViewController {
     private lazy var addCategoryButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Добавить категорию", for: .normal)
+        button.setTitleColor(.ypWhite, for: .normal)
         button.backgroundColor = .ypBlack
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
-        button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 16
         button.layer.masksToBounds = true
         button.addTarget(self, action: #selector(addCategoryButtonTapped), for: .touchUpInside)
@@ -176,7 +178,6 @@ extension CategoryViewController: UITableViewDelegate {
         }
         let cell = tableView.cellForRow(at: indexPath)
         cell?.accessoryType = .checkmark
-//        guard let newCategory = cell?.textLabel?.text else { return }
         delegate?.didRecieveCategory(indexPath.row)
         dismiss(animated: true)
     }
