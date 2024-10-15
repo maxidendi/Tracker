@@ -120,6 +120,12 @@ extension AddCategoryViewController: UITextFieldDelegate {
               text.count > 0 else {
             return
         }
+        guard !categories.categoriesProvider.contains(where: { $0.title == text }) else {
+            let alertModel = AlertModel(message: "Категория с таким наименованием уже существует",
+                                        actionTitle: "Ok")
+            showAlert(with: alertModel)
+            return
+        }
         let newCategory = TrackerCategory(title: text, trackers: [])
         self.newCategory = newCategory
         changeDoneButtonState()
