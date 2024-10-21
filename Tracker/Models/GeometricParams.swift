@@ -9,17 +9,17 @@ import Foundation
 
 struct GeometricParams {
     let cellCount: Int
+    let topInset: CGFloat
     let leftInset: CGFloat
     let rightInset: CGFloat
-    let topInset: CGFloat
     let bottomInset: CGFloat
     let cellSpacing: CGFloat
     let paddingWidth: CGFloat
     
     init(cellCount: Int,
+         topInset: CGFloat,
          leftInset: CGFloat,
          rightInset: CGFloat,
-         topInset: CGFloat,
          bottomInset: CGFloat,
          cellSpacing: CGFloat
     ) {

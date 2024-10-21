@@ -16,11 +16,11 @@ final class NewTrackerSupplementaryView: UICollectionReusableView {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         addSubview(titleLabel)
         NSLayoutConstraint.activate([
-            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
-            titleLabel.heightAnchor.constraint(equalToConstant: 18),
+            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Constants.General.inset12),
+            titleLabel.heightAnchor.constraint(equalToConstant: Constants.General.labelTextHeight),
             titleLabel.topAnchor.constraint(equalTo: topAnchor),
             titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor),
-            titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12)
+            titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Constants.General.inset12)
         ])
     }
     
@@ -33,7 +33,7 @@ final class NewTrackerSupplementaryView: UICollectionReusableView {
     static let identifier: String = "header"
     private var titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 19, weight: .bold)
+        label.font = Constants.Typography.bold19
         label.textColor = .ypBlack
         return label
     } ()

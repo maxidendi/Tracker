@@ -14,7 +14,7 @@ final class EmojiCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         addSubviews()
-        contentView.layer.cornerRadius = 16
+        contentView.layer.cornerRadius = Constants.General.inset16
         contentView.layer.masksToBounds = true
     }
     
@@ -27,7 +27,7 @@ final class EmojiCell: UICollectionViewCell {
     static let reuseIdentifier: String = "emojiCell"
     private lazy var emojiLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 32, weight: .bold)
+        label.font = Constants.Typography.bold32
         label.textAlignment = .center
         return label
     } ()

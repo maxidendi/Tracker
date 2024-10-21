@@ -7,10 +7,6 @@
 
 import UIKit
 
-protocol TrackerCellDelegate: AnyObject {
-    func counterButtonTapped(with id: UInt, isCompleted: Bool, completion: @escaping () -> Void)
-}
-
 final class TrackerCell: UICollectionViewCell {
     
     //MARK: - Init
@@ -26,11 +22,12 @@ final class TrackerCell: UICollectionViewCell {
     
     //MARK: - Properties
     
-    static let reuseIdentifier: String = "cell"
+    static let reuseIdentifier: String = "trackerCell"
+    private let constants = Constants.TrackerCellConstants.self
     weak var delegate: TrackerCellDelegate?
     private var id: UInt? = nil
     private var isCompleted: Bool = false
-    private var counter: Int = 0
+    private var counter: Int = .zero
     private var counterTitle: String {
         counter.toString()
     }
@@ -38,7 +35,7 @@ final class TrackerCell: UICollectionViewCell {
     private lazy var counterButton: UIButton = {
         let button = UIButton(type: .system)
         button.isEnabled = true
-        button.layer.cornerRadius = 17
+        button.layer.cornerRadius = constants.counterButtonDiameter / 2
         button.layer.masksToBounds = true
         button.addTarget(self, action: #selector(counterButtonTapped), for: .touchUpInside)
         return button
@@ -46,7 +43,7 @@ final class TrackerCell: UICollectionViewCell {
     
     private lazy var counterLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 12, weight: .medium)
+        label.font = Constants.Typography.medium12
         label.text = counterTitle
         label.textColor = .ypBlack
         return label
@@ -56,7 +53,7 @@ final class TrackerCell: UICollectionViewCell {
         let label = UILabel()
         label.font = .systemFont(ofSize: 13)
         label.textAlignment = .center
-        label.layer.cornerRadius = 12
+        label.layer.cornerRadius = constants.emojiLabelDiameter / 2
         label.layer.masksToBounds = true
         label.backgroundColor = .ypWhite.withAlphaComponent(0.3)
         return label
@@ -64,14 +61,15 @@ final class TrackerCell: UICollectionViewCell {
     
     private lazy var trackerTitleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 12, weight: .medium)
+        label.font = Constants.Typography.medium12
+        label.numberOfLines = 2
         label.textColor = .ypWhite
         return label
     } ()
     
     private lazy var topView: UIView = {
         let view = UIView()
-        view.layer.cornerRadius = 16
+        view.layer.cornerRadius = Constants.General.radius16
         view.layer.masksToBounds = true
         return view
     } ()
@@ -130,8 +128,13 @@ final class TrackerCell: UICollectionViewCell {
         counter = isCompleted ? counter + 1 : counter - 1
         counterLabel.text = counterTitle
     }
+}
+
+//MARK: - Extensions
+
+extension TrackerCell: SetupSubviewsProtocol {
     
-    private func addSubviews() {
+    func addSubviews() {
         [topView,
          bottomView,
          counterLabel,
@@ -146,28 +149,39 @@ final class TrackerCell: UICollectionViewCell {
         topView.addSubview(trackerTitleLabel)
         bottomView.addSubview(counterLabel)
         bottomView.addSubview(counterButton)
+    }
+
+    override func layoutSubviews() {
         NSLayoutConstraint.activate([
             topView.topAnchor.constraint(equalTo: contentView.topAnchor),
             topView.widthAnchor.constraint(equalTo: contentView.widthAnchor),
-            topView.heightAnchor.constraint(equalToConstant: 90),
+            topView.heightAnchor.constraint(equalToConstant: constants.topViewHeight),
             bottomView.topAnchor.constraint(equalTo: topView.bottomAnchor),
             bottomView.widthAnchor.constraint(equalTo: contentView.widthAnchor),
-            bottomView.heightAnchor.constraint(equalToConstant: 58),
-            emojiLabel.heightAnchor.constraint(equalToConstant: 24),
-            emojiLabel.widthAnchor.constraint(equalToConstant: 24),
-            emojiLabel.topAnchor.constraint(equalTo: topView.topAnchor, constant: 12),
-            emojiLabel.leadingAnchor.constraint(equalTo: topView.leadingAnchor, constant: 12),
-            trackerTitleLabel.leadingAnchor.constraint(equalTo: topView.leadingAnchor, constant: 12),
-            trackerTitleLabel.trailingAnchor.constraint(equalTo: topView.trailingAnchor, constant: -12),
-            trackerTitleLabel.topAnchor.constraint(equalTo: topView.topAnchor, constant: 44),
-            trackerTitleLabel.bottomAnchor.constraint(equalTo: topView.bottomAnchor, constant: -12),
-            counterButton.topAnchor.constraint(equalTo: bottomView.topAnchor, constant: 8),
-            counterButton.trailingAnchor.constraint(equalTo: bottomView.trailingAnchor, constant: -12),
-            counterButton.widthAnchor.constraint(equalToConstant: 34),
-            counterButton.heightAnchor.constraint(equalToConstant: 34),
+            bottomView.heightAnchor.constraint(equalToConstant: constants.bottomViewHeight),
+            emojiLabel.heightAnchor.constraint(equalToConstant: constants.emojiLabelDiameter),
+            emojiLabel.widthAnchor.constraint(equalToConstant: constants.emojiLabelDiameter),
+            emojiLabel.topAnchor.constraint(equalTo: topView.topAnchor,
+                                            constant: constants.insets.top),
+            emojiLabel.leadingAnchor.constraint(equalTo: topView.leadingAnchor,
+                                                constant: constants.insets.left),
+            trackerTitleLabel.leadingAnchor.constraint(equalTo: topView.leadingAnchor,
+                                                       constant: constants.insets.left),
+            trackerTitleLabel.trailingAnchor.constraint(equalTo: topView.trailingAnchor,
+                                                        constant: -constants.insets.right),
+            trackerTitleLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: Constants.General.labelTextHeight),
+            trackerTitleLabel.bottomAnchor.constraint(equalTo: topView.bottomAnchor,
+                                                      constant: -constants.insets.bottom),
+            counterButton.topAnchor.constraint(equalTo: bottomView.topAnchor,
+                                               constant: constants.counterButtonTopInset),
+            counterButton.trailingAnchor.constraint(equalTo: bottomView.trailingAnchor,
+                                                    constant: -constants.insets.right),
+            counterButton.widthAnchor.constraint(equalToConstant: constants.counterButtonDiameter),
+            counterButton.heightAnchor.constraint(equalToConstant: constants.counterButtonDiameter),
             counterLabel.centerYAnchor.constraint(equalTo: counterButton.centerYAnchor),
-            counterLabel.leadingAnchor.constraint(equalTo: bottomView.leadingAnchor, constant: 12),
-            counterLabel.heightAnchor.constraint(equalToConstant: 18)
+            counterLabel.leadingAnchor.constraint(equalTo: bottomView.leadingAnchor,
+                                                  constant: constants.insets.left),
+            counterLabel.heightAnchor.constraint(equalToConstant: Constants.General.labelTextHeight)
             ])
     }
 }

@@ -13,4 +13,9 @@ extension Calendar {
         let toDate = startOfDay(for: start)
         return dateComponents([.day], from: toDate, to: currentDate).day
     }
+    func onlyDate(from date: Date) -> Date {
+        let components = Calendar.current.dateComponents([.year, .month, .day], from: date)
+        let date = Calendar.current.date(from: components) ?? date
+        return date
+    }
 }

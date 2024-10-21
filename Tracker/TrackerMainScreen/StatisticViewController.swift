@@ -11,18 +11,17 @@ final class StatisticViewController: UIViewController {
     
     //MARK: - Properties
     
+    private let constants = Constants.StatisticViewControllerConstants.self
     private lazy var imageStubView: UIImageView = {
         let imageView = UIImageView(image: .statisticImageStub)
-        imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     } ()
     
     private lazy var labelStub: UILabel = {
         let label = UILabel()
-        label.text = "Анализировать пока нечего?"
-        label.font = .systemFont(ofSize: 12, weight: .medium)
+        label.text = constants.labelStubText
+        label.font = Constants.Typography.medium12
         label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     } ()
 
@@ -32,26 +31,40 @@ final class StatisticViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
         addSubviews()
+        layoutSubviews()
         setupNavigationBar()
     }
     
     //MARK: - Methods
     
-    private func addSubviews() {
-        view.addSubview(imageStubView)
-        view.addSubview(labelStub)
+    private func setupNavigationBar() {
+        navigationController?.navigationBar.prefersLargeTitles = true
+        title = constants.title
+    }
+}
+
+//MARK: - Extensions
+
+extension StatisticViewController: SetupSubviewsProtocol {
+    
+    func addSubviews() {
+        [imageStubView, labelStub].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview($0)
+        }
+    }
+
+    func layoutSubviews() {
         NSLayoutConstraint.activate([
             imageStubView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
             imageStubView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
-            labelStub.heightAnchor.constraint(equalToConstant: 18),
-            labelStub.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            labelStub.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            labelStub.topAnchor.constraint(equalTo: imageStubView.bottomAnchor, constant: 8)
+            labelStub.heightAnchor.constraint(equalToConstant: Constants.General.labelTextHeight),
+            labelStub.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,
+                                               constant: Constants.General.inset16),
+            labelStub.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor,
+                                                constant: -Constants.General.inset16),
+            labelStub.topAnchor.constraint(equalTo: imageStubView.bottomAnchor,
+                                           constant: constants.stubsSpacing)
         ])
-    }
-    
-    private func setupNavigationBar() {
-        navigationController?.navigationBar.prefersLargeTitles = true
-        title = "Статистика"
     }
 }

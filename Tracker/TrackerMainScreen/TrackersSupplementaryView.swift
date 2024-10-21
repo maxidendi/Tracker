@@ -16,10 +16,12 @@ final class TrackersSupplementaryView: UICollectionReusableView {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         addSubview(titleLabel)
         NSLayoutConstraint.activate([
-            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 28),
+            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor,
+                                                constant: Constants.General.supplementaryViewHorizontalPadding),
             titleLabel.topAnchor.constraint(equalTo: topAnchor),
             titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor),
-            titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -28)
+            titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor,
+                                                 constant: -Constants.General.supplementaryViewHorizontalPadding)
         ])
     }
     
@@ -32,7 +34,7 @@ final class TrackersSupplementaryView: UICollectionReusableView {
     static let identifier: String = "header"
     private var titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 19, weight: .bold)
+        label.font = Constants.Typography.bold19
         label.textColor = .ypBlack
         label.numberOfLines = 2
         return label

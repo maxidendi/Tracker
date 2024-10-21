@@ -36,13 +36,13 @@ final class ScheduleViewController: UIViewController {
         }
     }
     @objc dynamic private var scheduleIsEmpty: Bool = false
+    private let constants = Constants.ScheduleViewControllerConstants.self
     private var scheduleObserver: NSKeyValueObservation?
-    
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Расписание"
+        label.text = constants.title
         label.textAlignment = .center
-        label.font = .systemFont(ofSize: 16, weight: .medium)
+        label.font = Constants.Typography.medium16
         return label
     } ()
     
@@ -60,12 +60,12 @@ final class ScheduleViewController: UIViewController {
     
     private lazy var doneButton: UIButton = {
         let button = UIButton(type: .system)
-        button.isEnabled = true
-        button.backgroundColor = .ypGray
-        button.setTitle("Готово", for: .normal)
+        button.isEnabled = schedule.isEmpty ? false : true
+        button.backgroundColor = schedule.isEmpty ? .ypGray : .ypBlack
+        button.setTitle(constants.doneButtonTitle, for: .normal)
         button.setTitleColor(.ypWhite, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
-        button.layer.cornerRadius = 16
+        button.titleLabel?.font = Constants.Typography.medium16
+        button.layer.cornerRadius = Constants.General.radius16
         button.layer.masksToBounds = true
         button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         return button
@@ -77,6 +77,7 @@ final class ScheduleViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
         addSubviews()
+        layoutSubviews()
     }
     
     //MARK: - Methods
@@ -107,30 +108,44 @@ final class ScheduleViewController: UIViewController {
         doneButton.isEnabled = scheduleIsEmpty ? false : true
         doneButton.backgroundColor = scheduleIsEmpty ? .ypGray : .ypBlack
     }
+}
+
+//MARK: - Extensions
+
+extension ScheduleViewController: SetupSubviewsProtocol {
     
-    private func addSubviews() {
+    func addSubviews() {
         [titleLabel, tableView, doneButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
         }
+    }
+    
+    func layoutSubviews() {
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 14),
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor,
+                                            constant: constants.titleTopInset),
             titleLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             titleLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            titleLabel.heightAnchor.constraint(equalToConstant: 50),
-            tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            tableView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
-            tableView.bottomAnchor.constraint(equalTo: doneButton.topAnchor, constant: -24),
-            doneButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            doneButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
-            doneButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -24),
-            doneButton.heightAnchor.constraint(equalToConstant: 60)
+            titleLabel.heightAnchor.constraint(equalToConstant: constants.titleHeigth),
+            tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,
+                                               constant: Constants.General.inset16),
+            tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor,
+                                                constant: -Constants.General.inset16),
+            tableView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor,
+                                           constant: constants.verticalSpacing),
+            tableView.bottomAnchor.constraint(equalTo: doneButton.topAnchor,
+                                              constant: -constants.verticalSpacing),
+            doneButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,
+                                                constant: constants.buttonHorizontalPadding),
+            doneButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor,
+                                                 constant: -constants.buttonHorizontalPadding),
+            doneButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,
+                                               constant: -constants.verticalSpacing),
+            doneButton.heightAnchor.constraint(equalToConstant: constants.buttonHeight)
         ])
     }
 }
-
-//MARK: - Extensions
 
 extension ScheduleViewController: UITableViewDataSource {
     
@@ -153,23 +168,23 @@ extension ScheduleViewController: UITableViewDataSource {
                            for: .valueChanged)
         cell.accessoryView = switcher
         if weekDay.count == 1 {
-            cell.layer.cornerRadius = 16
-        } else if indexPath.row == 0 {
-            cell.layer.cornerRadius = 16
+            cell.layer.cornerRadius = Constants.General.radius16
+        } else if indexPath.row == .zero {
+            cell.layer.cornerRadius = Constants.General.radius16
             cell.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-            cell.separatorInset = .init(top: 0, left: 16, bottom: 0, right: 16)
+            cell.separatorInset = Constants.General.separatorInsets
         } else if indexPath.row == weekDay.count - 1 {
-            cell.layer.cornerRadius = 16
+            cell.layer.cornerRadius = Constants.General.radius16
             cell.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
-            cell.separatorInset = .init(top: 0, left: 0, bottom: 0, right: tableView.bounds.width)
+            cell.separatorInset = .init(top: .zero, left: .zero, bottom: .zero, right: tableView.bounds.width)
         } else {
-            cell.separatorInset = .init(top: 0, left: 16, bottom: 0, right: 16)
+            cell.separatorInset = Constants.General.separatorInsets
         }
         return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 75
+        return Constants.General.itemHeight
     }
 }
 

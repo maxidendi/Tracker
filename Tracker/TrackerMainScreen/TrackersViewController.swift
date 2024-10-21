@@ -7,11 +7,6 @@
 
 import UIKit
 
-protocol HabitOrEventViewControllerDelegate: AnyObject {
-    
-    func needToReloadCollectionView()
-}
-
 final class TrackersViewController: UIViewController {
     
     //MARK: - Properties
@@ -20,13 +15,8 @@ final class TrackersViewController: UIViewController {
     private var categories = TrackerCategoryProvider.shared
     private var completedTrackers: Set<TrackerRecord> = []
     private var currentDate = Date()
-    private let geomParams = GeometricParams(
-        cellCount: 2,
-        leftInset: 16,
-        rightInset: 16,
-        topInset: 8,
-        bottomInset: 16,
-        cellSpacing: 9)
+    private let calendar = Calendar.current
+    private let constants = Constants.TrackersViewControllerConstants.self
     
     private lazy var collectionView: UICollectionView = {
         let collection = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
@@ -46,8 +36,9 @@ final class TrackersViewController: UIViewController {
     
     private lazy var searchBarController: UISearchController = {
         let searchBarController = UISearchController(searchResultsController: nil)
-        searchBarController.searchBar.setValue("Отменить", forKey: "cancelButtonText")
-        searchBarController.searchBar.placeholder = "Поиск"
+        searchBarController.searchBar.setValue(constants.searchBarCancelButtonTitle,
+                                               forKey: "cancelButtonText")
+        searchBarController.searchBar.placeholder = constants.searchBarPlaceholder
         searchBarController.hidesNavigationBarDuringPresentation = false
         searchBarController.searchBar.searchTextField.clearButtonMode = .never
         return searchBarController
@@ -61,8 +52,8 @@ final class TrackersViewController: UIViewController {
     
     private lazy var labelStub: UILabel = {
         let label = UILabel()
-        label.text = "Что будем отслеживать?"
-        label.font = .systemFont(ofSize: 12, weight: .medium)
+        label.text = constants.labelStubText
+        label.font = Constants.Typography.medium12
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -80,6 +71,7 @@ final class TrackersViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
         addSubviews()
+        layoutSubviews()
         setupNavigationBar()
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -92,30 +84,9 @@ final class TrackersViewController: UIViewController {
     
     //MARK: - Methods
     
-    private func addSubviews() {
-        [imageStubView, labelStub, collectionView].forEach {
-            view.addSubview($0)
-            $0.translatesAutoresizingMaskIntoConstraints = false }
-        tabBarController?.tabBar.addSubview(tabBarSeparatorView)
-        tabBarSeparatorView.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 1)
-        NSLayoutConstraint.activate([
-            imageStubView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-            imageStubView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
-            labelStub.heightAnchor.constraint(equalToConstant: 18),
-            labelStub.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            labelStub.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            labelStub.topAnchor.constraint(equalTo: imageStubView.bottomAnchor, constant: 8),
-            datePicker.widthAnchor.constraint(equalToConstant: 100),
-            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
-        ])
-    }
-    
     private func setupNavigationBar() {
         navigationController?.navigationBar.prefersLargeTitles = true
-        title = "Трекеры"
+        title = constants.title
         navigationItem.leftBarButtonItem = UIBarButtonItem(
             image: .trackersPlusItem,
             style: .plain,
@@ -128,20 +99,16 @@ final class TrackersViewController: UIViewController {
     
     private func showStubsOrTrackers() {
         collectionView.reloadData()
-        if visibleCategories.isEmpty {
-            labelStub.isHidden = false
-            imageStubView.isHidden = false
-        } else {
-            labelStub.isHidden = true
-            imageStubView.isHidden = true
-        }
+        let isEmpty = visibleCategories.isEmpty
+        labelStub.isHidden = !isEmpty
+        imageStubView.isHidden = !isEmpty
     }
     
     //MARK: - Objc methods
     
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
-        currentDate = sender.date
-        let weekDay = Calendar.current.component(.weekday, from: currentDate)
+        currentDate = calendar.onlyDate(from: sender.date)
+        let weekDay = calendar.component(.weekday, from: currentDate)
         var visibleCategories: [TrackerCategory] = []
         categories.categoriesProvider.forEach { category in
             var trackers: [Tracker] = []
@@ -177,7 +144,44 @@ final class TrackersViewController: UIViewController {
     }
 }
 
-//MARK: - Extensions
+//
+//MARK: - SetupSubviewsProtocol extension
+//
+
+extension TrackersViewController: SetupSubviewsProtocol {
+    
+    func addSubviews() {
+        [imageStubView, labelStub, collectionView].forEach {
+            view.addSubview($0)
+            $0.translatesAutoresizingMaskIntoConstraints = false }
+        tabBarController?.tabBar.addSubview(tabBarSeparatorView)
+        tabBarSeparatorView.frame = CGRect(x: .zero, y: .zero, width: view.frame.width, height: 1)
+    }
+
+    func layoutSubviews() {
+        NSLayoutConstraint.activate([
+            imageStubView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            imageStubView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
+            labelStub.heightAnchor.constraint(equalToConstant: Constants.General.labelTextHeight),
+            labelStub.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,
+                                               constant: constants.geometricParams.leftInset),
+            labelStub.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor,
+                                                constant: -constants.geometricParams.rightInset),
+            labelStub.topAnchor.constraint(equalTo: imageStubView.bottomAnchor,
+                                           constant: Constants.General.stubsSpacing),
+            datePicker.widthAnchor.constraint(equalToConstant: constants.datePickerWidth),
+            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor,
+                                                constant: Constants.General.inset16),
+            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
+        ])
+    }
+}
+
+//
+//MARK: - UICollectionView extensions
+//
 
 extension TrackersViewController: UICollectionViewDataSource {
     
@@ -211,7 +215,8 @@ extension TrackersViewController: UICollectionViewDataSource {
         }
         let isCompleted = completedTrackers.contains(where: {
             $0.id == visibleCategories[section].trackers[indexPath.row].id &&
-            $0.date == currentDate})
+            calendar.numberOfDaysBetween($0.date, and: currentDate) == 0
+        })
         let counter = completedTrackers.filter({$0.id == visibleCategories[section].trackers[indexPath.row].id}).count
         cell.delegate = self
         cell.configureCell(id: visibleCategories[section].trackers[indexPath.row].id,
@@ -227,20 +232,20 @@ extension TrackersViewController: UICollectionViewDataSource {
 extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let availableWidth = collectionView.bounds.width - geomParams.paddingWidth
-        let itemWidth = availableWidth / CGFloat(geomParams.cellCount)
-        return CGSize(width: itemWidth, height: 148)
+        let availableWidth = collectionView.bounds.width - constants.geometricParams.paddingWidth
+        let itemWidth = availableWidth / CGFloat(constants.geometricParams.cellCount)
+        return CGSize(width: itemWidth, height: constants.collectionViewCellHeight)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        UIEdgeInsets(top: geomParams.topInset,
-                     left: geomParams.leftInset,
-                     bottom: geomParams.bottomInset,
-                     right: geomParams.rightInset)
+        UIEdgeInsets(top: constants.geometricParams.topInset,
+                     left: constants.geometricParams.leftInset,
+                     bottom: constants.geometricParams.bottomInset,
+                     right: constants.geometricParams.rightInset)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        geomParams.cellSpacing
+        constants.geometricParams.cellSpacing
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
@@ -248,10 +253,11 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        let indexPath = IndexPath(row: 0, section: section)
+        let indexPath = IndexPath(row: .zero, section: section)
         let headerView: UICollectionReusableView
         if #available(iOS 18.0, *) {
-            return CGSize(width: collectionView.bounds.width - 56, height: 18)
+            return CGSize(width: collectionView.bounds.width - 2 * Constants.General.supplementaryViewHorizontalPadding,
+                          height: Constants.General.labelTextHeight)
         } else {
             headerView = self.collectionView(collectionView,
                                                  viewForSupplementaryElementOfKind: UICollectionView.elementKindSectionHeader,
@@ -265,16 +271,18 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
+//
+//MARK: - Delegates extensions
+//
+
 extension TrackersViewController: TrackerCellDelegate {
     
     func counterButtonTapped(with id: UInt, isCompleted: Bool, completion: @escaping () -> Void) {
         let trackerRecord = TrackerRecord(id: id, date: currentDate)
         if isCompleted {
-            guard let numberOfDays = Calendar.current.numberOfDaysBetween(currentDate),
-                  numberOfDays >= 0
-            else {
-                return
-            }
+            guard let numberOfDays = calendar.numberOfDaysBetween(currentDate),
+                  numberOfDays >= .zero
+            else { return }
             completedTrackers.insert(trackerRecord)
             completion()
         } else {

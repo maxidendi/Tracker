@@ -22,17 +22,18 @@ final class ColorCell: UICollectionViewCell {
 
     //MARK: - Properties
     
+    private let constants = Constants.NewTrackerViewControllerConstants.self
     static let reuseIdentifier: String = "colorCell"
     private lazy var colorView: UIView = {
         let view = UIView()
-        view.layer.cornerRadius = 8
+        view.layer.cornerRadius = Constants.General.radius8
         view.layer.masksToBounds = true
         return view
     } ()
     
     private lazy var containerView: UIView = {
         let view = UIView()
-        view.layer.cornerRadius = 8
+        view.layer.cornerRadius = Constants.General.radius8
         view.layer.masksToBounds = true
         view.backgroundColor = .clear
         return view
@@ -47,12 +48,12 @@ final class ColorCell: UICollectionViewCell {
     }
     
     func cellDidSelected() {
-        containerView.layer.borderWidth = 3
+        containerView.layer.borderWidth = constants.colorCellBorderWidth
         containerView.layer.borderColor = colorView.backgroundColor?.withAlphaComponent(0.3).cgColor
     }
     
     func cellDidDeselected() {
-        containerView.layer.borderWidth = 0
+        containerView.layer.borderWidth = .zero
     }
 
     private func addSubviews() {
@@ -67,8 +68,10 @@ final class ColorCell: UICollectionViewCell {
             colorView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
             containerView.widthAnchor.constraint(equalTo: contentView.widthAnchor),
             containerView.heightAnchor.constraint(equalTo: contentView.heightAnchor),
-            colorView.widthAnchor.constraint(equalTo: contentView.widthAnchor, constant: -12),
-            colorView.heightAnchor.constraint(equalTo: contentView.heightAnchor, constant: -12)
+            colorView.widthAnchor.constraint(equalTo: contentView.widthAnchor,
+                                             constant: -constants.colorCellBorderWidth * 4),
+            colorView.heightAnchor.constraint(equalTo: contentView.heightAnchor,
+                                              constant: -constants.colorCellBorderWidth * 4)
         ])
     }
 }

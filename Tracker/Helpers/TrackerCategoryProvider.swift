@@ -76,5 +76,6 @@ final class TrackerCategoryProvider {
                                     title: "Playing videogames",
                                     color: .colorSelection4,
                                     emoji: "😻",
-                                    schedule: [.tuesday, .wednesday, .thursday, .friday])])]
+                                    schedule: [.tuesday, .wednesday, .thursday, .friday])])
+    ]
 }

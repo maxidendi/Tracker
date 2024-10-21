@@ -7,11 +7,7 @@
 
 import UIKit
 
-protocol AddCategoryDelegate: AnyObject {
-    func addCategory(_ category: TrackerCategory)
-}
-
-final class AddCategoryViewController: UIViewController {
+final class AddCategoryViewController: UIViewController, SetupSubviewsProtocol {
     
     //MARK: - Init
     
@@ -27,38 +23,42 @@ final class AddCategoryViewController: UIViewController {
     //MARK: - Properties
     
     weak var delegate: AddCategoryDelegate?
+    private let constants = Constants.AddCategoryViewControllerConstants.self
+    private var textFieldObserver: NSKeyValueObservation?
     private var categories = TrackerCategoryProvider.shared
     private var newCategory: TrackerCategory?
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Новая категория"
+        label.text = constants.title
         label.textAlignment = .center
-        label.font = .systemFont(ofSize: 16, weight: .medium)
+        label.font = Constants.Typography.medium16
         return label
     } ()
     
     private lazy var textField: UITextField = {
         let textField = UITextField()
-        let view = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: 75))
+        let view = UIView(frame: CGRect(x: .zero, y: .zero,
+                                        width: Constants.General.inset16,
+                                        height: Constants.General.itemHeight))
         textField.delegate = self
         textField.leftView = view
         textField.leftViewMode = .always
-        textField.placeholder = "Введите название категории"
+        textField.placeholder = constants.textFieldPlaceholderText
         textField.backgroundColor = .ypLightGray.withAlphaComponent(0.3)
-        textField.font = .systemFont(ofSize: 17, weight: .regular)
-        textField.layer.cornerRadius = 16
+        textField.font = Constants.Typography.regular17
+        textField.layer.cornerRadius = Constants.General.radius16
         textField.layer.masksToBounds = true
         return textField
     } ()
 
     private lazy var doneButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Готово", for: .normal)
+        button.setTitle(constants.doneButtonTitle, for: .normal)
         button.setTitleColor(.ypWhite, for: .normal)
         button.isEnabled = false
         button.backgroundColor = .ypGray
-        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
-        button.layer.cornerRadius = 16
+        button.titleLabel?.font = Constants.Typography.medium16
+        button.layer.cornerRadius = Constants.General.radius16
         button.layer.masksToBounds = true
         button.addTarget(self, action: #selector(doneButtonuttonTapped), for: .touchUpInside)
         return button
@@ -70,6 +70,13 @@ final class AddCategoryViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
         addSubviews()
+        layoutSubviews()
+        textFieldObserver = textField.observe(\.text,
+                                              options: [.new],
+                                              changeHandler: { [weak self] _, text  in
+            guard let self, let isEmpty = text.newValue??.isEmpty else { return }
+            changeDoneButtonState(!isEmpty)
+        })
     }
     
     //MARK: - Methods
@@ -80,29 +87,39 @@ final class AddCategoryViewController: UIViewController {
         dismiss(animated: true)
     }
     
-    private func changeDoneButtonState() {
-        doneButton.isEnabled = true
-        doneButton.backgroundColor = .ypBlack
+    private func changeDoneButtonState(_ isEnabled: Bool) {
+        doneButton.isEnabled = isEnabled
+        doneButton.backgroundColor = isEnabled ? .ypBlack : .ypGray
     }
     
-    private func addSubviews() {
+    func addSubviews() {
         [titleLabel, textField, doneButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
         }
+    }
+    
+    func layoutSubviews() {
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 14),
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor,
+                                            constant: constants.titleTopInset),
             titleLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             titleLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            titleLabel.heightAnchor.constraint(equalToConstant: 50),
-            textField.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            textField.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            textField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
-            textField.heightAnchor.constraint(equalToConstant: 75),
-            doneButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            doneButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
-            doneButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -24),
-            doneButton.heightAnchor.constraint(equalToConstant: 60)
+            titleLabel.heightAnchor.constraint(equalToConstant: constants.titleHeigth),
+            textField.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,
+                                               constant: Constants.General.inset16),
+            textField.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor,
+                                                constant: -Constants.General.inset16),
+            textField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor,
+                                           constant: constants.verticalSpacing),
+            textField.heightAnchor.constraint(equalToConstant: Constants.General.itemHeight),
+            doneButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,
+                                                constant: constants.buttonHorizontalPadding),
+            doneButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor,
+                                                 constant: -constants.buttonHorizontalPadding),
+            doneButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,
+                                               constant: -constants.verticalSpacing),
+            doneButton.heightAnchor.constraint(equalToConstant: constants.buttonHeight)
             ])
     }
 }
@@ -116,19 +133,15 @@ extension AddCategoryViewController: UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        guard let text = textField.text,
-              text.count > 0 else {
-            return
-        }
+        guard let text = textField.text else { return }
         guard !categories.categoriesProvider.contains(where: { $0.title == text }) else {
-            let alertModel = AlertModel(message: "Категория с таким наименованием уже существует",
-                                        actionTitle: "Ok")
+            let alertModel = AlertModel(message: Constants.AlertModelConstants.messageAddCategory,
+                                        actionTitle: Constants.AlertModelConstants.actionTitleAddCategory)
             showAlert(with: alertModel)
             return
         }
         let newCategory = TrackerCategory(title: text, trackers: [])
         self.newCategory = newCategory
-        changeDoneButtonState()
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {

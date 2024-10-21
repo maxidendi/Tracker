@@ -7,10 +7,6 @@
 
 import UIKit
 
-protocol ScheduleViewControllerDelegate: AnyObject {
-    func didRecieveSchedule(_ schedule: Set<WeekDay>)
-}
-
 final class NewTrackerViewController: UIViewController {
     
     //MARK: - Init
@@ -27,6 +23,7 @@ final class NewTrackerViewController: UIViewController {
     //MARK: - Properties
     
     weak var delegate: NewCategoryViewControllerDelegate?
+    private let constants = Constants.NewTrackerViewControllerConstants.self
     private var newTracker: Tracker?
     private var trackerCategoryIndex: Int?
     private var newTrackerTitle: String?
@@ -37,21 +34,14 @@ final class NewTrackerViewController: UIViewController {
     private var categories = TrackerCategoryProvider.shared
     private let emojiCategory: EmojiGategory = EmojiAndColors.emojiCategory
     private let colorsCategory: ColorsGategory = EmojiAndColors.colorsCategory
-    private let geomParams = GeometricParams(
-        cellCount: 6,
-        leftInset: 0,
-        rightInset: 0,
-        topInset: 24,
-        bottomInset: 40,
-        cellSpacing: 0)
     private var warningLabelHeightConstraint: NSLayoutConstraint?
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = isHabit ? "Новая привычка" :
-                               "Новое нерегулярное событие"
+        label.text = isHabit ? constants.newHabitTitle :
+                               constants.newEventTitle
         label.textAlignment = .center
-        label.font = .systemFont(ofSize: 16, weight: .medium)
+        label.font = Constants.Typography.medium16
         return label
     } ()
     
@@ -71,24 +61,26 @@ final class NewTrackerViewController: UIViewController {
     
     private lazy var warningLabel: UILabel = {
         let label = UILabel()
-        label.text = "Ограничение 38 символов"
+        label.text = constants.warningText
         label.textAlignment = .center
-        label.font = .systemFont(ofSize: 17, weight: .regular)
+        label.font = Constants.Typography.regular17
         label.textColor = .ypRed
         return label
     } ()
     
     private lazy var textField: UITextField = {
         let textField = UITextField()
-        let view = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: 75))
+        let view = UIView(frame: CGRect(x: .zero, y: .zero,
+                                        width: Constants.General.inset16,
+                                        height: Constants.General.itemHeight))
         textField.delegate = self
         textField.clearButtonMode = .whileEditing
         textField.leftView = view
         textField.leftViewMode = .always
-        textField.placeholder = "Введите название трекера"
+        textField.placeholder = constants.placeholderText
         textField.backgroundColor = .ypLightGray.withAlphaComponent(0.3)
-        textField.font = .systemFont(ofSize: 17, weight: .regular)
-        textField.layer.cornerRadius = 16
+        textField.font = Constants.Typography.regular17
+        textField.layer.cornerRadius = Constants.General.radius16
         textField.layer.masksToBounds = true
         return textField
     } ()
@@ -98,11 +90,11 @@ final class NewTrackerViewController: UIViewController {
         tableView.isScrollEnabled = false
         tableView.separatorColor = .ypGray
         tableView.separatorInset = UIEdgeInsets(
-            top: 0,
-            left: 16,
-            bottom: 0,
-            right: 16)
-        tableView.layer.cornerRadius = 16
+            top: .zero,
+            left: Constants.General.inset16,
+            bottom: .zero,
+            right: Constants.General.inset16)
+        tableView.layer.cornerRadius = Constants.General.radius16
         tableView.layer.masksToBounds = true
         return tableView
     } ()
@@ -115,11 +107,11 @@ final class NewTrackerViewController: UIViewController {
     
     private lazy var cancelButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Отменить", for: .normal)
+        button.setTitle(constants.cancelButtonTitle, for: .normal)
         button.setTitleColor(.ypRed, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
+        button.titleLabel?.font = Constants.Typography.medium16
         button.titleLabel?.textAlignment = .center
-        button.layer.cornerRadius = 16
+        button.layer.cornerRadius = Constants.General.radius16
         button.layer.masksToBounds = true
         button.layer.borderWidth = 1
         button.layer.borderColor = UIColor.ypRed.cgColor
@@ -129,12 +121,12 @@ final class NewTrackerViewController: UIViewController {
     
     private lazy var createButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Создать", for: .normal)
+        button.setTitle(constants.createButtonTitle, for: .normal)
         button.setTitleColor(.ypWhite, for: .normal)
         button.backgroundColor = .ypGray
-        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
+        button.titleLabel?.font = Constants.Typography.medium16
         button.titleLabel?.textAlignment = .center
-        button.layer.cornerRadius = 16
+        button.layer.cornerRadius = Constants.General.radius16
         button.layer.masksToBounds = true
         button.addTarget(self, action: #selector(createButtonTapped), for: .touchUpInside)
         return button
@@ -144,7 +136,7 @@ final class NewTrackerViewController: UIViewController {
         let stack = UIStackView(arrangedSubviews: [cancelButton, createButton])
         stack.axis = .horizontal
         stack.distribution = .fillEqually
-        stack.spacing = 8
+        stack.spacing = constants.buttonsSpacing
         return stack
     } ()
     
@@ -153,6 +145,8 @@ final class NewTrackerViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
+        addSubviews()
+        layoutSubviews()
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(UITableViewCell.self,
@@ -164,9 +158,6 @@ final class NewTrackerViewController: UIViewController {
         collectionView.register(NewTrackerSupplementaryView.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                 withReuseIdentifier: NewTrackerSupplementaryView.identifier)
-
-        setupSubviews()
-        addLayout()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -194,32 +185,43 @@ final class NewTrackerViewController: UIViewController {
     
     private func isReadyToCreateTracker() {
         guard let title = newTrackerTitle,
+              !title.isEmpty,
               let emoji = newTrackerEmoji,
               let color = newTrackerColor,
-              let _ = trackerCategoryIndex else { return }
+              let _ = trackerCategoryIndex else {
+            changeCreateButtonState(false)
+            return
+        }
         if isHabit && !newTrackerSchedule.isEmpty {
             newTracker = Tracker(id: categories.lastId + 1,
                                  title: title,
                                  color: color,
                                  emoji: emoji,
                                  schedule: Array(newTrackerSchedule))
-            changeCreateButtonState()
+            changeCreateButtonState(true)
         } else if !isHabit {
             newTracker = Tracker(id: categories.lastId + 1,
                                  title: title,
                                  color: color,
                                  emoji: emoji,
                                  schedule: [])
-            changeCreateButtonState()
+            changeCreateButtonState(true)
         }
     }
     
-    private func changeCreateButtonState() {
-        createButton.isEnabled = true
-        createButton.backgroundColor = .ypBlack
+    private func changeCreateButtonState(_ isEnabled: Bool) {
+        createButton.isEnabled = isEnabled
+        createButton.backgroundColor = isEnabled ? .ypBlack : .ypGray
     }
+}
+
+//
+//MARK: - SetupSubviewsProtocol extension
+//
+
+extension NewTrackerViewController: SetupSubviewsProtocol {
     
-    private func setupSubviews() {
+    func addSubviews() {
         [titleLabel,scrollView].forEach{
             view.addSubview($0)
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -232,18 +234,15 @@ final class NewTrackerViewController: UIViewController {
         }
     }
     
-    private func addOrRemoveWarningLabel(_ isLimited: Bool) {
-        
-    }
-    
-    private func addLayout() {
+    func layoutSubviews() {
         warningLabelHeightConstraint = warningLabel.heightAnchor.constraint(equalToConstant: .zero)
         warningLabelHeightConstraint?.isActive = true
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 14),
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor,
+                                            constant: constants.titleTopInset),
             titleLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             titleLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            titleLabel.heightAnchor.constraint(equalToConstant: 50),
+            titleLabel.heightAnchor.constraint(equalToConstant: constants.titleHeigth),
             scrollView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
@@ -253,32 +252,47 @@ final class NewTrackerViewController: UIViewController {
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-            textField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            textField.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 24),
-            textField.heightAnchor.constraint(equalToConstant: 75),
-            warningLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            warningLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            textField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,
+                                               constant: Constants.General.inset16),
+            textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor,
+                                                constant: -Constants.General.inset16),
+            textField.topAnchor.constraint(equalTo: contentView.topAnchor,
+                                           constant: constants.geometricParams.topInset),
+            textField.heightAnchor.constraint(equalToConstant: Constants.General.itemHeight),
+            warningLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,
+                                                  constant: Constants.General.inset16),
+            warningLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor,
+                                                   constant: -Constants.General.inset16),
             warningLabel.topAnchor.constraint(equalTo: textField.bottomAnchor),
-            tableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            tableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            tableView.topAnchor.constraint(equalTo: warningLabel.bottomAnchor, constant: 24),
-            tableView.heightAnchor.constraint(equalToConstant: isHabit ? 149 : 74),
-            collectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            collectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            collectionView.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 32),
+            tableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,
+                                               constant: Constants.General.inset16),
+            tableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor,
+                                                constant: -Constants.General.inset16),
+            tableView.topAnchor.constraint(equalTo: warningLabel.bottomAnchor,
+                                           constant: constants.geometricParams.topInset),
+            tableView.heightAnchor.constraint(equalToConstant: isHabit ? Constants.General.itemHeight * 2 - 1 :
+                                                                         Constants.General.itemHeight - 1),
+            collectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,
+                                                    constant: Constants.General.inset16),
+            collectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor,
+                                                     constant: -Constants.General.inset16),
+            collectionView.topAnchor.constraint(equalTo: tableView.bottomAnchor,
+                                                constant: constants.collectionViewTopInset),
             collectionView.heightAnchor.constraint(greaterThanOrEqualToConstant: 500),
             collectionView.bottomAnchor.constraint(equalTo: buttonsStackView.topAnchor),
-            buttonsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            buttonsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            buttonsStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -24),
-            buttonsStackView.heightAnchor.constraint(equalToConstant: 60)
+            buttonsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,
+                                                      constant: constants.buttonsStackHorizontalPadding),
+            buttonsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor,
+                                                       constant: -constants.buttonsStackHorizontalPadding),
+            buttonsStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor,
+                                                     constant: -constants.buttonsStackVerticalPadding),
+            buttonsStackView.heightAnchor.constraint(equalToConstant: constants.buttonHeight)
         ])
     }
 }
 
 //
-//MARK: - Extensions for UICollectionView
+//MARK: - UICollectionView extensions
 //
 
 extension NewTrackerViewController: UICollectionViewDataSource {
@@ -291,7 +305,7 @@ extension NewTrackerViewController: UICollectionViewDataSource {
         switch section {
         case 0: return emojiCategory.emoji.count
         case 1: return colorsCategory.colors.count
-        default: return 0
+        default: return .zero
         }
     }
     
@@ -366,19 +380,19 @@ extension NewTrackerViewController: UICollectionViewDataSource {
 extension NewTrackerViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let cellWidth = collectionView.bounds.width / CGFloat(geomParams.cellCount)
+        let cellWidth = collectionView.bounds.width / CGFloat(constants.geometricParams.cellCount)
         return CGSize(width: cellWidth, height: cellWidth)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        UIEdgeInsets(top: geomParams.topInset,
-                     left: geomParams.leftInset,
-                     bottom: geomParams.bottomInset,
-                     right: geomParams.rightInset)
+        UIEdgeInsets(top: constants.geometricParams.topInset,
+                     left: constants.geometricParams.leftInset,
+                     bottom: constants.geometricParams.bottomInset,
+                     right: constants.geometricParams.rightInset)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return geomParams.cellSpacing
+        return constants.geometricParams.cellSpacing
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
@@ -389,7 +403,8 @@ extension NewTrackerViewController: UICollectionViewDelegateFlowLayout {
         let indexPath = IndexPath(row: 0, section: section)
         let headerView: UICollectionReusableView
         if #available(iOS 18.0, *) {
-            return CGSize(width: collectionView.bounds.width - 56, height: 18)
+            return CGSize(width: collectionView.bounds.width - Constants.General.supplementaryViewHorizontalPadding * 2,
+                          height: Constants.General.labelTextHeight)
         } else {
             headerView = self.collectionView(collectionView,
                                                  viewForSupplementaryElementOfKind: UICollectionView.elementKindSectionHeader,
@@ -404,7 +419,7 @@ extension NewTrackerViewController: UICollectionViewDelegateFlowLayout {
 }
 
 //
-//MARK: - Extensions for UITableView
+//MARK: - UITableView extensions
 //
 
 extension NewTrackerViewController: UITableViewDataSource {
@@ -420,17 +435,17 @@ extension NewTrackerViewController: UITableViewDataSource {
         cell.backgroundColor = .ypLightGray.withAlphaComponent(0.3)
         cell.accessoryType = .disclosureIndicator
         cell.detailTextLabel?.textColor = .ypGray
-        cell.detailTextLabel?.font = .systemFont(ofSize: 17, weight: .regular)
+        cell.detailTextLabel?.font = Constants.Typography.regular17
         switch indexPath.row {
             case 0:
-                cell.textLabel?.text = "Категория"
+                cell.textLabel?.text = constants.categoryTitle
                 if let trackerCategoryIndex = trackerCategoryIndex {
                     cell.detailTextLabel?.text = categories.categoriesProvider[trackerCategoryIndex].title
                 }
             case 1:
-                cell.textLabel?.text = "Расписание"
-                cell.detailTextLabel?.text = newTrackerSchedule.count == 7 ?
-                                            "Каждый день" :
+                cell.textLabel?.text = constants.scheduleTitle
+            cell.detailTextLabel?.text = newTrackerSchedule.count == WeekDay.allCases.count ?
+                                            constants.scheduleEverydayTitle :
                                             newTrackerSchedule.compactMap{ $0.short }.joined(separator: ", ")
             default: break
         }
@@ -438,7 +453,7 @@ extension NewTrackerViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        75
+        Constants.General.itemHeight
     }
 }
 
@@ -464,7 +479,7 @@ extension NewTrackerViewController: UITableViewDelegate {
 }
 
 //
-//MARK: - Extension for ScheduleViewControllerDelegate
+//MARK: - UITextField extension
 //
 
 extension NewTrackerViewController: UITextFieldDelegate {
@@ -474,18 +489,17 @@ extension NewTrackerViewController: UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        guard let text = textField.text,
-              text.count > 0 else {
-            return
-        }
-        newTrackerTitle = text
+        newTrackerTitle = textField.text
         isReadyToCreateTracker()
     }
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let text = textField.text ?? ""
-        let isLimited = text.count + string.count <= 38
-        warningLabelHeightConstraint?.constant = isLimited ? 0 : 38
+        let isLimited = text.count + string.count <= constants.textFieldCharacterLimit
+        warningLabelHeightConstraint?.constant = isLimited ? .zero : constants.warningLabelHeight
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+            self.warningLabelHeightConstraint?.constant = .zero
+        }
         return isLimited
     }
     
@@ -496,7 +510,7 @@ extension NewTrackerViewController: UITextFieldDelegate {
 }
 
 //
-//MARK: - Extension for ScheduleViewControllerDelegate
+//MARK: - Delegate extensions
 //
 
 extension NewTrackerViewController: ScheduleViewControllerDelegate {

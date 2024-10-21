@@ -7,10 +7,6 @@
 
 import UIKit
 
-protocol CategoryViewControllerDelegate: AnyObject {
-    func didRecieveCategory(_ categoryIndex: Int)
-}
-
 final class CategoryViewController: UIViewController {
     
     //MARK: - Init
@@ -28,12 +24,13 @@ final class CategoryViewController: UIViewController {
     
     weak var delegate: CategoryViewControllerDelegate?
     var category: String?
+    private let constants = Constants.CategoryViewControllerConstants.self
     private var categories = TrackerCategoryProvider.shared
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Категория"
+        label.text = constants.title
         label.textAlignment = .center
-        label.font = .systemFont(ofSize: 16, weight: .medium)
+        label.font = Constants.Typography.medium16
         return label
     } ()
     
@@ -44,8 +41,8 @@ final class CategoryViewController: UIViewController {
     
     private lazy var labelStub: UILabel = {
         let label = UILabel()
-        label.text = "Привычки и события можно \nобъединить по смыслу"
-        label.font = .systemFont(ofSize: 12, weight: .medium)
+        label.text = constants.labelStubText
+        label.font = Constants.Typography.medium12
         label.numberOfLines = 2
         label.textAlignment = .center
         return label
@@ -65,11 +62,11 @@ final class CategoryViewController: UIViewController {
     
     private lazy var addCategoryButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Добавить категорию", for: .normal)
+        button.setTitle(constants.addCategoryButtonTitle, for: .normal)
         button.setTitleColor(.ypWhite, for: .normal)
         button.backgroundColor = .ypBlack
-        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
-        button.layer.cornerRadius = 16
+        button.titleLabel?.font = Constants.Typography.medium16
+        button.layer.cornerRadius = Constants.General.radius16
         button.layer.masksToBounds = true
         button.addTarget(self, action: #selector(addCategoryButtonTapped), for: .touchUpInside)
         return button
@@ -82,6 +79,7 @@ final class CategoryViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
         addSubviews()
+        layoutSubviews()
         showStubsOrTrackers()
     }
     
@@ -95,44 +93,57 @@ final class CategoryViewController: UIViewController {
     
     private func showStubsOrTrackers() {
         tableView.reloadData()
-        if categories.categoriesProvider.isEmpty {
-            labelStub.isHidden = false
-            imageStubView.isHidden = false
-        } else {
-            labelStub.isHidden = true
-            imageStubView.isHidden = true
-        }
-    }
-    
-    private func addSubviews() {
-        [titleLabel, tableView, addCategoryButton, imageStubView, labelStub].forEach {
-            $0.translatesAutoresizingMaskIntoConstraints = false
-            view.addSubview($0)
-        }
-        NSLayoutConstraint.activate([
-            imageStubView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-            imageStubView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
-            labelStub.heightAnchor.constraint(equalToConstant: 36),
-            labelStub.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            labelStub.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            labelStub.topAnchor.constraint(equalTo: imageStubView.bottomAnchor, constant: 8),
-            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 14),
-            titleLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            titleLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            titleLabel.heightAnchor.constraint(equalToConstant: 50),
-            tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            tableView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
-            tableView.bottomAnchor.constraint(equalTo: addCategoryButton.topAnchor, constant: -24),
-            addCategoryButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            addCategoryButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
-            addCategoryButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -24),
-            addCategoryButton.heightAnchor.constraint(equalToConstant: 60)
-        ])
+        let isEmpty = categories.categoriesProvider.isEmpty
+        labelStub.isHidden = !isEmpty
+        imageStubView.isHidden = !isEmpty
     }
 }
 
 //MARK: - Extensions
+
+extension CategoryViewController: SetupSubviewsProtocol {
+    
+    func addSubviews() {
+        [titleLabel, tableView, addCategoryButton, imageStubView, labelStub].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview($0)
+        }
+    }
+    
+    func layoutSubviews() {
+        NSLayoutConstraint.activate([
+            imageStubView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            imageStubView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
+            labelStub.heightAnchor.constraint(equalToConstant: Constants.General.labelTextHeight * 2),
+            labelStub.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,
+                                               constant: Constants.General.inset16),
+            labelStub.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor,
+                                                constant: -Constants.General.inset16),
+            labelStub.topAnchor.constraint(equalTo: imageStubView.bottomAnchor,
+                                           constant: Constants.General.stubsSpacing),
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor,
+                                            constant: constants.titleTopInset),
+            titleLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            titleLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            titleLabel.heightAnchor.constraint(equalToConstant: constants.titleHeigth),
+            tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,
+                                               constant: Constants.General.inset16),
+            tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor,
+                                                constant: -Constants.General.inset16),
+            tableView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor,
+                                           constant: constants.verticalSpacing),
+            tableView.bottomAnchor.constraint(equalTo: addCategoryButton.topAnchor,
+                                              constant: -constants.verticalSpacing),
+            addCategoryButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,
+                                                       constant: constants.buttonHorizontalPadding),
+            addCategoryButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor,
+                                                        constant: -constants.buttonHorizontalPadding),
+            addCategoryButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,
+                                                      constant: -constants.verticalSpacing),
+            addCategoryButton.heightAnchor.constraint(equalToConstant: constants.buttonHeight)
+        ])
+    }
+}
 
 extension CategoryViewController: UITableViewDataSource {
     
@@ -142,30 +153,30 @@ extension CategoryViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        cell.layer.cornerRadius = 0
-        cell.separatorInset = .zero
+        cell.layer.cornerRadius = .zero
         cell.selectionStyle = .none
         cell.backgroundColor = .ypLightGray.withAlphaComponent(0.3)
         cell.textLabel?.text = categories.categoriesProvider[indexPath.row].title
         cell.accessoryType = cell.textLabel?.text == category ? .checkmark : .none
         if categories.categoriesProvider.count == 1 {
-            cell.layer.cornerRadius = 16
-        } else if indexPath.row == 0 {
-            cell.layer.cornerRadius = 16
+            cell.layer.cornerRadius = Constants.General.radius16
+            cell.separatorInset = .init(top: .zero, left: .zero, bottom: .zero, right: tableView.bounds.width)
+        } else if indexPath.row == .zero {
+            cell.layer.cornerRadius = Constants.General.radius16
             cell.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-            cell.separatorInset = .init(top: 0, left: 16, bottom: 0, right: 16)
+            cell.separatorInset = Constants.General.separatorInsets
         } else if indexPath.row == categories.categoriesProvider.count - 1 {
-            cell.layer.cornerRadius = 16
+            cell.layer.cornerRadius = Constants.General.radius16
             cell.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
-            cell.separatorInset = .init(top: 0, left: 0, bottom: 0, right: tableView.bounds.width)
+            cell.separatorInset = .init(top: .zero, left: .zero, bottom: .zero, right: tableView.bounds.width)
         } else {
-            cell.separatorInset = .init(top: 0, left: 16, bottom: 0, right: 16)
+            cell.separatorInset = Constants.General.separatorInsets
         }
         return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 75
+        return Constants.General.itemHeight
     }
 }
 
@@ -173,7 +184,7 @@ extension CategoryViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         for item in 0..<categories.categoriesProvider.count {
-            let cell = tableView.cellForRow(at: IndexPath(row: item, section: 0))
+            let cell = tableView.cellForRow(at: IndexPath(row: item, section: .zero))
             cell?.accessoryType = .none
         }
         let cell = tableView.cellForRow(at: indexPath)
@@ -187,6 +198,6 @@ extension CategoryViewController: AddCategoryDelegate {
     
     func addCategory(_ category: TrackerCategory) {
         categories.categoriesProvider.append(category)
-        tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
+        showStubsOrTrackers()
     }
 }
