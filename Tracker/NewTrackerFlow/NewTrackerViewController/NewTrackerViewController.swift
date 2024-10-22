@@ -193,15 +193,13 @@ final class NewTrackerViewController: UIViewController {
             return
         }
         if isHabit && !newTrackerSchedule.isEmpty {
-            newTracker = Tracker(id: categories.lastId + 1,
-                                 title: title,
+            newTracker = Tracker(title: title,
                                  color: color,
                                  emoji: emoji,
                                  schedule: Array(newTrackerSchedule))
             changeCreateButtonState(true)
         } else if !isHabit {
-            newTracker = Tracker(id: categories.lastId + 1,
-                                 title: title,
+            newTracker = Tracker(title: title,
                                  color: color,
                                  emoji: emoji,
                                  schedule: [])

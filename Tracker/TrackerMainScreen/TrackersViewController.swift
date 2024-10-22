@@ -277,7 +277,7 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 
 extension TrackersViewController: TrackerCellDelegate {
     
-    func counterButtonTapped(with id: UInt, isCompleted: Bool, completion: @escaping () -> Void) {
+    func counterButtonTapped(with id: UUID, isCompleted: Bool, completion: @escaping () -> Void) {
         let trackerRecord = TrackerRecord(id: id, date: currentDate)
         if isCompleted {
             guard let numberOfDays = calendar.numberOfDaysBetween(currentDate),
