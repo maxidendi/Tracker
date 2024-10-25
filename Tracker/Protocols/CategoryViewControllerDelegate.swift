@@ -8,5 +8,5 @@
 import Foundation
 
 protocol CategoryViewControllerDelegate: AnyObject {
-    func didRecieveCategory(_ categoryIndex: Int)
+    func didRecieveCategory(_ category: String)
 }

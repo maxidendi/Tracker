@@ -26,12 +26,34 @@ final class TrackerRecordStore: NSObject {
     
     //MARK: - Properties
     
+    static let shared = TrackerRecordStore()
     let context: NSManagedObjectContext
+    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCategoryCoreData> = {
+        let fetchedRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+        let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
+        fetchedRequest.sortDescriptors = [sortDescriptor]
+        let fetchedResultsController = NSFetchedResultsController(
+            fetchRequest: fetchedRequest,
+            managedObjectContext: context,
+            sectionNameKeyPath: nil,
+            cacheName: nil)
+        return fetchedResultsController
+    } ()
     
     //MARK: - Methods
     
+    func saveContext() {
+        if context.hasChanges {
+            do {
+                try context.save()
+            } catch {
+                let nserror = error as NSError
+                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+            }
+        }
+    }
+    
     func addNewTrackerRecord(_ tracker: TrackerRecord) {
-        let trackerEntity = TrackerRecordCoreData(context: context)
         
     }
 }

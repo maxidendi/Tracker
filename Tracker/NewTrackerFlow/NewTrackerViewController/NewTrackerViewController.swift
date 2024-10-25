@@ -25,13 +25,13 @@ final class NewTrackerViewController: UIViewController {
     weak var delegate: NewCategoryViewControllerDelegate?
     private let constants = Constants.NewTrackerViewControllerConstants.self
     private var newTracker: Tracker?
-    private var trackerCategoryIndex: Int?
+    private var trackerCategory: String?
     private var newTrackerTitle: String?
     private var newTrackerColor: UIColor?
     private var newTrackerEmoji: String?
     private var newTrackerSchedule: Set<WeekDay> = []
     private let isHabit: Bool
-    private var categories = TrackerCategoryProvider.shared
+    private let trackerCategoriesStore = TrackerCategoryStore.shared
     private let emojiCategory: EmojiGategory = EmojiAndColors.emojiCategory
     private let colorsCategory: ColorsGategory = EmojiAndColors.colorsCategory
     private var warningLabelHeightConstraint: NSLayoutConstraint?
@@ -173,13 +173,14 @@ final class NewTrackerViewController: UIViewController {
     }
     
     @objc func createButtonTapped() {
-        guard let newTracker, let trackerCategoryIndex else { return }
-        let changedCategory = categories.categoriesProvider[trackerCategoryIndex]
-        var changedTrackers = changedCategory.trackers
-        changedTrackers.append(newTracker)
-        let newCategory = TrackerCategory(title: changedCategory.title,
-                                          trackers: changedTrackers)
-        categories.categoriesProvider[trackerCategoryIndex] = newCategory
+        guard let newTracker, let trackerCategory else { return }
+//        let changedCategory = categories.categoriesProvider[trackerCategoryIndex]
+//        var changedTrackers = changedCategory.trackers
+//        changedTrackers.append(newTracker)
+//        let newCategory = TrackerCategory(title: changedCategory.title,
+//                                          trackers: changedTrackers)
+//        categories.categoriesProvider[trackerCategoryIndex] = newCategory
+        trackerCategoriesStore.addTrackerCoreData(newTracker, to: trackerCategory)
         delegate?.dismissNewTrackerFlow()
     }
     
@@ -188,18 +189,20 @@ final class NewTrackerViewController: UIViewController {
               !title.isEmpty,
               let emoji = newTrackerEmoji,
               let color = newTrackerColor,
-              let _ = trackerCategoryIndex else {
+              let _ = trackerCategory else {
             changeCreateButtonState(false)
             return
         }
         if isHabit && !newTrackerSchedule.isEmpty {
-            newTracker = Tracker(title: title,
+            newTracker = Tracker(id: UUID(),
+                                 title: title,
                                  color: color,
                                  emoji: emoji,
                                  schedule: Array(newTrackerSchedule))
             changeCreateButtonState(true)
         } else if !isHabit {
-            newTracker = Tracker(title: title,
+            newTracker = Tracker(id: UUID(),
+                                 title: title,
                                  color: color,
                                  emoji: emoji,
                                  schedule: [])
@@ -437,8 +440,8 @@ extension NewTrackerViewController: UITableViewDataSource {
         switch indexPath.row {
             case 0:
                 cell.textLabel?.text = constants.categoryTitle
-                if let trackerCategoryIndex = trackerCategoryIndex {
-                    cell.detailTextLabel?.text = categories.categoriesProvider[trackerCategoryIndex].title
+                if let trackerCategory {
+                    cell.detailTextLabel?.text = trackerCategory
                 }
             case 1:
                 cell.textLabel?.text = constants.scheduleTitle
@@ -461,8 +464,8 @@ extension NewTrackerViewController: UITableViewDelegate {
         switch indexPath.row {
         case 0:
             let categoryVC = CategoryViewController(delegate: self)
-            if let trackerCategoryIndex = trackerCategoryIndex {
-                categoryVC.category = categories.categoriesProvider[trackerCategoryIndex].title
+            if let trackerCategory {
+                categoryVC.category = trackerCategory
             }
             categoryVC.modalPresentationStyle = .popover
             present(categoryVC, animated: true)
@@ -522,8 +525,8 @@ extension NewTrackerViewController: ScheduleViewControllerDelegate {
 
 extension NewTrackerViewController: CategoryViewControllerDelegate {
     
-    func didRecieveCategory(_ categoryIndex: Int) {
-        trackerCategoryIndex = categoryIndex
+    func didRecieveCategory(_ category: String) {
+        trackerCategory = category
         tableView.reloadData()
         isReadyToCreateTracker()
     }

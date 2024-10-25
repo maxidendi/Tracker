@@ -12,16 +12,23 @@ final class TrackersViewController: UIViewController {
     //MARK: - Properties
     
     private var visibleCategories: [TrackerCategory] = []
-    private var categories = TrackerCategoryProvider.shared
+    private var categories: [TrackerCategory] = []
     private var completedTrackers: Set<TrackerRecord> = []
     private var currentDate = Date()
     private let calendar = Calendar.current
     private let constants = Constants.TrackersViewControllerConstants.self
-    
+    private let trackerCategoriesStore = TrackerCategoryStore.shared
     private lazy var collectionView: UICollectionView = {
-        let collection = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+        let collection = UICollectionView(frame: .zero,
+                                          collectionViewLayout: UICollectionViewFlowLayout())
         collection.backgroundColor = .clear
-        collection.translatesAutoresizingMaskIntoConstraints = false
+        collection.delegate = self
+        collection.dataSource = self
+        collection.register(TrackerCell.self,
+                            forCellWithReuseIdentifier: TrackerCell.reuseIdentifier)
+        collection.register(TrackersSupplementaryView.self,
+                            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                            withReuseIdentifier: TrackersSupplementaryView.identifier)
         return collection
     } ()
     
@@ -46,7 +53,6 @@ final class TrackersViewController: UIViewController {
     
     private lazy var imageStubView: UIImageView = {
         let imageView = UIImageView(image: .trackersImageStub)
-        imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     } ()
     
@@ -55,7 +61,6 @@ final class TrackersViewController: UIViewController {
         label.text = constants.labelStubText
         label.font = Constants.Typography.medium12
         label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     } ()
     
@@ -70,15 +75,11 @@ final class TrackersViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
+        categories = trackerCategoriesStore.categories
+        print(categories)
         addSubviews()
         layoutSubviews()
         setupNavigationBar()
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.register(TrackerCell.self, forCellWithReuseIdentifier: TrackerCell.reuseIdentifier)
-        collectionView.register(TrackersSupplementaryView.self,
-                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-                                withReuseIdentifier: TrackersSupplementaryView.identifier)
         datePickerValueChanged(datePicker)
     }
     
@@ -110,7 +111,7 @@ final class TrackersViewController: UIViewController {
         currentDate = calendar.onlyDate(from: sender.date)
         let weekDay = calendar.component(.weekday, from: currentDate)
         var visibleCategories: [TrackerCategory] = []
-        categories.categoriesProvider.forEach { category in
+        categories.forEach { category in
             var trackers: [Tracker] = []
             category.trackers.forEach { tracker in
                 guard tracker.schedule.isEmpty,
@@ -213,16 +214,17 @@ extension TrackersViewController: UICollectionViewDataSource {
         else {
             return UICollectionViewCell()
         }
+        cell.delegate = self
+        let tracker = visibleCategories[section].trackers[indexPath.row]
         let isCompleted = completedTrackers.contains(where: {
-            $0.id == visibleCategories[section].trackers[indexPath.row].id &&
+            $0.id == tracker.id &&
             calendar.numberOfDaysBetween($0.date, and: currentDate) == 0
         })
-        let counter = completedTrackers.filter({$0.id == visibleCategories[section].trackers[indexPath.row].id}).count
-        cell.delegate = self
-        cell.configureCell(id: visibleCategories[section].trackers[indexPath.row].id,
-                           title: visibleCategories[section].trackers[indexPath.row].title,
-                           emoji: visibleCategories[section].trackers[indexPath.row].emoji,
-                           color: visibleCategories[section].trackers[indexPath.row].color,
+        let counter = completedTrackers.filter({$0.id == tracker.id}).count
+        cell.configureCell(id: tracker.id,
+                           title: tracker.title,
+                           emoji: tracker.emoji,
+                           color: tracker.color,
                            counter: counter,
                            isCompleted: isCompleted)
         return cell

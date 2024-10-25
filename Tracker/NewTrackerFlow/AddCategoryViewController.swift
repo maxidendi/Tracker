@@ -25,8 +25,9 @@ final class AddCategoryViewController: UIViewController, SetupSubviewsProtocol {
     weak var delegate: AddCategoryDelegate?
     private let constants = Constants.AddCategoryViewControllerConstants.self
     private var textFieldObserver: NSKeyValueObservation?
-    private var categories = TrackerCategoryProvider.shared
+    private var categories: [TrackerCategory] = []
     private var newCategory: TrackerCategory?
+    private let trackerCategoriesStore = TrackerCategoryStore.shared
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = constants.title
@@ -69,6 +70,7 @@ final class AddCategoryViewController: UIViewController, SetupSubviewsProtocol {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
+        categories = trackerCategoriesStore.categories
         addSubviews()
         layoutSubviews()
         textFieldObserver = textField.observe(\.text,
@@ -83,6 +85,7 @@ final class AddCategoryViewController: UIViewController, SetupSubviewsProtocol {
     
     @objc private func doneButtonuttonTapped() {
         guard let newCategory else { return }
+        trackerCategoriesStore.addCategoryCoreData(newCategory)
         delegate?.addCategory(newCategory)
         dismiss(animated: true)
     }
@@ -134,7 +137,7 @@ extension AddCategoryViewController: UITextFieldDelegate {
     
     func textFieldDidEndEditing(_ textField: UITextField) {
         guard let text = textField.text else { return }
-        guard !categories.categoriesProvider.contains(where: { $0.title == text }) else {
+        guard !categories.contains(where: { $0.title == text }) else {
             let alertModel = AlertModel(message: Constants.AlertModelConstants.messageAddCategory,
                                         actionTitle: Constants.AlertModelConstants.actionTitleAddCategory)
             showAlert(with: alertModel)

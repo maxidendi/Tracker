@@ -15,6 +15,7 @@
 		3F05FB922CC801310020C050 /* TrackerStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F05FB912CC801310020C050 /* TrackerStore.swift */; };
 		3F05FB942CC8014A0020C050 /* TrackerCategoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F05FB932CC8014A0020C050 /* TrackerCategoryStore.swift */; };
 		3F05FB962CC8015A0020C050 /* TrackerRecordStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F05FB952CC8015A0020C050 /* TrackerRecordStore.swift */; };
+		3F05FB982CCB7BEC0020C050 /* UIColorValueTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F05FB972CCB7BEC0020C050 /* UIColorValueTransformer.swift */; };
 		3F2438EB2CBE2D2C00CB0B4F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3F2438E42CBE2D2C00CB0B4F /* Assets.xcassets */; };
 		3F2438ED2CBE2D2C00CB0B4F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3F2438E82CBE2D2C00CB0B4F /* LaunchScreen.storyboard */; };
 		3F2438EE2CBE2D2C00CB0B4F /* Calendar+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F2438B12CBE2D2C00CB0B4F /* Calendar+Extension.swift */; };
@@ -62,6 +63,7 @@
 		3F05FB912CC801310020C050 /* TrackerStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerStore.swift; sourceTree = "<group>"; };
 		3F05FB932CC8014A0020C050 /* TrackerCategoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCategoryStore.swift; sourceTree = "<group>"; };
 		3F05FB952CC8015A0020C050 /* TrackerRecordStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRecordStore.swift; sourceTree = "<group>"; };
+		3F05FB972CCB7BEC0020C050 /* UIColorValueTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorValueTransformer.swift; sourceTree = "<group>"; };
 		3F2438B12CBE2D2C00CB0B4F /* Calendar+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Calendar+Extension.swift"; sourceTree = "<group>"; };
 		3F2438B32CBE2D2C00CB0B4F /* Int+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+Extension.swift"; sourceTree = "<group>"; };
 		3F2438B52CBE2D2C00CB0B4F /* TextField+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TextField+Extension.swift"; sourceTree = "<group>"; };
@@ -118,6 +120,7 @@
 			children = (
 				3F05FB902CC801140020C050 /* Stores */,
 				3F05FB6A2CC7C6FA0020C050 /* WeekDaysValueTransformer.swift */,
+				3F05FB972CCB7BEC0020C050 /* UIColorValueTransformer.swift */,
 				3F05FB662CC7C6660020C050 /* Trackers.xcdatamodeld */,
 			);
 			path = CoreData;
@@ -148,8 +151,8 @@
 		3F2438CA2CBE2D2C00CB0B4F /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				3F2438B92CBE2D2C00CB0B4F /* ColorsGategory.swift */,
 				3F2438BB2CBE2D2C00CB0B4F /* EmojiAndColors.swift */,
+				3F2438B92CBE2D2C00CB0B4F /* ColorsGategory.swift */,
 				3F2438BD2CBE2D2C00CB0B4F /* EmojiGategory.swift */,
 				3F2438BF2CBE2D2C00CB0B4F /* GeometricParams.swift */,
 				3F2438C22CBE2D2C00CB0B4F /* Tracker.swift */,
@@ -350,6 +353,7 @@
 				3F05FB682CC7C6660020C050 /* Trackers.xcdatamodeld in Sources */,
 				3F2439132CBE2D2C00CB0B4F /* ScheduleViewController.swift in Sources */,
 				3F2439142CBE2D2C00CB0B4F /* StatisticViewController.swift in Sources */,
+				3F05FB982CCB7BEC0020C050 /* UIColorValueTransformer.swift in Sources */,
 				3F2439152CBE2D2C00CB0B4F /* TrackerCell.swift in Sources */,
 				3F2439172CBE2D2C00CB0B4F /* TrackersSupplementaryView.swift in Sources */,
 				3F2439192CBE2D2C00CB0B4F /* TrackersViewController.swift in Sources */,
