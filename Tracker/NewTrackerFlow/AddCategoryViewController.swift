@@ -73,6 +73,7 @@ final class AddCategoryViewController: UIViewController, SetupSubviewsProtocol {
         categories = trackerCategoriesStore.categories
         addSubviews()
         layoutSubviews()
+        setupToHideKeyboard()
         textFieldObserver = textField.observe(\.text,
                                               options: [.new],
                                               changeHandler: { [weak self] _, text  in

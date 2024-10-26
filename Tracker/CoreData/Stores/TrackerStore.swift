@@ -12,7 +12,7 @@ final class TrackerStore: NSObject {
     
     //MARK: - Init
     
-     private init(context: NSManagedObjectContext) {
+    private init(context: NSManagedObjectContext) {
         self.context = context
     }
     
@@ -28,33 +28,8 @@ final class TrackerStore: NSObject {
     
     static let shared = TrackerStore()
     private let context: NSManagedObjectContext
-    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCoreData> = {
-        let fetchRequest = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
-        fetchRequest.sortDescriptors = [NSSortDescriptor(
-            keyPath: \TrackerCoreData.category?.title,
-            ascending: true)]
-        let controller = NSFetchedResultsController(
-            fetchRequest: fetchRequest,
-            managedObjectContext: context,
-            sectionNameKeyPath: nil,
-            cacheName: nil)
-        controller.delegate = self
-        try? controller.performFetch()
-        return controller
-    } ()
     
     //MARK: - Methods
-    
-    func saveContext() {
-        if context.hasChanges {
-            do {
-                try context.save()
-            } catch {
-                let nserror = error as NSError
-                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-            }
-        }
-    }
     
     func getTracker(from trackerCoreData: TrackerCoreData) -> Tracker? {
         guard let id = trackerCoreData.id,
@@ -80,8 +55,11 @@ final class TrackerStore: NSObject {
         trackerCoreData.schedule = tracker.schedule as NSObject
         return trackerCoreData
     }
-}
-
-extension TrackerStore: NSFetchedResultsControllerDelegate {
     
+    func getTrackerFromId(_ id: UUID) -> TrackerCoreData? {
+        let request = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
+        request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        let tracker = try? context.fetch(request).first
+        return tracker
+    }
 }

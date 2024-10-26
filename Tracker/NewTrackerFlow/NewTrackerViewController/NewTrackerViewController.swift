@@ -147,6 +147,7 @@ final class NewTrackerViewController: UIViewController {
         view.backgroundColor = .ypWhite
         addSubviews()
         layoutSubviews()
+        setupToHideKeyboard()
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(UITableViewCell.self,
@@ -174,12 +175,6 @@ final class NewTrackerViewController: UIViewController {
     
     @objc func createButtonTapped() {
         guard let newTracker, let trackerCategory else { return }
-//        let changedCategory = categories.categoriesProvider[trackerCategoryIndex]
-//        var changedTrackers = changedCategory.trackers
-//        changedTrackers.append(newTracker)
-//        let newCategory = TrackerCategory(title: changedCategory.title,
-//                                          trackers: changedTrackers)
-//        categories.categoriesProvider[trackerCategoryIndex] = newCategory
         trackerCategoriesStore.addTrackerCoreData(newTracker, to: trackerCategory)
         delegate?.dismissNewTrackerFlow()
     }

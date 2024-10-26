@@ -8,6 +8,5 @@
 import Foundation
 
 protocol NewCategoryViewControllerDelegate: AnyObject {
-    
     func dismissNewTrackerFlow()
 }

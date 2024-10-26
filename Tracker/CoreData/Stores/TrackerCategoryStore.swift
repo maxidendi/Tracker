@@ -27,11 +27,13 @@ final class TrackerCategoryStore: NSObject {
     //MARK: - Properties
     
     static let shared = TrackerCategoryStore()
+    weak var delegate: TrackerCategoryStoreDelegate?
     private let context: NSManagedObjectContext
     private let trackerStore = TrackerStore.shared
     private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCategoryCoreData> = {
         let fetchedRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
-        let sortDescriptor = NSSortDescriptor(keyPath: \TrackerCategoryCoreData.title, ascending: true)
+        let sortDescriptor = NSSortDescriptor(keyPath: \TrackerCategoryCoreData.title,
+                                              ascending: true)
         fetchedRequest.sortDescriptors = [sortDescriptor]
         let fetchedResultsController = NSFetchedResultsController(
             fetchRequest: fetchedRequest,
@@ -43,7 +45,7 @@ final class TrackerCategoryStore: NSObject {
             try fetchedResultsController.performFetch()
         } catch {
             let nserror = error as NSError
-            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+            assertionFailure("Unresolved error \(nserror), \(nserror.userInfo)")
         }
         return fetchedResultsController
     } ()
@@ -62,9 +64,17 @@ final class TrackerCategoryStore: NSObject {
                 try context.save()
             } catch {
                 let nserror = error as NSError
-                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+                assertionFailure("Unresolved error \(nserror), \(nserror.userInfo)")
             }
         }
+    }
+    
+    func getTrackerCategoryCoreData(from category: String) -> TrackerCategoryCoreData? {
+        let request = fetchedResultsController.fetchRequest
+        request.predicate = NSPredicate(format: "title == %@", category)
+        guard let categoryCoreData = try? context.fetch(request).first
+        else { return nil }
+        return categoryCoreData
     }
     
     func getTrackerCategory(from categoryCoreData: TrackerCategoryCoreData) -> TrackerCategory? {
@@ -76,14 +86,6 @@ final class TrackerCategoryStore: NSObject {
                                trackers: trackers)
     }
     
-    func getCategoryCoreData(from category: String) -> TrackerCategoryCoreData? {
-        let request = fetchedResultsController.fetchRequest
-        request.predicate = NSPredicate(format: "title == %@", category)
-        guard let categoryCoreData = try? context.fetch(request).first
-        else { return nil }
-        return categoryCoreData
-    }
-    
     func addCategoryCoreData(_ category: TrackerCategory) {
         let categoryCoreData = TrackerCategoryCoreData(context: context)
         categoryCoreData.title = category.title
@@ -93,7 +95,7 @@ final class TrackerCategoryStore: NSObject {
     
     func addTrackerCoreData(_ tracker: Tracker, to category: String) {
         let trackerCoreData = trackerStore.getTrackerCoreData(from: tracker)
-        guard let category = getCategoryCoreData(from: category),
+        guard let category = getTrackerCategoryCoreData(from: category),
               let trackers = category.trackers as? Set<TrackerCoreData>
         else {
             let newCategory = TrackerCategoryCoreData(context: context)
@@ -104,11 +106,12 @@ final class TrackerCategoryStore: NSObject {
         let newTrackers = trackers.union([trackerCoreData])
         category.trackers = newTrackers as NSSet
         saveContext()
-        print("tracker added")
     }
 }
 
 extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
     
-    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        delegate?.didUpdateCategories()
+    }
 }

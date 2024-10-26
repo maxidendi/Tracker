@@ -13,17 +13,4 @@ struct Tracker {
     let color: UIColor
     let emoji: String
     let schedule: [WeekDay]
-//
-//    init(id: UUID,
-//         title: String,
-//         color: UIColor,
-//         emoji: String,
-//         schedule: [WeekDay]
-//    ) {
-//        self.id = id
-//        self.title = title
-//        self.color = color
-//        self.emoji = emoji
-//        self.schedule = schedule
-//    }
 }

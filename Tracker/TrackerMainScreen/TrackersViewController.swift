@@ -18,6 +18,7 @@ final class TrackersViewController: UIViewController {
     private let calendar = Calendar.current
     private let constants = Constants.TrackersViewControllerConstants.self
     private let trackerCategoriesStore = TrackerCategoryStore.shared
+    private let trackerRecordStore = TrackerRecordStore.shared
     private lazy var collectionView: UICollectionView = {
         let collection = UICollectionView(frame: .zero,
                                           collectionViewLayout: UICollectionViewFlowLayout())
@@ -76,7 +77,10 @@ final class TrackersViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
         categories = trackerCategoriesStore.categories
-        print(categories)
+        trackerCategoriesStore.delegate = self
+        completedTrackers = trackerRecordStore.records
+        trackerRecordStore.delegate = self
+        setupToHideKeyboard()
         addSubviews()
         layoutSubviews()
         setupNavigationBar()
@@ -285,10 +289,10 @@ extension TrackersViewController: TrackerCellDelegate {
             guard let numberOfDays = calendar.numberOfDaysBetween(currentDate),
                   numberOfDays >= .zero
             else { return }
-            completedTrackers.insert(trackerRecord)
+            trackerRecordStore.addTrackerRecord(trackerRecord)
             completion()
         } else {
-            completedTrackers.remove(trackerRecord)
+            trackerRecordStore.removeTrackerRecord(trackerRecord)
             completion()
         }
     }
@@ -299,5 +303,20 @@ extension TrackersViewController: HabitOrEventViewControllerDelegate {
     func needToReloadCollectionView() {
         dismiss(animated: true)
         datePickerValueChanged(datePicker)
+    }
+}
+
+extension TrackersViewController: TrackerCategoryStoreDelegate {
+    
+    func didUpdateCategories() {
+        categories = trackerCategoriesStore.categories
+        collectionView.reloadData()
+    }
+}
+
+extension TrackersViewController: TrackerRecordStoreDelegate {
+    
+    func didUpdateRecords() {
+        completedTrackers = trackerRecordStore.records
     }
 }
