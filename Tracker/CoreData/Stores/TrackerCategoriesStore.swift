@@ -8,15 +8,22 @@
 import UIKit
 import CoreData
 
-final class TrackerCategoryStore: NSObject {
+protocol CategoryStoreProtocol: AnyObject {
+    var delegate: CategoriesStoreDelegate? { get set }
+    var categories: [TrackerCategory] { get }
+    func addCategoryCoreData(_ category: TrackerCategory)
+    func addTrackerCoreData(_ tracker: Tracker, to category: String)
+}
+
+final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
     
     //MARK: - Init
     
-    private init(context: NSManagedObjectContext) {
+    init(context: NSManagedObjectContext) {
         self.context = context
     }
     
-    private convenience override init() {
+    convenience override init() {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate
         else {
             fatalError("AppDelegate not found")
@@ -26,8 +33,7 @@ final class TrackerCategoryStore: NSObject {
     
     //MARK: - Properties
     
-    static let shared = TrackerCategoryStore()
-    weak var delegate: TrackerCategoryStoreDelegate?
+    weak var delegate: CategoriesStoreDelegate?
     private let context: NSManagedObjectContext
     private let trackerStore = TrackerStore.shared
     private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCategoryCoreData> = {
@@ -58,7 +64,7 @@ final class TrackerCategoryStore: NSObject {
     
     //MARK: - Methods
     
-    func saveContext() {
+    private func saveContext() {
         if context.hasChanges {
             do {
                 try context.save()
@@ -69,7 +75,7 @@ final class TrackerCategoryStore: NSObject {
         }
     }
     
-    func getTrackerCategoryCoreData(from category: String) -> TrackerCategoryCoreData? {
+    private func getTrackerCategoryCoreData(from category: String) -> TrackerCategoryCoreData? {
         let request = fetchedResultsController.fetchRequest
         request.predicate = NSPredicate(format: "title == %@", category)
         guard let categoryCoreData = try? context.fetch(request).first
@@ -77,7 +83,7 @@ final class TrackerCategoryStore: NSObject {
         return categoryCoreData
     }
     
-    func getTrackerCategory(from categoryCoreData: TrackerCategoryCoreData) -> TrackerCategory? {
+    private func getTrackerCategory(from categoryCoreData: TrackerCategoryCoreData) -> TrackerCategory? {
         guard let category = categoryCoreData.title,
               let trackersSet = categoryCoreData.trackers as? Set<TrackerCoreData>
         else { return nil }

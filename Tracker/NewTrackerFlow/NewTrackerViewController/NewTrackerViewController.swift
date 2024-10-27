@@ -11,8 +11,9 @@ final class NewTrackerViewController: UIViewController {
     
     //MARK: - Init
     
-    init(isHabit: Bool) {
+    init(isHabit: Bool, dataProvider: DataProviderProtocol) {
         self.isHabit = isHabit
+        self.dataProvider = dataProvider
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -31,7 +32,7 @@ final class NewTrackerViewController: UIViewController {
     private var newTrackerEmoji: String?
     private var newTrackerSchedule: Set<WeekDay> = []
     private let isHabit: Bool
-    private let trackerCategoriesStore = TrackerCategoryStore.shared
+    private let dataProvider: DataProviderProtocol
     private let emojiCategory: EmojiGategory = EmojiAndColors.emojiCategory
     private let colorsCategory: ColorsGategory = EmojiAndColors.colorsCategory
     private var warningLabelHeightConstraint: NSLayoutConstraint?
@@ -100,7 +101,8 @@ final class NewTrackerViewController: UIViewController {
     } ()
     
     private lazy var collectionView: UICollectionView = {
-        let collection = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+        let collection = UICollectionView(frame: .zero,
+                                          collectionViewLayout: UICollectionViewFlowLayout())
         collection.backgroundColor = .clear
         return collection
     } ()
@@ -175,7 +177,7 @@ final class NewTrackerViewController: UIViewController {
     
     @objc func createButtonTapped() {
         guard let newTracker, let trackerCategory else { return }
-        trackerCategoriesStore.addTrackerCoreData(newTracker, to: trackerCategory)
+        dataProvider.addTracker(newTracker, to: trackerCategory)
         delegate?.dismissNewTrackerFlow()
     }
     
@@ -458,7 +460,8 @@ extension NewTrackerViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch indexPath.row {
         case 0:
-            let categoryVC = CategoryViewController(delegate: self)
+            let categoryVC = CategoryViewController(dataProvider: DataProvider(),
+                                                    delegate: self)
             if let trackerCategory {
                 categoryVC.category = trackerCategory
             }

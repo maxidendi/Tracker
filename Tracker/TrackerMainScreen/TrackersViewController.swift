@@ -9,6 +9,17 @@ import UIKit
 
 final class TrackersViewController: UIViewController {
     
+    //MARK: - Init
+    
+    init(dataProvider: DataProviderProtocol) {
+        self.dataProvider = dataProvider
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     //MARK: - Properties
     
     private var visibleCategories: [TrackerCategory] = []
@@ -17,8 +28,7 @@ final class TrackersViewController: UIViewController {
     private var currentDate = Date()
     private let calendar = Calendar.current
     private let constants = Constants.TrackersViewControllerConstants.self
-    private let trackerCategoriesStore = TrackerCategoryStore.shared
-    private let trackerRecordStore = TrackerRecordStore.shared
+    private var dataProvider: DataProviderProtocol
     private lazy var collectionView: UICollectionView = {
         let collection = UICollectionView(frame: .zero,
                                           collectionViewLayout: UICollectionViewFlowLayout())
@@ -76,10 +86,9 @@ final class TrackersViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
-        categories = trackerCategoriesStore.categories
-        trackerCategoriesStore.delegate = self
-        completedTrackers = trackerRecordStore.records
-        trackerRecordStore.delegate = self
+        dataProvider.delegate = self
+        categories = dataProvider.getCategories()
+        completedTrackers = dataProvider.getRecords()
         setupToHideKeyboard()
         addSubviews()
         layoutSubviews()
@@ -132,7 +141,8 @@ final class TrackersViewController: UIViewController {
                 }
                 trackers.append(tracker)
             }
-            let visibleCategory: TrackerCategory = TrackerCategory(title: category.title, trackers: trackers)
+            let visibleCategory: TrackerCategory = TrackerCategory(title: category.title,
+                                                                   trackers: trackers)
             if !visibleCategory.trackers.isEmpty {
                 visibleCategories.append(visibleCategory)
             }
@@ -266,14 +276,13 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
                           height: Constants.General.labelTextHeight)
         } else {
             headerView = self.collectionView(collectionView,
-                                                 viewForSupplementaryElementOfKind: UICollectionView.elementKindSectionHeader,
-                                                 at: indexPath)
+                                             viewForSupplementaryElementOfKind: UICollectionView.elementKindSectionHeader,
+                                             at: indexPath)
         }
-        return headerView.systemLayoutSizeFitting(CGSize(
-            width: collectionView.frame.width,
-            height: UIView.layoutFittingExpandedSize.height),
-            withHorizontalFittingPriority: .required,
-            verticalFittingPriority: .fittingSizeLevel)
+        return headerView.systemLayoutSizeFitting(CGSize(width: collectionView.frame.width,
+                                                         height: UIView.layoutFittingExpandedSize.height),
+                                                  withHorizontalFittingPriority: .required,
+                                                  verticalFittingPriority: .fittingSizeLevel)
     }
 }
 
@@ -289,10 +298,10 @@ extension TrackersViewController: TrackerCellDelegate {
             guard let numberOfDays = calendar.numberOfDaysBetween(currentDate),
                   numberOfDays >= .zero
             else { return }
-            trackerRecordStore.addTrackerRecord(trackerRecord)
+            dataProvider.addTrackerRecord(trackerRecord)
             completion()
         } else {
-            trackerRecordStore.removeTrackerRecord(trackerRecord)
+            dataProvider.removeTrackerRecord(trackerRecord)
             completion()
         }
     }
@@ -306,17 +315,14 @@ extension TrackersViewController: HabitOrEventViewControllerDelegate {
     }
 }
 
-extension TrackersViewController: TrackerCategoryStoreDelegate {
+extension TrackersViewController: DataProviderDelegate {
     
-    func didUpdateCategories() {
-        categories = trackerCategoriesStore.categories
+    func updateCategories(_ categories: [TrackerCategory]) {
+        self.categories = categories
         collectionView.reloadData()
     }
-}
-
-extension TrackersViewController: TrackerRecordStoreDelegate {
     
-    func didUpdateRecords() {
-        completedTrackers = trackerRecordStore.records
+    func updateRecords(_ records: Set<TrackerRecord>) {
+        completedTrackers = records
     }
 }

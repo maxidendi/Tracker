@@ -7,6 +7,6 @@
 
 import Foundation
 
-protocol TrackerCategoryStoreDelegate: AnyObject {
+protocol CategoriesStoreDelegate: AnyObject {
     func didUpdateCategories()
 }

@@ -7,6 +7,6 @@
 
 import Foundation
 
-protocol TrackerRecordStoreDelegate: AnyObject {
+protocol RecordsStoreDelegate: AnyObject {
     func didUpdateRecords()
 }

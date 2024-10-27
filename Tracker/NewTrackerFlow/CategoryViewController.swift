@@ -11,9 +11,12 @@ final class CategoryViewController: UIViewController {
     
     //MARK: - Init
     
-    init(delegate: CategoryViewControllerDelegate? = nil) {
-        super.init(nibName: nil, bundle: nil)
+    init(dataProvider: DataProviderProtocol,
+         delegate: CategoryViewControllerDelegate? = nil
+    ) {
+        self.dataProvider = dataProvider
         self.delegate = delegate
+        super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder: NSCoder) {
@@ -24,10 +27,10 @@ final class CategoryViewController: UIViewController {
     
     weak var delegate: CategoryViewControllerDelegate?
     var category: String?
-    private let trackerCategoriesStore = TrackerCategoryStore.shared
+    private let dataProvider: DataProviderProtocol
     private let constants = Constants.CategoryViewControllerConstants.self
     private var categories: [TrackerCategory] {
-        trackerCategoriesStore.categories
+        dataProvider.getCategories()
     }
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -83,18 +86,19 @@ final class CategoryViewController: UIViewController {
         view.backgroundColor = .ypWhite
         addSubviews()
         layoutSubviews()
-        showStubsOrTrackers()
+        showStubsOrCategories()
     }
     
     //MARK: - Methods
     
     @objc private func addCategoryButtonTapped() {
-        let addCategoryViewController = AddCategoryViewController(delegate: self)
+        let addCategoryViewController = AddCategoryViewController(dataProvider: DataProvider(),
+                                                                  delegate: self)
         addCategoryViewController.modalPresentationStyle = .popover
         present(addCategoryViewController, animated: true)
     }
     
-    private func showStubsOrTrackers() {
+    private func showStubsOrCategories() {
         tableView.reloadData()
         let isEmpty = categories.isEmpty
         labelStub.isHidden = !isEmpty
@@ -201,6 +205,6 @@ extension CategoryViewController: UITableViewDelegate {
 extension CategoryViewController: AddCategoryDelegate {
     
     func addCategory(_ category: TrackerCategory) {
-        showStubsOrTrackers()
+        showStubsOrCategories()
     }
 }
