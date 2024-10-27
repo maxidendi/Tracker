@@ -28,7 +28,6 @@ final class AddCategoryViewController: UIViewController, SetupSubviewsProtocol {
     weak var delegate: AddCategoryDelegate?
     private let dataProvider: DataProviderProtocol
     private let constants = Constants.AddCategoryViewControllerConstants.self
-    private var textFieldObserver: NSKeyValueObservation?
     private var categoriesList: [String] = []
     private var newCategory: TrackerCategory?
     private lazy var titleLabel: UILabel = {
@@ -77,12 +76,6 @@ final class AddCategoryViewController: UIViewController, SetupSubviewsProtocol {
         addSubviews()
         layoutSubviews()
         setupToHideKeyboard()
-        textFieldObserver = textField.observe(\.text,
-                                              options: [.new],
-                                              changeHandler: { [weak self] _, text  in
-            guard let self, let isEmpty = text.newValue??.isEmpty else { return }
-            changeDoneButtonState(!isEmpty)
-        })
     }
     
     //MARK: - Methods
@@ -141,14 +134,16 @@ extension AddCategoryViewController: UITextFieldDelegate {
     
     func textFieldDidEndEditing(_ textField: UITextField) {
         guard let text = textField.text else { return }
-        guard !categoriesList.contains(where: { $0 == text }) else {
+        guard !categoriesList.contains(where: { $0 == text }) && !text.isEmpty else {
             let alertModel = AlertModel(message: Constants.AlertModelConstants.messageAddCategory,
                                         actionTitle: Constants.AlertModelConstants.actionTitleAddCategory)
             showAlert(with: alertModel)
+            changeDoneButtonState(false)
             return
         }
         let newCategory = TrackerCategory(title: text, trackers: [])
         self.newCategory = newCategory
+        changeDoneButtonState(true)
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {

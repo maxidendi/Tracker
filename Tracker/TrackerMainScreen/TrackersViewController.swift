@@ -309,6 +309,10 @@ extension TrackersViewController: TrackerCellDelegate {
 
 extension TrackersViewController: HabitOrEventViewControllerDelegate {
     
+    func getDataProvider() -> DataProviderProtocol {
+        dataProvider
+    }
+    
     func needToReloadCollectionView() {
         dismiss(animated: true)
         datePickerValueChanged(datePicker)

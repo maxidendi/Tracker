@@ -8,13 +8,6 @@
 import UIKit
 import CoreData
 
-protocol RecordsStoreProtocol: AnyObject {
-    var delegate: RecordsStoreDelegate? { get set }
-    var records: Set<TrackerRecord> { get }
-    func addTrackerRecord(_ record: TrackerRecord)
-    func removeTrackerRecord(_ record: TrackerRecord)
-}
-
 final class TrackerRecordsStore: NSObject, RecordsStoreProtocol {
     
     //MARK: - Init

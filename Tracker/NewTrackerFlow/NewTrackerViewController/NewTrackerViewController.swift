@@ -36,7 +36,6 @@ final class NewTrackerViewController: UIViewController {
     private let emojiCategory: EmojiGategory = EmojiAndColors.emojiCategory
     private let colorsCategory: ColorsGategory = EmojiAndColors.colorsCategory
     private var warningLabelHeightConstraint: NSLayoutConstraint?
-    
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = isHabit ? constants.newHabitTitle :
@@ -460,11 +459,12 @@ extension NewTrackerViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch indexPath.row {
         case 0:
-            let categoryVC = CategoryViewController(dataProvider: DataProvider(),
+            let categoryVC = CategoryViewController(dataProvider: dataProvider,
+                                                    category: trackerCategory,
                                                     delegate: self)
-            if let trackerCategory {
-                categoryVC.category = trackerCategory
-            }
+//            if let trackerCategory {
+//                categoryVC.category = trackerCategory
+//            }
             categoryVC.modalPresentationStyle = .popover
             present(categoryVC, animated: true)
         case 1:

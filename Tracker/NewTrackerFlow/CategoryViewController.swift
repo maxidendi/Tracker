@@ -12,9 +12,11 @@ final class CategoryViewController: UIViewController {
     //MARK: - Init
     
     init(dataProvider: DataProviderProtocol,
+         category: String?,
          delegate: CategoryViewControllerDelegate? = nil
     ) {
         self.dataProvider = dataProvider
+        self.category = category
         self.delegate = delegate
         super.init(nibName: nil, bundle: nil)
     }
@@ -26,7 +28,7 @@ final class CategoryViewController: UIViewController {
     //MARK: - Properties
     
     weak var delegate: CategoryViewControllerDelegate?
-    var category: String?
+    private var category: String?
     private let dataProvider: DataProviderProtocol
     private let constants = Constants.CategoryViewControllerConstants.self
     private var categories: [TrackerCategory] {
@@ -92,7 +94,7 @@ final class CategoryViewController: UIViewController {
     //MARK: - Methods
     
     @objc private func addCategoryButtonTapped() {
-        let addCategoryViewController = AddCategoryViewController(dataProvider: DataProvider(),
+        let addCategoryViewController = AddCategoryViewController(dataProvider: dataProvider,
                                                                   delegate: self)
         addCategoryViewController.modalPresentationStyle = .popover
         present(addCategoryViewController, animated: true)

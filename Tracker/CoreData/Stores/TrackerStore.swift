@@ -8,12 +8,6 @@
 import UIKit
 import CoreData
 
-protocol TrackerStoreProtocol: AnyObject {
-    func getTracker(from trackerCoreData: TrackerCoreData) -> Tracker?
-    func getTrackerCoreData(from tracker: Tracker) -> TrackerCoreData
-    func getTrackerFromId(_ id: UUID) -> TrackerCoreData?
-}
-
 final class TrackerStore: NSObject, TrackerStoreProtocol {
     
     //MARK: - Init

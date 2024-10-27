@@ -55,6 +55,9 @@
 		3FD7FF982CCD5D1600D91C4D /* DataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FD7FF972CCD5D1600D91C4D /* DataProvider.swift */; };
 		3FD7FF9A2CCEB10500D91C4D /* DataProviderProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FD7FF992CCEB10500D91C4D /* DataProviderProtocol.swift */; };
 		3FD7FF9C2CCEB11800D91C4D /* DataProviderDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FD7FF9B2CCEB11800D91C4D /* DataProviderDelegate.swift */; };
+		3FD7FFA02CCEB64600D91C4D /* RecordsStoreProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FD7FF9F2CCEB64600D91C4D /* RecordsStoreProtocol.swift */; };
+		3FD7FFA22CCEB65B00D91C4D /* CategoryStoreProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FD7FFA12CCEB65B00D91C4D /* CategoryStoreProtocol.swift */; };
+		3FD7FFA42CCEB66A00D91C4D /* TrackerStoreProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FD7FFA32CCEB66A00D91C4D /* TrackerStoreProtocol.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -108,6 +111,9 @@
 		3FD7FF972CCD5D1600D91C4D /* DataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProvider.swift; sourceTree = "<group>"; };
 		3FD7FF992CCEB10500D91C4D /* DataProviderProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProviderProtocol.swift; sourceTree = "<group>"; };
 		3FD7FF9B2CCEB11800D91C4D /* DataProviderDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProviderDelegate.swift; sourceTree = "<group>"; };
+		3FD7FF9F2CCEB64600D91C4D /* RecordsStoreProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordsStoreProtocol.swift; sourceTree = "<group>"; };
+		3FD7FFA12CCEB65B00D91C4D /* CategoryStoreProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryStoreProtocol.swift; sourceTree = "<group>"; };
+		3FD7FFA32CCEB66A00D91C4D /* TrackerStoreProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerStoreProtocol.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -242,6 +248,9 @@
 		3FB806812CC175A5005A35AE /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
+				3FD7FFA32CCEB66A00D91C4D /* TrackerStoreProtocol.swift */,
+				3FD7FFA12CCEB65B00D91C4D /* CategoryStoreProtocol.swift */,
+				3FD7FF9F2CCEB64600D91C4D /* RecordsStoreProtocol.swift */,
 				3FD7FF9B2CCEB11800D91C4D /* DataProviderDelegate.swift */,
 				3FD7FF992CCEB10500D91C4D /* DataProviderProtocol.swift */,
 				3FD7FF942CCD127A00D91C4D /* CategoriesStoreDelegate.swift */,
@@ -357,10 +366,12 @@
 				3FB806872CC1803E005A35AE /* HabitOrEventViewControllerDelegate.swift in Sources */,
 				3F2439042CBE2D2C00CB0B4F /* WeekDay.swift in Sources */,
 				3F2439062CBE2D2C00CB0B4F /* ColorCell.swift in Sources */,
+				3FD7FFA22CCEB65B00D91C4D /* CategoryStoreProtocol.swift in Sources */,
 				3FB806892CC1808F005A35AE /* TrackerCellDelegate.swift in Sources */,
 				3F2439072CBE2D2C00CB0B4F /* EmojiCell.swift in Sources */,
 				3F2439082CBE2D2C00CB0B4F /* NewTrackerSupplementaryView.swift in Sources */,
 				3F2439092CBE2D2C00CB0B4F /* NewTrackerViewController.swift in Sources */,
+				3FD7FFA42CCEB66A00D91C4D /* TrackerStoreProtocol.swift in Sources */,
 				3F24390A2CBE2D2C00CB0B4F /* AddCategoryViewController.swift in Sources */,
 				3F24390C2CBE2D2C00CB0B4F /* CategoryViewController.swift in Sources */,
 				3F2439212CBE30FB00CB0B4F /* UIViewController+Extension.swift in Sources */,
@@ -369,6 +380,7 @@
 				3F2439102CBE2D2C00CB0B4F /* HabitOrEventViewController.swift in Sources */,
 				3F05FB682CC7C6660020C050 /* Trackers.xcdatamodeld in Sources */,
 				3F2439132CBE2D2C00CB0B4F /* ScheduleViewController.swift in Sources */,
+				3FD7FFA02CCEB64600D91C4D /* RecordsStoreProtocol.swift in Sources */,
 				3F2439142CBE2D2C00CB0B4F /* StatisticViewController.swift in Sources */,
 				3F05FB982CCB7BEC0020C050 /* UIColorValueTransformer.swift in Sources */,
 				3F2439152CBE2D2C00CB0B4F /* TrackerCell.swift in Sources */,

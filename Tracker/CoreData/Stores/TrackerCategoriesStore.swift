@@ -8,13 +8,6 @@
 import UIKit
 import CoreData
 
-protocol CategoryStoreProtocol: AnyObject {
-    var delegate: CategoriesStoreDelegate? { get set }
-    var categories: [TrackerCategory] { get }
-    func addCategoryCoreData(_ category: TrackerCategory)
-    func addTrackerCoreData(_ tracker: Tracker, to category: String)
-}
-
 final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
     
     //MARK: - Init
