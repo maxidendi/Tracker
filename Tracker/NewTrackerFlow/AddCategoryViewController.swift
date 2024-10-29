@@ -11,9 +11,12 @@ final class AddCategoryViewController: UIViewController, SetupSubviewsProtocol {
     
     //MARK: - Init
     
-    init(delegate: AddCategoryDelegate? = nil) {
-        super.init(nibName: nil, bundle: nil)
+    init(dataProvider: DataProviderProtocol,
+         delegate: AddCategoryDelegate? = nil
+    ) {
+        self.dataProvider = dataProvider
         self.delegate = delegate
+        super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder: NSCoder) {
@@ -23,9 +26,9 @@ final class AddCategoryViewController: UIViewController, SetupSubviewsProtocol {
     //MARK: - Properties
     
     weak var delegate: AddCategoryDelegate?
+    private let dataProvider: DataProviderProtocol
     private let constants = Constants.AddCategoryViewControllerConstants.self
-    private var textFieldObserver: NSKeyValueObservation?
-    private var categories = TrackerCategoryProvider.shared
+    private var categoriesList: [String] = []
     private var newCategory: TrackerCategory?
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -69,20 +72,17 @@ final class AddCategoryViewController: UIViewController, SetupSubviewsProtocol {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
+        categoriesList = dataProvider.getCategoriesList()
         addSubviews()
         layoutSubviews()
-        textFieldObserver = textField.observe(\.text,
-                                              options: [.new],
-                                              changeHandler: { [weak self] _, text  in
-            guard let self, let isEmpty = text.newValue??.isEmpty else { return }
-            changeDoneButtonState(!isEmpty)
-        })
+        setupToHideKeyboard()
     }
     
     //MARK: - Methods
     
     @objc private func doneButtonuttonTapped() {
         guard let newCategory else { return }
+        dataProvider.addcategory(newCategory)
         delegate?.addCategory(newCategory)
         dismiss(animated: true)
     }
@@ -134,14 +134,16 @@ extension AddCategoryViewController: UITextFieldDelegate {
     
     func textFieldDidEndEditing(_ textField: UITextField) {
         guard let text = textField.text else { return }
-        guard !categories.categoriesProvider.contains(where: { $0.title == text }) else {
+        guard !categoriesList.contains(where: { $0 == text }) && !text.isEmpty else {
             let alertModel = AlertModel(message: Constants.AlertModelConstants.messageAddCategory,
                                         actionTitle: Constants.AlertModelConstants.actionTitleAddCategory)
             showAlert(with: alertModel)
+            changeDoneButtonState(false)
             return
         }
         let newCategory = TrackerCategory(title: text, trackers: [])
         self.newCategory = newCategory
+        changeDoneButtonState(true)
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {

@@ -11,8 +11,9 @@ final class NewTrackerViewController: UIViewController {
     
     //MARK: - Init
     
-    init(isHabit: Bool) {
+    init(isHabit: Bool, dataProvider: DataProviderProtocol) {
         self.isHabit = isHabit
+        self.dataProvider = dataProvider
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -25,17 +26,16 @@ final class NewTrackerViewController: UIViewController {
     weak var delegate: NewCategoryViewControllerDelegate?
     private let constants = Constants.NewTrackerViewControllerConstants.self
     private var newTracker: Tracker?
-    private var trackerCategoryIndex: Int?
+    private var trackerCategory: String?
     private var newTrackerTitle: String?
     private var newTrackerColor: UIColor?
     private var newTrackerEmoji: String?
     private var newTrackerSchedule: Set<WeekDay> = []
     private let isHabit: Bool
-    private var categories = TrackerCategoryProvider.shared
+    private let dataProvider: DataProviderProtocol
     private let emojiCategory: EmojiGategory = EmojiAndColors.emojiCategory
     private let colorsCategory: ColorsGategory = EmojiAndColors.colorsCategory
     private var warningLabelHeightConstraint: NSLayoutConstraint?
-    
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = isHabit ? constants.newHabitTitle :
@@ -100,7 +100,8 @@ final class NewTrackerViewController: UIViewController {
     } ()
     
     private lazy var collectionView: UICollectionView = {
-        let collection = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+        let collection = UICollectionView(frame: .zero,
+                                          collectionViewLayout: UICollectionViewFlowLayout())
         collection.backgroundColor = .clear
         return collection
     } ()
@@ -147,6 +148,7 @@ final class NewTrackerViewController: UIViewController {
         view.backgroundColor = .ypWhite
         addSubviews()
         layoutSubviews()
+        setupToHideKeyboard()
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(UITableViewCell.self,
@@ -173,13 +175,8 @@ final class NewTrackerViewController: UIViewController {
     }
     
     @objc func createButtonTapped() {
-        guard let newTracker, let trackerCategoryIndex else { return }
-        let changedCategory = categories.categoriesProvider[trackerCategoryIndex]
-        var changedTrackers = changedCategory.trackers
-        changedTrackers.append(newTracker)
-        let newCategory = TrackerCategory(title: changedCategory.title,
-                                          trackers: changedTrackers)
-        categories.categoriesProvider[trackerCategoryIndex] = newCategory
+        guard let newTracker, let trackerCategory else { return }
+        dataProvider.addTracker(newTracker, to: trackerCategory)
         delegate?.dismissNewTrackerFlow()
     }
     
@@ -188,19 +185,19 @@ final class NewTrackerViewController: UIViewController {
               !title.isEmpty,
               let emoji = newTrackerEmoji,
               let color = newTrackerColor,
-              let _ = trackerCategoryIndex else {
+              let _ = trackerCategory else {
             changeCreateButtonState(false)
             return
         }
         if isHabit && !newTrackerSchedule.isEmpty {
-            newTracker = Tracker(id: categories.lastId + 1,
+            newTracker = Tracker(id: UUID(),
                                  title: title,
                                  color: color,
                                  emoji: emoji,
                                  schedule: Array(newTrackerSchedule))
             changeCreateButtonState(true)
         } else if !isHabit {
-            newTracker = Tracker(id: categories.lastId + 1,
+            newTracker = Tracker(id: UUID(),
                                  title: title,
                                  color: color,
                                  emoji: emoji,
@@ -439,8 +436,8 @@ extension NewTrackerViewController: UITableViewDataSource {
         switch indexPath.row {
             case 0:
                 cell.textLabel?.text = constants.categoryTitle
-                if let trackerCategoryIndex = trackerCategoryIndex {
-                    cell.detailTextLabel?.text = categories.categoriesProvider[trackerCategoryIndex].title
+                if let trackerCategory {
+                    cell.detailTextLabel?.text = trackerCategory
                 }
             case 1:
                 cell.textLabel?.text = constants.scheduleTitle
@@ -462,10 +459,12 @@ extension NewTrackerViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch indexPath.row {
         case 0:
-            let categoryVC = CategoryViewController(delegate: self)
-            if let trackerCategoryIndex = trackerCategoryIndex {
-                categoryVC.category = categories.categoriesProvider[trackerCategoryIndex].title
-            }
+            let categoryVC = CategoryViewController(dataProvider: dataProvider,
+                                                    category: trackerCategory,
+                                                    delegate: self)
+//            if let trackerCategory {
+//                categoryVC.category = trackerCategory
+//            }
             categoryVC.modalPresentationStyle = .popover
             present(categoryVC, animated: true)
         case 1:
@@ -524,8 +523,8 @@ extension NewTrackerViewController: ScheduleViewControllerDelegate {
 
 extension NewTrackerViewController: CategoryViewControllerDelegate {
     
-    func didRecieveCategory(_ categoryIndex: Int) {
-        trackerCategoryIndex = categoryIndex
+    func didRecieveCategory(_ category: String) {
+        trackerCategory = category
         tableView.reloadData()
         isReadyToCreateTracker()
     }

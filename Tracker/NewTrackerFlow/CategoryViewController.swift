@@ -11,9 +11,14 @@ final class CategoryViewController: UIViewController {
     
     //MARK: - Init
     
-    init(delegate: CategoryViewControllerDelegate? = nil) {
-        super.init(nibName: nil, bundle: nil)
+    init(dataProvider: DataProviderProtocol,
+         category: String?,
+         delegate: CategoryViewControllerDelegate? = nil
+    ) {
+        self.dataProvider = dataProvider
+        self.category = category
         self.delegate = delegate
+        super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder: NSCoder) {
@@ -23,9 +28,12 @@ final class CategoryViewController: UIViewController {
     //MARK: - Properties
     
     weak var delegate: CategoryViewControllerDelegate?
-    var category: String?
+    private var category: String?
+    private let dataProvider: DataProviderProtocol
     private let constants = Constants.CategoryViewControllerConstants.self
-    private var categories = TrackerCategoryProvider.shared
+    private var categories: [TrackerCategory] {
+        dataProvider.getCategories()
+    }
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = constants.title
@@ -80,20 +88,21 @@ final class CategoryViewController: UIViewController {
         view.backgroundColor = .ypWhite
         addSubviews()
         layoutSubviews()
-        showStubsOrTrackers()
+        showStubsOrCategories()
     }
     
     //MARK: - Methods
     
     @objc private func addCategoryButtonTapped() {
-        let addCategoryViewController = AddCategoryViewController(delegate: self)
+        let addCategoryViewController = AddCategoryViewController(dataProvider: dataProvider,
+                                                                  delegate: self)
         addCategoryViewController.modalPresentationStyle = .popover
         present(addCategoryViewController, animated: true)
     }
     
-    private func showStubsOrTrackers() {
+    private func showStubsOrCategories() {
         tableView.reloadData()
-        let isEmpty = categories.categoriesProvider.isEmpty
+        let isEmpty = categories.isEmpty
         labelStub.isHidden = !isEmpty
         imageStubView.isHidden = !isEmpty
     }
@@ -148,7 +157,7 @@ extension CategoryViewController: SetupSubviewsProtocol {
 extension CategoryViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        categories.categoriesProvider.count
+        categories.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -156,16 +165,16 @@ extension CategoryViewController: UITableViewDataSource {
         cell.layer.cornerRadius = .zero
         cell.selectionStyle = .none
         cell.backgroundColor = .ypLightGray.withAlphaComponent(0.3)
-        cell.textLabel?.text = categories.categoriesProvider[indexPath.row].title
+        cell.textLabel?.text = categories[indexPath.row].title
         cell.accessoryType = cell.textLabel?.text == category ? .checkmark : .none
-        if categories.categoriesProvider.count == 1 {
+        if categories.count == 1 {
             cell.layer.cornerRadius = Constants.General.radius16
             cell.separatorInset = .init(top: .zero, left: .zero, bottom: .zero, right: tableView.bounds.width)
         } else if indexPath.row == .zero {
             cell.layer.cornerRadius = Constants.General.radius16
             cell.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
             cell.separatorInset = Constants.General.separatorInsets
-        } else if indexPath.row == categories.categoriesProvider.count - 1 {
+        } else if indexPath.row == categories.count - 1 {
             cell.layer.cornerRadius = Constants.General.radius16
             cell.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
             cell.separatorInset = .init(top: .zero, left: .zero, bottom: .zero, right: tableView.bounds.width)
@@ -183,13 +192,14 @@ extension CategoryViewController: UITableViewDataSource {
 extension CategoryViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        for item in 0..<categories.categoriesProvider.count {
+        for item in 0..<categories.count {
             let cell = tableView.cellForRow(at: IndexPath(row: item, section: .zero))
             cell?.accessoryType = .none
         }
         let cell = tableView.cellForRow(at: indexPath)
         cell?.accessoryType = .checkmark
-        delegate?.didRecieveCategory(indexPath.row)
+        guard let text = cell?.textLabel?.text else { return }
+        delegate?.didRecieveCategory(text)
         dismiss(animated: true)
     }
 }
@@ -197,7 +207,6 @@ extension CategoryViewController: UITableViewDelegate {
 extension CategoryViewController: AddCategoryDelegate {
     
     func addCategory(_ category: TrackerCategory) {
-        categories.categoriesProvider.append(category)
-        showStubsOrTrackers()
+        showStubsOrCategories()
     }
 }

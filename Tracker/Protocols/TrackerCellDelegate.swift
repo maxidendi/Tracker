@@ -8,5 +8,5 @@
 import Foundation
 
 protocol TrackerCellDelegate: AnyObject {
-    func counterButtonTapped(with id: UInt, isCompleted: Bool, completion: @escaping () -> Void)
+    func counterButtonTapped(with id: UUID, isCompleted: Bool, completion: @escaping () -> Void)
 }

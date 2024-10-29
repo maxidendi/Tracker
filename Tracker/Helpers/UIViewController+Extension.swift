@@ -8,6 +8,19 @@
 import UIKit
 
 extension UIViewController {
+    
+    @objc func dissmissKeyboard() {
+        view.endEditing(true)
+    }
+    
+    func setupToHideKeyboard() {
+        let tapGestureRecognizer = UITapGestureRecognizer(
+            target: self,
+            action: #selector(dissmissKeyboard))
+        tapGestureRecognizer.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGestureRecognizer)
+    }
+    
     func showAlert(with model: AlertModel) {
         let alert = UIAlertController(title: nil,
                                       message: model.message,

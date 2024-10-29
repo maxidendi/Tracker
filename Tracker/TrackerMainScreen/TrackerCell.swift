@@ -25,7 +25,7 @@ final class TrackerCell: UICollectionViewCell {
     static let reuseIdentifier: String = "trackerCell"
     private let constants = Constants.TrackerCellConstants.self
     weak var delegate: TrackerCellDelegate?
-    private var id: UInt? = nil
+    private var id: UUID? = nil
     private var isCompleted: Bool = false
     private var counter: Int = .zero
     private var counterTitle: String {
@@ -83,7 +83,7 @@ final class TrackerCell: UICollectionViewCell {
     //MARK: - Methods
     
     func configureCell(
-        id: UInt,
+        id: UUID,
         title: String,
         emoji: String,
         color: UIColor,
