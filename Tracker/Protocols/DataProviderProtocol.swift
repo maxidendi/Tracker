@@ -12,7 +12,7 @@ protocol DataProviderProtocol {
     func getCategories() -> [TrackerCategory]
     func getCategoriesList() -> [String]
     func getRecords() -> Set<TrackerRecord>
-    func addcategory(_ category: TrackerCategory)
+    func addCategory(_ category: TrackerCategory)
     func addTracker(_ tracker: Tracker, to category: String)
     func addTrackerRecord(_ record: TrackerRecord)
     func removeTrackerRecord(_ record: TrackerRecord)

@@ -12,43 +12,20 @@ final class TrackerRecordsStore: NSObject, RecordsStoreProtocol {
     
     //MARK: - Init
     
-    init(context: NSManagedObjectContext) {
-        self.context = context
-    }
-    
-    convenience override init() {
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate
-        else {
-            fatalError("AppDelegate not found")
-        }
-        self.init(context: appDelegate.persistentContainer.viewContext)
+    init(delegate: RecordsStoreDelegate? = nil) {
+        self.delegate = delegate
+        super.init()
+        configureFetchedResultsController()
     }
     
     //MARK: - Properties
     
     weak var delegate: RecordsStoreDelegate?
-    private let context: NSManagedObjectContext
+    private let context = TrackerStore.shared.persistentContainer.viewContext
     private let trackerStore = TrackerStore.shared
-    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerRecordCoreData> = {
-        let request = NSFetchRequest<TrackerRecordCoreData>(entityName: "TrackerRecordCoreData")
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \TrackerRecordCoreData.id,
-                                                    ascending: true)]
-        let fetchedResultsController = NSFetchedResultsController(
-            fetchRequest: request,
-            managedObjectContext: context,
-            sectionNameKeyPath: nil,
-            cacheName: nil)
-        fetchedResultsController.delegate = self
-        do {
-            try fetchedResultsController.performFetch()
-        } catch {
-            let nserror = error as NSError
-            assertionFailure("Unresolved error \(nserror), \(nserror.userInfo)")
-        }
-        return fetchedResultsController
-    } ()
+    private var fetchedResultsController: NSFetchedResultsController<TrackerRecordCoreData>?
     var records: Set<TrackerRecord> {
-        let recordsCoreData = fetchedResultsController.fetchedObjects
+        let recordsCoreData = fetchedResultsController?.fetchedObjects
         guard let records = recordsCoreData?.compactMap({ getTrackerRecord(from: $0) })
                 else { return [] }
         return Set(records)
@@ -65,6 +42,25 @@ final class TrackerRecordsStore: NSObject, RecordsStoreProtocol {
                 let nserror = error as NSError
                 assertionFailure("Unresolved error \(nserror), \(nserror.userInfo)")
             }
+        }
+    }
+    
+    private func configureFetchedResultsController() {
+        let request = NSFetchRequest<TrackerRecordCoreData>(entityName: "TrackerRecordCoreData")
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \TrackerRecordCoreData.id,
+                                                    ascending: true)]
+        let fetchedResultsController = NSFetchedResultsController(
+            fetchRequest: request,
+            managedObjectContext: context,
+            sectionNameKeyPath: nil,
+            cacheName: nil)
+        fetchedResultsController.delegate = self
+        do {
+            try fetchedResultsController.performFetch()
+            self.fetchedResultsController = fetchedResultsController
+        } catch {
+            let nserror = error as NSError
+            assertionFailure("Unresolved error \(nserror), \(nserror.userInfo)")
         }
     }
     

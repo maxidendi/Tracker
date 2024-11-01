@@ -11,23 +11,28 @@ import CoreData
 final class TrackerStore: NSObject, TrackerStoreProtocol {
     
     //MARK: - Init
-    
-    private init(context: NSManagedObjectContext) {
-        self.context = context
-    }
-    
-    private convenience override init() {
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate
-        else {
-            fatalError("AppDelegate not found")
-        }
-        self.init(context: appDelegate.persistentContainer.viewContext)
-    }
+
+    private override init() {}
     
     //MARK: - Properties
     
     static let shared = TrackerStore()
-    private let context: NSManagedObjectContext
+    
+    //MARK: - CoreData stack
+    
+    lazy var persistentContainer: NSPersistentContainer = {
+        let container = NSPersistentContainer(name: "Trackers")
+        container.loadPersistentStores(completionHandler: { _, error in
+            if let error {
+                fatalError("Unable to load persistent stores: \(error)")
+            }
+        })
+        return container
+    } ()
+    private var context: NSManagedObjectContext  {
+        persistentContainer.viewContext
+    }
+
     
     //MARK: - Methods
     
@@ -38,11 +43,12 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
               let emoji = trackerCoreData.emoji,
               let schedule = trackerCoreData.schedule as? [WeekDay]
         else { return nil }
-        let tracker = Tracker(id: id,
-                              title: title,
-                              color: color,
-                              emoji: emoji,
-                              schedule: schedule)
+        let tracker = Tracker(
+            id: id,
+            title: title,
+            color: color,
+            emoji: emoji,
+            schedule: schedule)
         return tracker
     }
     

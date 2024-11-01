@@ -32,18 +32,18 @@ final class DataProvider: DataProviderProtocol {
     //MARK: - Methods
     
     func getCategories() -> [TrackerCategory] {
-        categoryStore.categories
+        categoryStore.getCategories()
     }
     
     func getCategoriesList() -> [String] {
-        categoryStore.categories.map{ $0.title }
+        categoryStore.getCategories().map{ $0.title }
     }
     
     func getRecords() -> Set<TrackerRecord> {
         recordsStore.records
     }
     
-    func addcategory(_ category: TrackerCategory) {
+    func addCategory(_ category: TrackerCategory) {
         categoryStore.addCategoryCoreData(category)
     }
     
@@ -64,7 +64,7 @@ final class DataProvider: DataProviderProtocol {
 
 extension DataProvider: CategoriesStoreDelegate {
     func didUpdateCategories() {
-        delegate?.updateCategories(categoryStore.categories)
+        delegate?.updateCategories(categoryStore.getCategories())
     }
 }
 

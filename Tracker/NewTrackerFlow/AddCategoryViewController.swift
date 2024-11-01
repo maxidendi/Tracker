@@ -82,7 +82,7 @@ final class AddCategoryViewController: UIViewController, SetupSubviewsProtocol {
     
     @objc private func doneButtonuttonTapped() {
         guard let newCategory else { return }
-        dataProvider.addcategory(newCategory)
+        dataProvider.addCategory(newCategory)
         delegate?.addCategory(newCategory)
         dismiss(animated: true)
     }

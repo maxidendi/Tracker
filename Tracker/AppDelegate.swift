@@ -25,17 +25,5 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
     }
-    
-    //MARK: - CoreData stack
-    
-    lazy var persistentContainer: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: "Trackers")
-        container.loadPersistentStores(completionHandler: { _, error in
-            if let error {
-                fatalError("Unable to load persistent stores: \(error)")
-            }
-        })
-        return container
-    } ()
 }
 

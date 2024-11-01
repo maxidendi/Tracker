@@ -462,9 +462,6 @@ extension NewTrackerViewController: UITableViewDelegate {
             let categoryVC = CategoryViewController(dataProvider: dataProvider,
                                                     category: trackerCategory,
                                                     delegate: self)
-//            if let trackerCategory {
-//                categoryVC.category = trackerCategory
-//            }
             categoryVC.modalPresentationStyle = .popover
             present(categoryVC, animated: true)
         case 1:
