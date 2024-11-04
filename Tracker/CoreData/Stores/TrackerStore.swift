@@ -8,40 +8,93 @@
 import UIKit
 import CoreData
 
+protocol TrackerStoreDelegate: AnyObject {
+    
+    func didUpdateTrackers()
+    
+    func getCategoryCoreData(from category: String) -> TrackerCategoryCoreData?
+}
+
 final class TrackerStore: NSObject, TrackerStoreProtocol {
     
     //MARK: - Init
 
-    private override init() {}
+    init(context: NSManagedObjectContext) {
+        self.context = context
+        super.init()
+        configureFetchedResultsController()
+    }
     
     //MARK: - Properties
     
-    static let shared = TrackerStore()
-    
-    //MARK: - CoreData stack
-    
-    lazy var persistentContainer: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: "Trackers")
-        container.loadPersistentStores(completionHandler: { _, error in
-            if let error {
-                fatalError("Unable to load persistent stores: \(error)")
-            }
-        })
-        return container
-    } ()
-    private var context: NSManagedObjectContext  {
-        persistentContainer.viewContext
-    }
+    weak var delegate: TrackerStoreDelegate?
+    private let context: NSManagedObjectContext
+    var trackerCoreDataFRC: NSFetchedResultsController<TrackerCoreData>?
 
     
     //MARK: - Methods
     
+    private func saveContext() {
+        if context.hasChanges {
+            do {
+                try context.save()
+            } catch {
+                let nserror = error as NSError
+                assertionFailure("Unresolved error \(nserror), \(nserror.userInfo)")
+            }
+        }
+    }
+    
+    private func configureFetchedResultsController() {
+        let fetchedRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        let sortDescriptor = NSSortDescriptor(keyPath: \TrackerCoreData.category,
+                                              ascending: true)
+        fetchedRequest.sortDescriptors = [sortDescriptor]
+        let fetchedResultsController = NSFetchedResultsController(
+            fetchRequest: fetchedRequest,
+            managedObjectContext: context,
+            sectionNameKeyPath: "category",
+            cacheName: nil)
+        fetchedResultsController.delegate = self
+        do {
+            try fetchedResultsController.performFetch()
+            self.trackerCoreDataFRC = fetchedResultsController
+        } catch {
+            let nserror = error as NSError
+            assertionFailure("Unresolved error \(nserror), \(nserror.userInfo)")
+        }
+    }
+    
+    func fetchTrackers(for weekDay: Int, date: Date) {
+        guard let trackerCoreDataFRC else { return }
+        let predicate = NSPredicate(
+            format: """
+            (%K.@count = 0 AND (%K.@count > 0 AND ANY %K.%K = %@))
+            OR (%K.@count = 0 AND %K.@count = 0)
+            OR (%K.@count > 0 AND ANY %K = %ld)
+            """,
+            #keyPath(TrackerCoreData.weekdays),
+            #keyPath(TrackerCoreData.record),
+            #keyPath(TrackerCoreData.record),
+            #keyPath(TrackerRecordCoreData.date),
+            date as CVarArg,
+            #keyPath(TrackerCoreData.weekdays),
+            #keyPath(TrackerCoreData.record),
+            #keyPath(TrackerCoreData.weekdays),
+            #keyPath(TrackerCoreData.weekdays.weekDay),
+            weekDay
+        )
+        trackerCoreDataFRC.fetchRequest.predicate = predicate
+        try? trackerCoreDataFRC.performFetch()
+    }
+
     func getTracker(from trackerCoreData: TrackerCoreData) -> Tracker? {
         guard let id = trackerCoreData.id,
               let title = trackerCoreData.title,
               let color = trackerCoreData.color as? UIColor,
               let emoji = trackerCoreData.emoji,
-              let schedule = trackerCoreData.schedule as? [WeekDay]
+              let weekdays = trackerCoreData.weekdays as? Set<TrackerWeekDayCoreData>,
+              let schedule = weekdays.compactMap({ WeekDay(from: $0.weekDay) }) as? [WeekDay]
         else { return nil }
         let tracker = Tracker(
             id: id,
@@ -52,20 +105,40 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         return tracker
     }
     
+    func addTrackerCoreData(_ tracker: Tracker, to category: String) {
+        let trackerCoreData = getTrackerCoreData(from: tracker)
+        guard let categoryCoreData = delegate?.getCategoryCoreData(from: category),
+              let trackers = categoryCoreData.trackers as? Set<TrackerCoreData>
+        else {
+            let newCategoryCoreData = TrackerCategoryCoreData(context: context)
+            newCategoryCoreData.title = category
+            newCategoryCoreData.trackers = NSSet(array: [trackerCoreData])
+            trackerCoreData.category = newCategoryCoreData
+            return saveContext()
+        }
+        let newTrackers = trackers.union([trackerCoreData])
+        categoryCoreData.trackers = newTrackers as NSSet
+        saveContext()
+    }
+    
     func getTrackerCoreData(from tracker: Tracker) -> TrackerCoreData {
         let trackerCoreData = TrackerCoreData(context: context)
         trackerCoreData.id = tracker.id
         trackerCoreData.title = tracker.title
         trackerCoreData.color = tracker.color
         trackerCoreData.emoji = tracker.emoji
-        trackerCoreData.schedule = tracker.schedule as NSObject
+        tracker.schedule.forEach{
+            let trackerWeekDay = TrackerWeekDayCoreData(context: context)
+            trackerWeekDay.weekDay = Int32($0.toInt)
+            trackerCoreData.addToWeekdays(trackerWeekDay)
+            trackerWeekDay.tracker = trackerCoreData
+        }
         return trackerCoreData
     }
-    
-    func getTrackerFromId(_ id: UUID) -> TrackerCoreData? {
-        let request = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
-        request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
-        let tracker = try? context.fetch(request).first
-        return tracker
+}
+
+extension TrackerStore: NSFetchedResultsControllerDelegate {
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<any NSFetchRequestResult>) {
+        delegate?.didUpdateTrackers()
     }
 }

@@ -8,5 +8,5 @@
 import Foundation
 
 protocol AddCategoryDelegate: AnyObject {
-    func addCategory(_ category: TrackerCategory)
+    func addCategory()
 }

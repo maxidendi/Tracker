@@ -185,7 +185,8 @@ final class NewTrackerViewController: UIViewController {
               !title.isEmpty,
               let emoji = newTrackerEmoji,
               let color = newTrackerColor,
-              let _ = trackerCategory else {
+              let _ = trackerCategory
+        else {
             changeCreateButtonState(false)
             return
         }

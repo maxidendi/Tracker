@@ -9,10 +9,15 @@ import Foundation
 
 protocol DataProviderProtocol {
     var delegate: DataProviderDelegate? { get set }
-    func getCategories() -> [TrackerCategory]
+    func fetchTrackersCoreData(_ weekDay: Int, currentDate: Date)
+    func numberOfCategories() -> Int?
+    func titleForSection(_ section: Int) -> String?
+    func numberOfTrackersInSection(_ section: Int) -> Int
+    func getTracker(at indexPath: IndexPath, currentDate: Date) -> TrackerCellModel?
     func getCategoriesList() -> [String]
-    func getRecords() -> Set<TrackerRecord>
-    func addCategory(_ category: TrackerCategory)
+//    func getCategoriesList() -> [String]
+    func getRecords(for tracker: Tracker) -> [TrackerRecord]
+    func addCategory(_ category: String)
     func addTracker(_ tracker: Tracker, to category: String)
     func addTrackerRecord(_ record: TrackerRecord)
     func removeTrackerRecord(_ record: TrackerRecord)

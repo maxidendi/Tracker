@@ -22,9 +22,6 @@ final class TrackersViewController: UIViewController {
     
     //MARK: - Properties
     
-    private var visibleCategories: [TrackerCategory] = []
-    private var categories: [TrackerCategory] = []
-    private var completedTrackers: Set<TrackerRecord> = []
     private var currentDate = Date()
     private let calendar = Calendar.current
     private let constants = Constants.TrackersViewControllerConstants.self
@@ -87,8 +84,6 @@ final class TrackersViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
         dataProvider.delegate = self
-        categories = dataProvider.getCategories()
-        completedTrackers = dataProvider.getRecords()
         setupToHideKeyboard()
         addSubviews()
         layoutSubviews()
@@ -111,11 +106,9 @@ final class TrackersViewController: UIViewController {
         navigationItem.searchController = searchBarController
     }
     
-    private func showStubsOrTrackers() {
-        collectionView.reloadData()
-        let isEmpty = visibleCategories.isEmpty
-        labelStub.isHidden = !isEmpty
-        imageStubView.isHidden = !isEmpty
+    private func stubsIsHidden(_ isHidden: Bool) {
+        labelStub.isHidden = isHidden
+        imageStubView.isHidden = isHidden
     }
     
     //MARK: - Objc methods
@@ -123,32 +116,9 @@ final class TrackersViewController: UIViewController {
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
         currentDate = calendar.onlyDate(from: sender.date)
         let weekDay = calendar.component(.weekday, from: currentDate)
-        var visibleCategories: [TrackerCategory] = []
-        categories.forEach { category in
-            var trackers: [Tracker] = []
-            category.trackers.forEach { tracker in
-                guard tracker.schedule.isEmpty,
-                      !completedTrackers.contains(where: {
-                          $0.id == tracker.id &&
-                          $0.date != currentDate})
-                else {
-                    tracker.schedule.forEach { schedule in
-                        if schedule.toInt == weekDay {
-                            trackers.append(tracker)
-                        }
-                    }
-                    return
-                }
-                trackers.append(tracker)
-            }
-            let visibleCategory: TrackerCategory = TrackerCategory(title: category.title,
-                                                                   trackers: trackers)
-            if !visibleCategory.trackers.isEmpty {
-                visibleCategories.append(visibleCategory)
-            }
-        }
-        self.visibleCategories = visibleCategories
-        showStubsOrTrackers()
+        dataProvider.fetchTrackersCoreData(weekDay, currentDate: currentDate)
+        collectionView.reloadData()
+        collectionView.numberOfSections == 0 ? stubsIsHidden(false) : stubsIsHidden(true)
     }
     
     @objc private func didTapPlusButton() {
@@ -201,11 +171,11 @@ extension TrackersViewController: SetupSubviewsProtocol {
 extension TrackersViewController: UICollectionViewDataSource {
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        visibleCategories.count
+        dataProvider.numberOfCategories() ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        visibleCategories[section].trackers.count
+        dataProvider.numberOfTrackersInSection(section)
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
@@ -216,31 +186,20 @@ extension TrackersViewController: UICollectionViewDataSource {
         as? TrackersSupplementaryView else {
             return UICollectionReusableView()
         }
-        headerView.setTitle(visibleCategories[indexPath.section].title)
+        headerView.setTitle(dataProvider.titleForSection(indexPath.section) ?? "")
         return headerView
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let section = indexPath.section
         guard let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: TrackerCell.reuseIdentifier,
-            for: indexPath) as? TrackerCell
+            for: indexPath) as? TrackerCell,
+              let trackerCellModel = dataProvider.getTracker(at: indexPath, currentDate: currentDate)
         else {
             return UICollectionViewCell()
         }
         cell.delegate = self
-        let tracker = visibleCategories[section].trackers[indexPath.row]
-        let isCompleted = completedTrackers.contains(where: {
-            $0.id == tracker.id &&
-            calendar.numberOfDaysBetween($0.date, and: currentDate) == 0
-        })
-        let counter = completedTrackers.filter({$0.id == tracker.id}).count
-        cell.configureCell(id: tracker.id,
-                           title: tracker.title,
-                           emoji: tracker.emoji,
-                           color: tracker.color,
-                           counter: counter,
-                           isCompleted: isCompleted)
+        cell.configureCell(model: trackerCellModel)
         return cell
     }
 }
@@ -321,12 +280,7 @@ extension TrackersViewController: HabitOrEventViewControllerDelegate {
 
 extension TrackersViewController: DataProviderDelegate {
     
-    func updateCategories(_ categories: [TrackerCategory]) {
-        self.categories = categories
+    func updateTrackers() {
         collectionView.reloadData()
-    }
-    
-    func updateRecords(_ records: Set<TrackerRecord>) {
-        completedTrackers = records
     }
 }

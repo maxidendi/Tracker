@@ -8,8 +8,8 @@
 import Foundation
 
 protocol CategoryStoreProtocol: AnyObject {
-    var delegate: CategoriesStoreDelegate? { get set }
-    func getCategories() -> [TrackerCategory] 
-    func addCategoryCoreData(_ category: TrackerCategory)
-    func addTrackerCoreData(_ tracker: Tracker, to category: String)
+//    var delegate: CategoriesStoreDelegate? { get set }
+    func getCategoriesList() -> [String]
+    func getTrackerCategoryCoreData(from category: String) -> TrackerCategoryCoreData?
+    func addCategoryCoreData(_ category: String)
 }

@@ -31,8 +31,8 @@ final class CategoryViewController: UIViewController {
     private var category: String?
     private let dataProvider: DataProviderProtocol
     private let constants = Constants.CategoryViewControllerConstants.self
-    private var categories: [TrackerCategory] {
-        dataProvider.getCategories()
+    private var categories: [String] {
+        dataProvider.getCategoriesList()
     }
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -165,7 +165,7 @@ extension CategoryViewController: UITableViewDataSource {
         cell.layer.cornerRadius = .zero
         cell.selectionStyle = .none
         cell.backgroundColor = .ypLightGray.withAlphaComponent(0.3)
-        cell.textLabel?.text = categories[indexPath.row].title
+        cell.textLabel?.text = categories[indexPath.row]
         cell.accessoryType = cell.textLabel?.text == category ? .checkmark : .none
         if categories.count == 1 {
             cell.layer.cornerRadius = Constants.General.radius16
@@ -206,7 +206,7 @@ extension CategoryViewController: UITableViewDelegate {
 
 extension CategoryViewController: AddCategoryDelegate {
     
-    func addCategory(_ category: TrackerCategory) {
+    func addCategory() {
         showStubsOrCategories()
     }
 }

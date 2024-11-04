@@ -29,7 +29,7 @@ final class AddCategoryViewController: UIViewController, SetupSubviewsProtocol {
     private let dataProvider: DataProviderProtocol
     private let constants = Constants.AddCategoryViewControllerConstants.self
     private var categoriesList: [String] = []
-    private var newCategory: TrackerCategory?
+    private var newCategory: String?
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = constants.title
@@ -83,7 +83,7 @@ final class AddCategoryViewController: UIViewController, SetupSubviewsProtocol {
     @objc private func doneButtonuttonTapped() {
         guard let newCategory else { return }
         dataProvider.addCategory(newCategory)
-        delegate?.addCategory(newCategory)
+        delegate?.addCategory()
         dismiss(animated: true)
     }
     
@@ -141,8 +141,8 @@ extension AddCategoryViewController: UITextFieldDelegate {
             changeDoneButtonState(false)
             return
         }
-        let newCategory = TrackerCategory(title: text, trackers: [])
-        self.newCategory = newCategory
+//        let newCategory = TrackerCategory(title: text, trackers: [])
+        self.newCategory = text
         changeDoneButtonState(true)
     }
     

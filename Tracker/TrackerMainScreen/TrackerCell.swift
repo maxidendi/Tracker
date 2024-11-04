@@ -83,20 +83,22 @@ final class TrackerCell: UICollectionViewCell {
     //MARK: - Methods
     
     func configureCell(
-        id: UUID,
-        title: String,
-        emoji: String,
-        color: UIColor,
-        counter: Int,
-        isCompleted: Bool
+//        id: UUID,
+//        title: String,
+//        emoji: String,
+//        color: UIColor,
+//        tracker: Tracker,
+//        counter: Int,
+//        isCompleted: Bool
+        model: TrackerCellModel
     ) {
-        self.id = id
-        self.isCompleted = isCompleted
-        self.counter = counter
+        self.id = model.tracker.id
+        self.isCompleted = model.isCompleted
+        self.counter = model.count
         counterLabel.text = counterTitle
-        trackerTitleLabel.text = title
-        emojiLabel.text = emoji
-        topView.backgroundColor = color
+        trackerTitleLabel.text = model.tracker.title
+        emojiLabel.text = model.tracker.emoji
+        topView.backgroundColor = model.tracker.color
         switchCounterButtonImage(isCompleted)
     }
     
