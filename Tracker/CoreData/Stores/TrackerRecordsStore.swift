@@ -21,7 +21,6 @@ final class TrackerRecordsStore: NSObject, RecordsStoreProtocol {
     
     private let context: NSManagedObjectContext
 
-    
     //MARK: - Methods
     
     private func saveContext() {
@@ -43,7 +42,7 @@ final class TrackerRecordsStore: NSObject, RecordsStoreProtocol {
     }
     
     private func getTrackerFromId(_ id: UUID) -> TrackerCoreData? {
-        let request = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
+        let request = TrackerCoreData.fetchRequest()
         request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
         let tracker = try? context.fetch(request).first
         return tracker

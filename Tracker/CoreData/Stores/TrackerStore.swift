@@ -31,7 +31,6 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
     private let context: NSManagedObjectContext
     var trackerCoreDataFRC: NSFetchedResultsController<TrackerCoreData>?
 
-    
     //MARK: - Methods
     
     private func saveContext() {
@@ -47,13 +46,13 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
     
     private func configureFetchedResultsController() {
         let fetchedRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
-        let sortDescriptor = NSSortDescriptor(keyPath: \TrackerCoreData.category,
+        let sortDescriptor = NSSortDescriptor(keyPath: \TrackerCoreData.title,
                                               ascending: true)
         fetchedRequest.sortDescriptors = [sortDescriptor]
         let fetchedResultsController = NSFetchedResultsController(
             fetchRequest: fetchedRequest,
             managedObjectContext: context,
-            sectionNameKeyPath: "category",
+            sectionNameKeyPath: #keyPath(TrackerCoreData.category),
             cacheName: nil)
         fetchedResultsController.delegate = self
         do {
@@ -106,34 +105,21 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
     }
     
     func addTrackerCoreData(_ tracker: Tracker, to category: String) {
-        let trackerCoreData = getTrackerCoreData(from: tracker)
-        guard let categoryCoreData = delegate?.getCategoryCoreData(from: category),
-              let trackers = categoryCoreData.trackers as? Set<TrackerCoreData>
-        else {
-            let newCategoryCoreData = TrackerCategoryCoreData(context: context)
-            newCategoryCoreData.title = category
-            newCategoryCoreData.trackers = NSSet(array: [trackerCoreData])
-            trackerCoreData.category = newCategoryCoreData
-            return saveContext()
-        }
-        let newTrackers = trackers.union([trackerCoreData])
-        categoryCoreData.trackers = newTrackers as NSSet
-        saveContext()
-    }
-    
-    func getTrackerCoreData(from tracker: Tracker) -> TrackerCoreData {
+        guard let categoryCoreData =  delegate?.getCategoryCoreData(from: category)
+        else { return }
         let trackerCoreData = TrackerCoreData(context: context)
         trackerCoreData.id = tracker.id
+        trackerCoreData.category = categoryCoreData
         trackerCoreData.title = tracker.title
         trackerCoreData.color = tracker.color
         trackerCoreData.emoji = tracker.emoji
+        trackerCoreData.record = []
         tracker.schedule.forEach{
             let trackerWeekDay = TrackerWeekDayCoreData(context: context)
             trackerWeekDay.weekDay = Int32($0.toInt)
             trackerCoreData.addToWeekdays(trackerWeekDay)
-            trackerWeekDay.tracker = trackerCoreData
         }
-        return trackerCoreData
+        saveContext()
     }
 }
 

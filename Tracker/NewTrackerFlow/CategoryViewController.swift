@@ -208,5 +208,6 @@ extension CategoryViewController: AddCategoryDelegate {
     
     func addCategory() {
         showStubsOrCategories()
+        dismiss(animated: true)
     }
 }

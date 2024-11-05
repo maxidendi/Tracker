@@ -14,6 +14,4 @@ protocol TrackerStoreProtocol: AnyObject {
     func fetchTrackers(for weekDay: Int, date: Date)
     func addTrackerCoreData(_ tracker: Tracker, to category: String)
     func getTracker(from trackerCoreData: TrackerCoreData) -> Tracker?
-    func getTrackerCoreData(from tracker: Tracker) -> TrackerCoreData
-//    func getTrackerFromId(_ id: UUID) -> TrackerCoreData?
 }

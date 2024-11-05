@@ -35,6 +35,8 @@ final class NewTrackerViewController: UIViewController {
     private let dataProvider: DataProviderProtocol
     private let emojiCategory: EmojiGategory = EmojiAndColors.emojiCategory
     private let colorsCategory: ColorsGategory = EmojiAndColors.colorsCategory
+    private var selectedEmojiIndexPath: IndexPath?
+    private var selectedColorIndexPath: IndexPath?
     private var warningLabelHeightConstraint: NSLayoutConstraint?
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -349,22 +351,24 @@ extension NewTrackerViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         switch indexPath.section {
             case 0:
-                for row in 0..<collectionView.numberOfItems(inSection: 0) {
-                    guard let cell = collectionView.cellForItem(at: IndexPath(item: row, section: 0))
-                            as? EmojiCell else { return }
-                    cell.cellDidDeselected()
+                if let selectedEmojiIndexPath,
+                   let oldCell = collectionView.cellForItem(at: selectedEmojiIndexPath) as? EmojiCell
+                {
+                    oldCell.cellDidDeselected()
                 }
-                guard let cell = collectionView.cellForItem(at: indexPath)
-                        as? EmojiCell else { return }
-                cell.cellDidSelected()
+                selectedEmojiIndexPath = indexPath
+                guard let newCell = collectionView.cellForItem(at: indexPath) as? EmojiCell
+                else { return }
+                newCell.cellDidSelected()
                 newTrackerEmoji = emojiCategory.emoji[indexPath.row]
                 isReadyToCreateTracker()
             case 1:
-                for row in 0..<collectionView.numberOfItems(inSection: 1) {
-                    guard let cell = collectionView.cellForItem(at: IndexPath(item: row, section: 1))
-                            as? ColorCell else { return }
-                    cell.cellDidDeselected()
+                if let selectedColorIndexPath,
+                   let oldCell = collectionView.cellForItem(at: selectedColorIndexPath) as? ColorCell
+                {
+                    oldCell.cellDidDeselected()
                 }
+                selectedColorIndexPath = indexPath
                 guard let cell = collectionView.cellForItem(at: indexPath)
                         as? ColorCell else { return }
                 cell.cellDidSelected()

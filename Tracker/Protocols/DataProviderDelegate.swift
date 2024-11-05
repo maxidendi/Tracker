@@ -8,7 +8,6 @@
 import Foundation
 
 protocol DataProviderDelegate: AnyObject {
-    
     func updateTrackers()
 }
 

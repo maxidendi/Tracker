@@ -84,7 +84,6 @@ final class AddCategoryViewController: UIViewController, SetupSubviewsProtocol {
         guard let newCategory else { return }
         dataProvider.addCategory(newCategory)
         delegate?.addCategory()
-        dismiss(animated: true)
     }
     
     private func changeDoneButtonState(_ isEnabled: Bool) {
@@ -141,7 +140,6 @@ extension AddCategoryViewController: UITextFieldDelegate {
             changeDoneButtonState(false)
             return
         }
-//        let newCategory = TrackerCategory(title: text, trackers: [])
         self.newCategory = text
         changeDoneButtonState(true)
     }

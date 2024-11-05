@@ -41,19 +41,10 @@ final class DataProvider: DataProviderProtocol {
     private let categoryStore: CategoryStoreProtocol
     private let recordsStore: RecordsStoreProtocol
     private let trackerStore: TrackerStoreProtocol
-    lazy var persistentContainer: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: "Trackers")
-        container.loadPersistentStores(completionHandler: { _, error in
-            if let error {
-                fatalError("Unable to load persistent stores: \(error)")
-            }
-        })
-        return container
-    } ()
     
     //MARK: - Methods
     
-    //TrackerStore FRC
+    //TrackerStore FRC to TrackersVC collectionView
     
     func fetchTrackersCoreData(_ weekDay: Int, currentDate: Date) {
         trackerStore.fetchTrackers(for: weekDay, date: currentDate)
@@ -64,7 +55,7 @@ final class DataProvider: DataProviderProtocol {
     }
     
     func titleForSection(_ section: Int) -> String? {
-        let trackerCoreData = trackerStore.trackerCoreDataFRC?.sections?[section].objects?[0] as? TrackerCoreData
+        let trackerCoreData = trackerStore.trackerCoreDataFRC?.sections?[section].objects?.first as? TrackerCoreData
         return trackerCoreData?.category?.title
     }
     
@@ -87,22 +78,18 @@ final class DataProvider: DataProviderProtocol {
         return trackerCellModel
     }
     
+    func addTracker(_ tracker: Tracker, to category: String) {
+        trackerStore.addTrackerCoreData(tracker, to: category)
+    }
+
     //Other Stores
     
     func getCategoriesList() -> [String] {
         categoryStore.getCategoriesList()
     }
     
-    func getRecords(for tracker: Tracker) -> [TrackerRecord] {
-        recordsStore.getTrackerRecords(for: tracker)
-    }
-    
     func addCategory(_ category: String) {
         categoryStore.addCategoryCoreData(category)
-    }
-    
-    func addTracker(_ tracker: Tracker, to category: String) {
-        trackerStore.addTrackerCoreData(tracker, to: category)
     }
     
     func addTrackerRecord(_ record: TrackerRecord) {
@@ -111,6 +98,10 @@ final class DataProvider: DataProviderProtocol {
     
     func removeTrackerRecord(_ record: TrackerRecord) {
         recordsStore.removeTrackerRecord(record)
+    }
+    
+    private func getRecords(for tracker: Tracker) -> [TrackerRecord] {
+        recordsStore.getTrackerRecords(for: tracker)
     }
 }
 

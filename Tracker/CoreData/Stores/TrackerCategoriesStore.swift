@@ -36,7 +36,10 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
     
     func getTrackerCategoryCoreData(from category: String) -> TrackerCategoryCoreData? {
         let request = TrackerCategoryCoreData.fetchRequest()
-        request.predicate = NSPredicate(format: "title == %@", category)
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \TrackerCategoryCoreData.title, ascending: true)]
+        request.predicate = NSPredicate(format: "%K = %@",
+                                        #keyPath(TrackerCategoryCoreData.title),
+                                        category)
         guard let categoryCoreData = try? context.fetch(request).first else { return nil }
         return categoryCoreData
     }
@@ -55,7 +58,7 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
     func addCategoryCoreData(_ category: String) {
         let categoryCoreData = TrackerCategoryCoreData(context: context)
         categoryCoreData.title = category
-        categoryCoreData.trackers = NSSet()
+        categoryCoreData.trackers = []
         saveContext()
     }
 }

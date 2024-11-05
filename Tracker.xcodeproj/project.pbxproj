@@ -11,7 +11,6 @@
 		3F05FA482CC2D15A0020C050 /* CategoryViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F05FA472CC2D15A0020C050 /* CategoryViewControllerDelegate.swift */; };
 		3F05FA4A2CC2D2100020C050 /* NewCategoryViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F05FA492CC2D2100020C050 /* NewCategoryViewControllerDelegate.swift */; };
 		3F05FB682CC7C6660020C050 /* Trackers.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3F05FB662CC7C6660020C050 /* Trackers.xcdatamodeld */; };
-		3F05FB6B2CC7C6FA0020C050 /* WeekDaysValueTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F05FB6A2CC7C6FA0020C050 /* WeekDaysValueTransformer.swift */; };
 		3F05FB922CC801310020C050 /* TrackerStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F05FB912CC801310020C050 /* TrackerStore.swift */; };
 		3F05FB942CC8014A0020C050 /* TrackerCategoriesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F05FB932CC8014A0020C050 /* TrackerCategoriesStore.swift */; };
 		3F05FB962CC8015A0020C050 /* TrackerRecordsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F05FB952CC8015A0020C050 /* TrackerRecordsStore.swift */; };
@@ -66,7 +65,6 @@
 		3F05FA472CC2D15A0020C050 /* CategoryViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryViewControllerDelegate.swift; sourceTree = "<group>"; };
 		3F05FA492CC2D2100020C050 /* NewCategoryViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewCategoryViewControllerDelegate.swift; sourceTree = "<group>"; };
 		3F05FB672CC7C6660020C050 /* Trackers.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Trackers.xcdatamodel; sourceTree = "<group>"; };
-		3F05FB6A2CC7C6FA0020C050 /* WeekDaysValueTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekDaysValueTransformer.swift; sourceTree = "<group>"; };
 		3F05FB912CC801310020C050 /* TrackerStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerStore.swift; sourceTree = "<group>"; };
 		3F05FB932CC8014A0020C050 /* TrackerCategoriesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCategoriesStore.swift; sourceTree = "<group>"; };
 		3F05FB952CC8015A0020C050 /* TrackerRecordsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRecordsStore.swift; sourceTree = "<group>"; };
@@ -133,7 +131,6 @@
 			isa = PBXGroup;
 			children = (
 				3F05FB902CC801140020C050 /* Stores */,
-				3F05FB6A2CC7C6FA0020C050 /* WeekDaysValueTransformer.swift */,
 				3F05FB972CCB7BEC0020C050 /* UIColorValueTransformer.swift */,
 				3F05FB662CC7C6660020C050 /* Trackers.xcdatamodeld */,
 			);
@@ -378,7 +375,6 @@
 				3F24390A2CBE2D2C00CB0B4F /* AddCategoryViewController.swift in Sources */,
 				3F24390C2CBE2D2C00CB0B4F /* CategoryViewController.swift in Sources */,
 				3F2439212CBE30FB00CB0B4F /* UIViewController+Extension.swift in Sources */,
-				3F05FB6B2CC7C6FA0020C050 /* WeekDaysValueTransformer.swift in Sources */,
 				3F05FA482CC2D15A0020C050 /* CategoryViewControllerDelegate.swift in Sources */,
 				3F2439102CBE2D2C00CB0B4F /* HabitOrEventViewController.swift in Sources */,
 				3F05FB682CC7C6660020C050 /* Trackers.xcdatamodeld in Sources */,

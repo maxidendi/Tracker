@@ -273,8 +273,8 @@ extension TrackersViewController: HabitOrEventViewControllerDelegate {
     }
     
     func needToReloadCollectionView() {
-        dismiss(animated: true)
         datePickerValueChanged(datePicker)
+        dismiss(animated: true)
     }
 }
 

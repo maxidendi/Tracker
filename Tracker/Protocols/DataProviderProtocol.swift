@@ -15,8 +15,6 @@ protocol DataProviderProtocol {
     func numberOfTrackersInSection(_ section: Int) -> Int
     func getTracker(at indexPath: IndexPath, currentDate: Date) -> TrackerCellModel?
     func getCategoriesList() -> [String]
-//    func getCategoriesList() -> [String]
-    func getRecords(for tracker: Tracker) -> [TrackerRecord]
     func addCategory(_ category: String)
     func addTracker(_ tracker: Tracker, to category: String)
     func addTrackerRecord(_ record: TrackerRecord)
