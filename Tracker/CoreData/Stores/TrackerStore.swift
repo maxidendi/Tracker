@@ -8,13 +8,6 @@
 import UIKit
 import CoreData
 
-protocol TrackerStoreDelegate: AnyObject {
-    
-    func didUpdateTrackers()
-    
-    func getCategoryCoreData(from category: String) -> TrackerCategoryCoreData?
-}
-
 final class TrackerStore: NSObject, TrackerStoreProtocol {
     
     //MARK: - Init

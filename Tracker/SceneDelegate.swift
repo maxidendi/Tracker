@@ -14,6 +14,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
+        guard UserDefaults.standard.bool(forKey: "isFirstLaunch") else {
+            UserDefaults.standard.set(true, forKey: "isFirstLaunch")
+            window?.rootViewController = OnboardingPagesViewController(
+                transitionStyle: .scroll,
+                navigationOrientation: .horizontal)
+            window?.makeKeyAndVisible()
+            return
+        }
         window?.rootViewController = TrackerTabBarController()
         window?.makeKeyAndVisible()
     }
