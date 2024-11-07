@@ -7,15 +7,15 @@
 
 import UIKit
 
-final class CategoryViewController: UIViewController {
+final class CategoryView: UIViewController {
     
     //MARK: - Init
     
-    init(dataProvider: DataProviderProtocol,
+    init(viewModel: CategoryViewModelProtocol,
          category: String?,
          delegate: CategoryViewControllerDelegate? = nil
     ) {
-        self.dataProvider = dataProvider
+        self.viewModel = viewModel
         self.category = category
         self.delegate = delegate
         super.init(nibName: nil, bundle: nil)
@@ -29,11 +29,9 @@ final class CategoryViewController: UIViewController {
     
     weak var delegate: CategoryViewControllerDelegate?
     private var category: String?
-    private let dataProvider: DataProviderProtocol
+    private var viewModel: CategoryViewModelProtocol
     private let constants = Constants.CategoryViewControllerConstants.self
-    private var categories: [String] {
-        dataProvider.getCategoriesList()
-    }
+    private var categories: [String] = []
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = constants.title
@@ -64,7 +62,7 @@ final class CategoryViewController: UIViewController {
         tableView.showsVerticalScrollIndicator = false
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        tableView.register(CategoryCell.self, forCellReuseIdentifier: CategoryCell.identifier)
         return tableView
     } ()
     
@@ -88,13 +86,24 @@ final class CategoryViewController: UIViewController {
         view.backgroundColor = .ypWhite
         addSubviews()
         layoutSubviews()
-        showStubsOrCategories()
+        bind()
+        viewModel.fetchCategories()
     }
     
     //MARK: - Methods
     
+    private func bind() {
+        viewModel.onCategoriesListStateChange = { [weak self] list in
+            self?.categories = list
+            self?.showStubsOrCategories()
+        }
+        viewModel.onCategorySelected = { [weak self] category in
+            self?.delegate?.didRecieveCategory(category)
+        }
+    }
+    
     @objc private func addCategoryButtonTapped() {
-        let addCategoryViewController = AddCategoryViewController(dataProvider: dataProvider,
+        let addCategoryViewController = AddCategoryViewController(dataProvider: viewModel.getDataProvider(),
                                                                   delegate: self)
         addCategoryViewController.modalPresentationStyle = .popover
         present(addCategoryViewController, animated: true)
@@ -110,7 +119,7 @@ final class CategoryViewController: UIViewController {
 
 //MARK: - Extensions
 
-extension CategoryViewController: SetupSubviewsProtocol {
+extension CategoryView: SetupSubviewsProtocol {
     
     func addSubviews() {
         [titleLabel, tableView, addCategoryButton, imageStubView, labelStub].forEach {
@@ -154,33 +163,22 @@ extension CategoryViewController: SetupSubviewsProtocol {
     }
 }
 
-extension CategoryViewController: UITableViewDataSource {
+extension CategoryView: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         categories.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        cell.layer.cornerRadius = .zero
-        cell.selectionStyle = .none
-        cell.backgroundColor = .ypLightGray.withAlphaComponent(0.3)
-        cell.textLabel?.text = categories[indexPath.row]
-        cell.accessoryType = cell.textLabel?.text == category ? .checkmark : .none
-        if categories.count == 1 {
-            cell.layer.cornerRadius = Constants.General.radius16
-            cell.separatorInset = .init(top: .zero, left: .zero, bottom: .zero, right: tableView.bounds.width)
-        } else if indexPath.row == .zero {
-            cell.layer.cornerRadius = Constants.General.radius16
-            cell.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-            cell.separatorInset = Constants.General.separatorInsets
-        } else if indexPath.row == categories.count - 1 {
-            cell.layer.cornerRadius = Constants.General.radius16
-            cell.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
-            cell.separatorInset = .init(top: .zero, left: .zero, bottom: .zero, right: tableView.bounds.width)
-        } else {
-            cell.separatorInset = Constants.General.separatorInsets
-        }
+        guard let cell = tableView.dequeueReusableCell(
+            withIdentifier: CategoryCell.identifier,
+            for: indexPath) as? CategoryCell
+        else { return UITableViewCell() }
+        cell.configure(category: categories[indexPath.row],
+                       isMarked: category == categories[indexPath.row],
+                       indexPath: indexPath,
+                       rowsCount: categories.count,
+                       separatorWidth: tableView.bounds.width)
         return cell
     }
     
@@ -189,25 +187,20 @@ extension CategoryViewController: UITableViewDataSource {
     }
 }
 
-extension CategoryViewController: UITableViewDelegate {
+extension CategoryView: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        for item in 0..<categories.count {
-            let cell = tableView.cellForRow(at: IndexPath(row: item, section: .zero))
-            cell?.accessoryType = .none
-        }
         let cell = tableView.cellForRow(at: indexPath)
-        cell?.accessoryType = .checkmark
         guard let text = cell?.textLabel?.text else { return }
-        delegate?.didRecieveCategory(text)
+        viewModel.selectCategory(text)
         dismiss(animated: true)
     }
 }
 
-extension CategoryViewController: AddCategoryDelegate {
+extension CategoryView: AddCategoryDelegate {
     
     func addCategory() {
-        showStubsOrCategories()
+        viewModel.fetchCategories()
         dismiss(animated: true)
     }
 }

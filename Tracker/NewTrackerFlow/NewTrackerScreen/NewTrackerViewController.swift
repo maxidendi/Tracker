@@ -464,9 +464,10 @@ extension NewTrackerViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch indexPath.row {
         case 0:
-            let categoryVC = CategoryViewController(dataProvider: dataProvider,
-                                                    category: trackerCategory,
-                                                    delegate: self)
+            let categoryViewModel = CategoryViewModel(dataProvider: dataProvider)
+            let categoryVC = CategoryView(viewModel: categoryViewModel,
+                                          category: trackerCategory,
+                                          delegate: self)
             categoryVC.modalPresentationStyle = .popover
             present(categoryVC, animated: true)
         case 1:
