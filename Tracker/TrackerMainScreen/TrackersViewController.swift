@@ -22,7 +22,9 @@ final class TrackersViewController: UIViewController {
     
     //MARK: - Properties
     
-    private var currentDate = Date()
+    private var currentDate: Date {
+        calendar.onlyDate(from: datePicker.date)
+    }
     private let calendar = Calendar.current
     private let constants = Constants.TrackersViewControllerConstants.self
     private var dataProvider: DataProviderProtocol
@@ -45,7 +47,7 @@ final class TrackersViewController: UIViewController {
         picker.locale = .init(identifier: "ru_RU")
         picker.preferredDatePickerStyle = .compact
         picker.datePickerMode = .date
-        picker.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .valueChanged)
+        picker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
         return picker
     } ()
     
@@ -83,12 +85,12 @@ final class TrackersViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
-        dataProvider.delegate = self
+        dataProvider.trackersDelegate = self
         setupToHideKeyboard()
         addSubviews()
         layoutSubviews()
         setupNavigationBar()
-        datePickerValueChanged(datePicker)
+        datePickerValueChanged()
     }
     
     //MARK: - Methods
@@ -113,12 +115,9 @@ final class TrackersViewController: UIViewController {
     
     //MARK: - Objc methods
     
-    @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
-        currentDate = calendar.onlyDate(from: sender.date)
-        let weekDay = calendar.component(.weekday, from: currentDate)
-        dataProvider.fetchTrackersCoreData(weekDay, currentDate: currentDate)
+    @objc private func datePickerValueChanged() {
+        dataProvider.fetchTrackersCoreData(for: currentDate)
         collectionView.reloadData()
-        collectionView.numberOfSections == 0 ? stubsIsHidden(false) : stubsIsHidden(true)
     }
     
     @objc private func didTapPlusButton() {
@@ -134,7 +133,6 @@ final class TrackersViewController: UIViewController {
 //
 
 extension TrackersViewController: SetupSubviewsProtocol {
-    
     func addSubviews() {
         [imageStubView, labelStub, collectionView].forEach {
             view.addSubview($0)
@@ -169,9 +167,10 @@ extension TrackersViewController: SetupSubviewsProtocol {
 //
 
 extension TrackersViewController: UICollectionViewDataSource {
-    
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        dataProvider.numberOfCategories() ?? 0
+        let numberOfSection = dataProvider.numberOfCategories() ?? 0
+        numberOfSection == 0 ? stubsIsHidden(false) : stubsIsHidden(true)
+        return numberOfSection
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -205,7 +204,6 @@ extension TrackersViewController: UICollectionViewDataSource {
 }
 
 extension TrackersViewController: UICollectionViewDelegateFlowLayout {
-    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let availableWidth = collectionView.bounds.width - constants.geometricParams.paddingWidth
         let itemWidth = availableWidth / CGFloat(constants.geometricParams.cellCount)
@@ -250,7 +248,6 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 //
 
 extension TrackersViewController: TrackerCellDelegate {
-    
     func counterButtonTapped(with id: UUID, isCompleted: Bool, completion: @escaping () -> Void) {
         let trackerRecord = TrackerRecord(id: id, date: currentDate)
         if isCompleted {
@@ -267,20 +264,23 @@ extension TrackersViewController: TrackerCellDelegate {
 }
 
 extension TrackersViewController: HabitOrEventViewControllerDelegate {
-    
     func getDataProvider() -> DataProviderProtocol {
         dataProvider
     }
     
     func needToReloadCollectionView() {
-        datePickerValueChanged(datePicker)
         dismiss(animated: true)
     }
 }
 
-extension TrackersViewController: DataProviderDelegate {
-    
-    func updateTrackers() {
-        collectionView.reloadData()
+extension TrackersViewController: TrackersDelegate {
+    func updateTrackers(_ indexes: TrackerIndexes) {
+        collectionView.performBatchUpdates{
+            collectionView.insertSections(indexes.insertedSections)
+            collectionView.deleteSections(indexes.deletedSections)
+            collectionView.insertItems(at: Array(indexes.insertedIndexes))
+            collectionView.deleteItems(at: Array(indexes.deletedIndexes))
+            collectionView.reloadItems(at: Array(indexes.updatedIndexes))
+        }
     }
 }

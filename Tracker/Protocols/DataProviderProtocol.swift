@@ -8,8 +8,8 @@
 import Foundation
 
 protocol DataProviderProtocol {
-    var delegate: DataProviderDelegate? { get set }
-    func fetchTrackersCoreData(_ weekDay: Int, currentDate: Date)
+    var trackersDelegate: TrackersDelegate? { get set }
+    func fetchTrackersCoreData(for currentDate: Date)
     func numberOfCategories() -> Int?
     func titleForSection(_ section: Int) -> String?
     func numberOfTrackersInSection(_ section: Int) -> Int

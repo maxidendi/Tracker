@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol DataProviderDelegate: AnyObject {
-    func updateTrackers()
+protocol TrackersDelegate: AnyObject {
+    func updateTrackers(_ indexes: TrackerIndexes)
 }
 

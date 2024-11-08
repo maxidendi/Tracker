@@ -178,8 +178,8 @@ final class NewTrackerViewController: UIViewController {
     
     @objc func createButtonTapped() {
         guard let newTracker, let trackerCategory else { return }
-        dataProvider.addTracker(newTracker, to: trackerCategory)
         delegate?.dismissNewTrackerFlow()
+        dataProvider.addTracker(newTracker, to: trackerCategory)
     }
     
     private func isReadyToCreateTracker() {

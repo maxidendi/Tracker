@@ -102,18 +102,24 @@ final class CategoryView: UIViewController {
         }
     }
     
-    @objc private func addCategoryButtonTapped() {
-        let addCategoryViewController = AddCategoryViewController(dataProvider: viewModel.getDataProvider(),
-                                                                  delegate: self)
-        addCategoryViewController.modalPresentationStyle = .popover
-        present(addCategoryViewController, animated: true)
-    }
-    
     private func showStubsOrCategories() {
         tableView.reloadData()
         let isEmpty = categories.isEmpty
         labelStub.isHidden = !isEmpty
         imageStubView.isHidden = !isEmpty
+    }
+    
+    private func updateTableView(oldCount: Int, newCount: Int) {
+        tableView.performBatchUpdates {
+            
+        }
+    }
+    
+    @objc private func addCategoryButtonTapped() {
+        let addCategoryViewController = AddCategoryViewController(dataProvider: viewModel.getDataProvider(),
+                                                                  delegate: self)
+        addCategoryViewController.modalPresentationStyle = .popover
+        present(addCategoryViewController, animated: true)
     }
 }
 

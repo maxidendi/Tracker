@@ -22,6 +22,11 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
     
     weak var delegate: TrackerStoreDelegate?
     private let context: NSManagedObjectContext
+    var insertedSections = IndexSet()
+    var deletedSections = IndexSet()
+    var insertedIndexes: Set<IndexPath> = []
+    var updatedIndexes: Set<IndexPath> = []
+    var deletedIndexes: Set<IndexPath> = []
     var trackerCoreDataFRC: NSFetchedResultsController<TrackerCoreData>?
 
     //MARK: - Methods
@@ -37,15 +42,23 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         }
     }
     
+    private func clearChanges() {
+        insertedIndexes = []
+        updatedIndexes = []
+        deletedIndexes = []
+        insertedSections = IndexSet()
+        deletedSections = IndexSet()
+    }
+    
     private func configureFetchedResultsController() {
         let fetchedRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
-        let sortDescriptor = NSSortDescriptor(keyPath: \TrackerCoreData.title,
-                                              ascending: true)
-        fetchedRequest.sortDescriptors = [sortDescriptor]
+        let sortDescriptorCategory = NSSortDescriptor(keyPath: \TrackerCoreData.category?.title,
+                                                      ascending: true)
+        fetchedRequest.sortDescriptors = [sortDescriptorCategory]
         let fetchedResultsController = NSFetchedResultsController(
             fetchRequest: fetchedRequest,
             managedObjectContext: context,
-            sectionNameKeyPath: #keyPath(TrackerCoreData.category),
+            sectionNameKeyPath: #keyPath(TrackerCoreData.category.title),
             cacheName: nil)
         fetchedResultsController.delegate = self
         do {
@@ -117,7 +130,56 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
 }
 
 extension TrackerStore: NSFetchedResultsControllerDelegate {
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<any NSFetchRequestResult>) {
-        delegate?.didUpdateTrackers()
+    
+    func controller(
+        _ controller: NSFetchedResultsController<NSFetchRequestResult>,
+        didChange sectionInfo: NSFetchedResultsSectionInfo,
+        atSectionIndex sectionIndex: Int,
+        for type: NSFetchedResultsChangeType
+    ){
+        switch type {
+        case .insert:
+            insertedSections.insert(sectionIndex)
+        case .delete:
+            deletedSections.insert(sectionIndex)
+        default:
+            break
+        }
+    }
+    
+    func controller(
+        _ controller: NSFetchedResultsController<NSFetchRequestResult>,
+        didChange anObject: Any,
+        at indexPath: IndexPath?,
+        for type: NSFetchedResultsChangeType,
+        newIndexPath: IndexPath?
+    ) {
+        switch type {
+        case .insert:
+            if let newIndexPath {
+                insertedIndexes.insert(newIndexPath)
+            }
+        case .delete:
+            if let indexPath {
+                deletedIndexes.insert(indexPath)
+            }
+        case .update:
+            if let indexPath {
+                updatedIndexes.insert(indexPath)
+            }
+        default:
+            break
+        }
+    }
+    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        let indexes = TrackerIndexes(
+            insertedSections: insertedSections,
+            deletedSections: deletedSections,
+            insertedIndexes: insertedIndexes,
+            updatedIndexes: updatedIndexes,
+            deletedIndexes: deletedIndexes)
+        delegate?.didUpdateTrackers(indexes)
+        clearChanges()
     }
 }

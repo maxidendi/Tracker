@@ -46,6 +46,7 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
     
     func getCategoriesList() -> [String] {
         let request = TrackerCategoryCoreData.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \TrackerCategoryCoreData.title, ascending: true)]
         request.propertiesToFetch = ["title"]
         request.resultType = .dictionaryResultType
         guard let categoriesCoreData = try? context.execute(request) as? NSAsynchronousFetchResult<NSFetchRequestResult>,

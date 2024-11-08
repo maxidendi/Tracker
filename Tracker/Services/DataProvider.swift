@@ -5,6 +5,10 @@
 //  Created by Денис Максимов on 26.10.2024.
 //
 
+protocol CategoriesDelegate: AnyObject {
+    func categoriesDidChange()
+}
+
 import UIKit
 import CoreData
 
@@ -36,7 +40,8 @@ final class DataProvider: DataProviderProtocol {
     
     //MARK: - Properties
     
-    weak var delegate: DataProviderDelegate?
+    weak var categoriesDelegate: CategoriesDelegate?
+    weak var trackersDelegate: TrackersDelegate?
     private let calendar = Calendar.current
     private let categoryStore: CategoryStoreProtocol
     private let recordsStore: RecordsStoreProtocol
@@ -46,7 +51,8 @@ final class DataProvider: DataProviderProtocol {
     
     //TrackerStore FRC to TrackersVC collectionView
     
-    func fetchTrackersCoreData(_ weekDay: Int, currentDate: Date) {
+    func fetchTrackersCoreData(for currentDate: Date) {
+        let weekDay = calendar.component(.weekday, from: currentDate)
         trackerStore.fetchTrackers(for: weekDay, date: currentDate)
     }
     
@@ -108,8 +114,8 @@ final class DataProvider: DataProviderProtocol {
 //MARK: - Extensions
 
 extension DataProvider: TrackerStoreDelegate {
-    func didUpdateTrackers() {
-        delegate?.updateTrackers()
+    func didUpdateTrackers(_ indexes: TrackerIndexes) {
+        trackersDelegate?.updateTrackers(indexes)
     }
     
     func getCategoryCoreData(from category: String) -> TrackerCategoryCoreData? {
