@@ -60,10 +60,10 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
             managedObjectContext: context,
             sectionNameKeyPath: #keyPath(TrackerCoreData.category.title),
             cacheName: nil)
+        trackerCoreDataFRC = fetchedResultsController
         fetchedResultsController.delegate = self
         do {
             try fetchedResultsController.performFetch()
-            self.trackerCoreDataFRC = fetchedResultsController
         } catch {
             let nserror = error as NSError
             assertionFailure("Unresolved error \(nserror), \(nserror.userInfo)")

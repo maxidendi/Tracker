@@ -31,7 +31,15 @@ final class CategoryView: UIViewController {
     private var category: String?
     private var viewModel: CategoryViewModelProtocol
     private let constants = Constants.CategoryViewControllerConstants.self
-    private var categories: [String] = []
+    
+    private lazy var blurEffectView: UIVisualEffectView = {
+        let blurEffect = UIBlurEffect(style: .systemMaterial)
+        let visualEffectView = UIVisualEffectView(effect: blurEffect)
+        visualEffectView.alpha = 0
+        visualEffectView.frame = view.bounds
+        return visualEffectView
+    } ()
+
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = constants.title
@@ -87,32 +95,42 @@ final class CategoryView: UIViewController {
         addSubviews()
         layoutSubviews()
         bind()
-        viewModel.fetchCategories()
     }
     
     //MARK: - Methods
     
     private func bind() {
-        viewModel.onCategoriesListStateChange = { [weak self] list in
-            self?.categories = list
-            self?.showStubsOrCategories()
+        viewModel.onCategoriesListStateChange = { [weak self] indexes in
+            self?.updateTableView(with: indexes)
         }
         viewModel.onCategorySelected = { [weak self] category in
             self?.delegate?.didRecieveCategory(category)
         }
     }
     
-    private func showStubsOrCategories() {
-        tableView.reloadData()
-        let isEmpty = categories.isEmpty
-        labelStub.isHidden = !isEmpty
-        imageStubView.isHidden = !isEmpty
+    private func updateTableView(with indexes: CategoryIndexes) {
+        tableView.performBatchUpdates({
+            tableView.insertRows(at: Array(indexes.insertedIndexes), with: .automatic)
+            tableView.deleteRows(at: Array(indexes.deletedIndexes), with: .automatic)
+            tableView.reloadRows(at: Array(indexes.updatedIndexes), with: .automatic)
+        }, completion: { [weak self] _ in
+            self?.configureCells()
+        })
     }
     
-    private func updateTableView(oldCount: Int, newCount: Int) {
-        tableView.performBatchUpdates {
-            
+    private func configureCells() {
+        guard let rows = viewModel.categoriesCount() else { return }
+        for row in 0..<rows {
+            let indexPath = IndexPath(row: row, section: 0)
+            let cell = tableView.cellForRow(at: indexPath)
+            cell?.setSeparatorAndCorners(rows: rows, indexPath: indexPath)
         }
+    }
+    
+    private func showStubsOrCategories(_ rows: Int) {
+        let isEmpty = rows == 0
+        labelStub.isHidden = !isEmpty
+        imageStubView.isHidden = !isEmpty
     }
     
     @objc private func addCategoryButtonTapped() {
@@ -128,7 +146,7 @@ final class CategoryView: UIViewController {
 extension CategoryView: SetupSubviewsProtocol {
     
     func addSubviews() {
-        [titleLabel, tableView, addCategoryButton, imageStubView, labelStub].forEach {
+        [titleLabel, tableView, addCategoryButton, imageStubView, labelStub, blurEffectView].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
         }
@@ -172,19 +190,21 @@ extension CategoryView: SetupSubviewsProtocol {
 extension CategoryView: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        categories.count
+        let numberOfRows = viewModel.categoriesCount() ?? 0
+        showStubsOrCategories(numberOfRows)
+        return numberOfRows
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(
             withIdentifier: CategoryCell.identifier,
-            for: indexPath) as? CategoryCell
+            for: indexPath) as? CategoryCell,
+              let categoryText = viewModel.getCategoryTitle(at: indexPath)
         else { return UITableViewCell() }
-        cell.configure(category: categories[indexPath.row],
-                       isMarked: category == categories[indexPath.row],
+        cell.configure(category: categoryText,
+                       isMarked: category == categoryText,
                        indexPath: indexPath,
-                       rowsCount: categories.count,
-                       separatorWidth: tableView.bounds.width)
+                       rowsCount: tableView.numberOfRows(inSection: 0))
         return cell
     }
     
@@ -194,6 +214,31 @@ extension CategoryView: UITableViewDataSource {
 }
 
 extension CategoryView: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView,
+                   contextMenuConfigurationForRowAt
+                   indexPath: IndexPath,
+                   point: CGPoint
+    ) -> UIContextMenuConfiguration? {
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { suggestedActions in
+            let deleteAction = UIAction(title: "Удалить", image: nil, attributes: .destructive) { [weak self] _ in
+                self?.viewModel.deleteCategory(at: indexPath)
+            }
+            return UIMenu(title: "", children: [deleteAction])
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, willBeginEditingRowAt indexPath: IndexPath) {
+        UIView.animate(withDuration: 0.25) {
+            self.blurEffectView.alpha = 1
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, didEndEditingRowAt indexPath: IndexPath?) {
+        UIView.animate(withDuration: 0.25) {
+            self.blurEffectView.alpha = 0
+        }
+    }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let cell = tableView.cellForRow(at: indexPath)
@@ -206,7 +251,6 @@ extension CategoryView: UITableViewDelegate {
 extension CategoryView: AddCategoryDelegate {
     
     func addCategory() {
-        viewModel.fetchCategories()
         dismiss(animated: true)
     }
 }

@@ -8,9 +8,11 @@
 import Foundation
 
 protocol CategoryViewModelProtocol: AnyObject {
-    var onCategoriesListStateChange: (([String]) -> Void)? { get set }
+    var onCategoriesListStateChange: ((CategoryIndexes) -> Void)? { get set }
     var onCategorySelected: ((String) -> Void)? { get set }
-    func fetchCategories()
+    func categoriesCount() -> Int?
+    func deleteCategory(at indexPath: IndexPath)
+    func getCategoryTitle(at indexPath: IndexPath) -> String?
     func selectCategory(_ category: String)
     func getDataProvider() -> DataProviderProtocol
 }

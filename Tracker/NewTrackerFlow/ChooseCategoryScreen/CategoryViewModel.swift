@@ -13,18 +13,27 @@ final class CategoryViewModel: CategoryViewModelProtocol {
     
     init(dataProvider: DataProviderProtocol) {
         self.dataProvider = dataProvider
+        self.dataProvider.categoriesDelegate = self
     }
     
     //MARK: - Properties
     
-    var onCategoriesListStateChange: (([String]) -> Void)?
+    var onCategoriesListStateChange: ((CategoryIndexes) -> Void)?
     var onCategorySelected: ((String) -> Void)?
-    private let dataProvider: DataProviderProtocol
+    private var dataProvider: DataProviderProtocol
     
     //MARK: - Methods
     
-    func fetchCategories() {
-        onCategoriesListStateChange?(dataProvider.getCategoriesList())
+    func categoriesCount() -> Int? {
+        dataProvider.getCategoriesList().count
+    }
+    
+    func getCategoryTitle(at indexPath: IndexPath) -> String? {
+        dataProvider.getCategory(at: indexPath)
+    }
+    
+    func deleteCategory(at indexPath: IndexPath) {
+        dataProvider.removeCategory(indexPath)
     }
     
     func selectCategory(_ category: String) {
@@ -33,5 +42,13 @@ final class CategoryViewModel: CategoryViewModelProtocol {
     
     func getDataProvider() -> DataProviderProtocol {
         dataProvider
+    }
+}
+
+//MARK: - Extensions
+
+extension CategoryViewModel: CategoriesDelegate {
+    func categoriesDidChange(_ indexes: CategoryIndexes) {
+        onCategoriesListStateChange?(indexes)
     }
 }

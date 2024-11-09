@@ -15,11 +15,17 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
     init(context: NSManagedObjectContext) {
         self.context = context
         super.init()
+        configureFetchedResultsController()
     }
     
     //MARK: - Properties
     
+    weak var delegate: TrackerCategoriesStoreDelegate?
     private let context: NSManagedObjectContext
+    var trackerCategoryCoreDataFRC: NSFetchedResultsController<TrackerCategoryCoreData>?
+    var insertedIndexes: Set<IndexPath> = []
+    var updatedIndexes: Set<IndexPath> = []
+    var deletedIndexes: Set<IndexPath> = []
     
     //MARK: - Methods
     
@@ -34,6 +40,32 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
         }
     }
     
+    private func clearChanges() {
+        insertedIndexes = []
+        updatedIndexes = []
+        deletedIndexes = []
+    }
+    
+    private func configureFetchedResultsController() {
+        let fetchedRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+        let sortDescriptorCategory = NSSortDescriptor(keyPath: \TrackerCategoryCoreData.title,
+                                                      ascending: true)
+        fetchedRequest.sortDescriptors = [sortDescriptorCategory]
+        let fetchedResultsController = NSFetchedResultsController(
+            fetchRequest: fetchedRequest,
+            managedObjectContext: context,
+            sectionNameKeyPath: nil,
+            cacheName: nil)
+        trackerCategoryCoreDataFRC = fetchedResultsController
+        fetchedResultsController.delegate = self
+        do {
+            try fetchedResultsController.performFetch()
+        } catch {
+            let nserror = error as NSError
+            assertionFailure("Unresolved error \(nserror), \(nserror.userInfo)")
+        }
+    }
+    
     func getTrackerCategoryCoreData(from category: String) -> TrackerCategoryCoreData? {
         let request = TrackerCategoryCoreData.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(keyPath: \TrackerCategoryCoreData.title, ascending: true)]
@@ -45,15 +77,7 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
     }
     
     func getCategoriesList() -> [String] {
-        let request = TrackerCategoryCoreData.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \TrackerCategoryCoreData.title, ascending: true)]
-        request.propertiesToFetch = ["title"]
-        request.resultType = .dictionaryResultType
-        guard let categoriesCoreData = try? context.execute(request) as? NSAsynchronousFetchResult<NSFetchRequestResult>,
-              let finalResult = categoriesCoreData.finalResult as? [[String: String]] else { return [] }
-        
-        let categories = finalResult.compactMap{ $0["title"] }
-        return categories
+        trackerCategoryCoreDataFRC?.fetchedObjects?.compactMap(\.title) ?? []
     }
     
     func addCategoryCoreData(_ category: String) {
@@ -61,5 +85,48 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
         categoryCoreData.title = category
         categoryCoreData.trackers = []
         saveContext()
+    }
+    
+    func deleteCategoryCoreData(_ index: IndexPath) {
+        guard let categoryCoreData = trackerCategoryCoreDataFRC?.fetchedObjects?[index.row] as? TrackerCategoryCoreData
+        else { return }
+        context.delete(categoryCoreData)
+        saveContext()
+    }
+}
+
+extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
+    func controller(
+        _ controller: NSFetchedResultsController<NSFetchRequestResult>,
+        didChange anObject: Any,
+        at indexPath: IndexPath?,
+        for type: NSFetchedResultsChangeType,
+        newIndexPath: IndexPath?
+    ) {
+        switch type {
+        case .insert:
+            if let newIndexPath {
+                insertedIndexes.insert(newIndexPath)
+            }
+        case .delete:
+            if let indexPath {
+                deletedIndexes.insert(indexPath)
+            }
+        case .update:
+            if let indexPath {
+                updatedIndexes.insert(indexPath)
+            }
+        default:
+            break
+        }
+    }
+    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        let categoryIndexes = CategoryIndexes(
+            insertedIndexes: insertedIndexes,
+            updatedIndexes: updatedIndexes,
+            deletedIndexes: deletedIndexes)
+        delegate?.didUpdateCategories(categoryIndexes)
+        clearChanges()
     }
 }

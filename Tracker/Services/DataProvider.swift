@@ -6,7 +6,11 @@
 //
 
 protocol CategoriesDelegate: AnyObject {
-    func categoriesDidChange()
+    func categoriesDidChange(_ indexes: CategoryIndexes)
+}
+
+protocol TrackerCategoriesStoreDelegate: AnyObject {
+    func didUpdateCategories(_ indexes: CategoryIndexes)
 }
 
 import UIKit
@@ -24,6 +28,7 @@ final class DataProvider: DataProviderProtocol {
         self.recordsStore = recordsStore
         self.trackerStore = trackerStore
         trackerStore.delegate = self
+        categoryStore.delegate = self
     }
     
     convenience init() {
@@ -90,12 +95,22 @@ final class DataProvider: DataProviderProtocol {
 
     //Other Stores
     
+    func getCategory(at indexPath: IndexPath) -> String? {
+        guard let categoryCoreData = categoryStore.trackerCategoryCoreDataFRC?.object(at: indexPath) as? TrackerCategoryCoreData,
+              let categoryTitle = categoryCoreData.title else { return nil }
+        return categoryTitle
+    }
+    
     func getCategoriesList() -> [String] {
         categoryStore.getCategoriesList()
     }
     
     func addCategory(_ category: String) {
         categoryStore.addCategoryCoreData(category)
+    }
+    
+    func removeCategory(_ index: IndexPath) {
+        categoryStore.deleteCategoryCoreData(index)
     }
     
     func addTrackerRecord(_ record: TrackerRecord) {
@@ -120,5 +135,11 @@ extension DataProvider: TrackerStoreDelegate {
     
     func getCategoryCoreData(from category: String) -> TrackerCategoryCoreData? {
         categoryStore.getTrackerCategoryCoreData(from: category)
+    }
+}
+
+extension DataProvider: TrackerCategoriesStoreDelegate {
+    func didUpdateCategories(_ indexes: CategoryIndexes) {
+        categoriesDelegate?.categoriesDidChange(indexes)
     }
 }
