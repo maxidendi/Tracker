@@ -9,17 +9,17 @@
         <attribute name="emoji" attributeType="String"/>
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="title" attributeType="String"/>
-        <relationship name="category" maxCount="1" deletionRule="Cascade" destinationEntity="TrackerCategoryCoreData" inverseName="trackers" inverseEntity="TrackerCategoryCoreData"/>
+        <relationship name="category" maxCount="1" deletionRule="Nullify" destinationEntity="TrackerCategoryCoreData" inverseName="trackers" inverseEntity="TrackerCategoryCoreData"/>
         <relationship name="record" toMany="YES" deletionRule="Cascade" destinationEntity="TrackerRecordCoreData" inverseName="tracker" inverseEntity="TrackerRecordCoreData"/>
         <relationship name="weekdays" toMany="YES" deletionRule="Cascade" destinationEntity="TrackerWeekDayCoreData" inverseName="tracker" inverseEntity="TrackerWeekDayCoreData"/>
     </entity>
     <entity name="TrackerRecordCoreData" representedClassName="TrackerRecordCoreData" syncable="YES" codeGenerationType="class">
         <attribute name="date" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
-        <relationship name="tracker" maxCount="1" deletionRule="Cascade" destinationEntity="TrackerCoreData" inverseName="record" inverseEntity="TrackerCoreData"/>
+        <relationship name="tracker" maxCount="1" deletionRule="Nullify" destinationEntity="TrackerCoreData" inverseName="record" inverseEntity="TrackerCoreData"/>
     </entity>
     <entity name="TrackerWeekDayCoreData" representedClassName="TrackerWeekDayCoreData" syncable="YES" codeGenerationType="class">
         <attribute name="weekDay" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
-        <relationship name="tracker" maxCount="1" deletionRule="Cascade" destinationEntity="TrackerCoreData" inverseName="weekdays" inverseEntity="TrackerCoreData"/>
+        <relationship name="tracker" maxCount="1" deletionRule="Nullify" destinationEntity="TrackerCoreData" inverseName="weekdays" inverseEntity="TrackerCoreData"/>
     </entity>
 </model>

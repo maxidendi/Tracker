@@ -464,9 +464,9 @@ extension NewTrackerViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch indexPath.row {
         case 0:
-            let categoryViewModel = CategoryViewModel(dataProvider: dataProvider)
+            let categoryViewModel = CategoryViewModel(dataProvider: dataProvider,
+                                                      category: trackerCategory)
             let categoryVC = CategoryView(viewModel: categoryViewModel,
-                                          category: trackerCategory,
                                           delegate: self)
             categoryVC.modalPresentationStyle = .popover
             present(categoryVC, animated: true)
@@ -526,9 +526,15 @@ extension NewTrackerViewController: ScheduleViewControllerDelegate {
 
 extension NewTrackerViewController: CategoryViewControllerDelegate {
     
-    func didRecieveCategory(_ category: String) {
+    func didSelectCategory(_ category: String?) {
         trackerCategory = category
         tableView.reloadData()
         isReadyToCreateTracker()
+        dismiss(animated: true)
+    }
+    
+    func didRecieveCategory(_ category: String?) {
+        trackerCategory = category
+        tableView.reloadData()
     }
 }

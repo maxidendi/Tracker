@@ -12,7 +12,9 @@ extension UITableViewCell {
         guard let indexPath else { return }
         if rows == 1 {
             self.layer.cornerRadius = Constants.General.radius16
+            self.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner]
             self.separatorInset = .init(top: .zero, left: .zero, bottom: .zero, right: self.bounds.width)
+            return
         } else if indexPath.row == .zero {
             self.layer.cornerRadius = Constants.General.radius16
             self.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
@@ -24,5 +26,6 @@ extension UITableViewCell {
         } else {
             self.separatorInset = Constants.General.separatorInsets
         }
+        self.layoutSublayers(of: self.layer)
     }
 }

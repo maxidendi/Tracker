@@ -94,12 +94,12 @@ final class DataProvider: DataProviderProtocol {
     }
 
     //Other Stores
-    
-    func getCategory(at indexPath: IndexPath) -> String? {
-        guard let categoryCoreData = categoryStore.trackerCategoryCoreDataFRC?.object(at: indexPath) as? TrackerCategoryCoreData,
-              let categoryTitle = categoryCoreData.title else { return nil }
-        return categoryTitle
-    }
+//    
+//    func getCategory(at indexPath: IndexPath) -> String? {
+//        guard let categoryCoreData = categoryStore.trackerCategoryCoreDataFRC?.object(at: indexPath) as? TrackerCategoryCoreData,
+//              let categoryTitle = categoryCoreData.title else { return nil }
+//        return categoryTitle
+//    }
     
     func getCategoriesList() -> [String] {
         categoryStore.getCategoriesList()

@@ -26,19 +26,5 @@ final class CategoryCell: UITableViewCell {
         self.textLabel?.text = category
         self.accessoryType = isMarked ? .checkmark : .none
         setSeparatorAndCorners(rows: rowsCount, indexPath: indexPath)
-//        if rowsCount == 1 {
-//            self.layer.cornerRadius = Constants.General.radius16
-//            self.separatorInset = .init(top: .zero, left: .zero, bottom: .zero, right: separatorWidth)
-//        } else if indexPath.row == .zero {
-//            self.layer.cornerRadius = Constants.General.radius16
-//            self.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-//            self.separatorInset = Constants.General.separatorInsets
-//        } else if indexPath.row == rowsCount - 1 {
-//            self.layer.cornerRadius = Constants.General.radius16
-//            self.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
-//            self.separatorInset = .init(top: .zero, left: .zero, bottom: .zero, right: separatorWidth)
-//        } else {
-//            self.separatorInset = Constants.General.separatorInsets
-//        }
     }
 }

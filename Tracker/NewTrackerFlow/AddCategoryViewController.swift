@@ -136,7 +136,7 @@ extension AddCategoryViewController: UITextFieldDelegate {
         guard !categoriesList.contains(where: { $0 == text }) && !text.isEmpty else {
             let alertModel = AlertModel(message: Constants.AlertModelConstants.messageAddCategory,
                                         actionTitle: Constants.AlertModelConstants.actionTitleAddCategory)
-            showAlert(with: alertModel)
+            showAlert(with: alertModel, alertStyle: .alert, actionStyle: .default, handler: nil)
             changeDoneButtonState(false)
             return
         }

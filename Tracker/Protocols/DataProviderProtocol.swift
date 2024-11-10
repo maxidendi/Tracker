@@ -15,7 +15,7 @@ protocol DataProviderProtocol {
     func titleForSection(_ section: Int) -> String?
     func numberOfTrackersInSection(_ section: Int) -> Int
     func getTracker(at indexPath: IndexPath, currentDate: Date) -> TrackerCellModel?
-    func getCategory(at indexPath: IndexPath) -> String?
+//    func getCategory(at indexPath: IndexPath) -> String?
     func getCategoriesList() -> [String]
     func addCategory(_ category: String)
     func removeCategory(_ index: IndexPath)

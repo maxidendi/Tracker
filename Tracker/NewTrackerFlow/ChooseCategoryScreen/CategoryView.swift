@@ -12,11 +12,9 @@ final class CategoryView: UIViewController {
     //MARK: - Init
     
     init(viewModel: CategoryViewModelProtocol,
-         category: String?,
          delegate: CategoryViewControllerDelegate? = nil
     ) {
         self.viewModel = viewModel
-        self.category = category
         self.delegate = delegate
         super.init(nibName: nil, bundle: nil)
     }
@@ -28,7 +26,6 @@ final class CategoryView: UIViewController {
     //MARK: - Properties
     
     weak var delegate: CategoryViewControllerDelegate?
-    private var category: String?
     private var viewModel: CategoryViewModelProtocol
     private let constants = Constants.CategoryViewControllerConstants.self
     
@@ -67,6 +64,7 @@ final class CategoryView: UIViewController {
         tableView.backgroundColor = .ypWhite
         tableView.separatorColor = .ypGray
         tableView.isScrollEnabled = true
+        tableView.clipsToBounds = false
         tableView.showsVerticalScrollIndicator = false
         tableView.dataSource = self
         tableView.delegate = self
@@ -104,6 +102,9 @@ final class CategoryView: UIViewController {
             self?.updateTableView(with: indexes)
         }
         viewModel.onCategorySelected = { [weak self] category in
+            self?.delegate?.didSelectCategory(category)
+        }
+        viewModel.onCategoryChanged = { [weak self] category in
             self?.delegate?.didRecieveCategory(category)
         }
     }
@@ -119,7 +120,7 @@ final class CategoryView: UIViewController {
     }
     
     private func configureCells() {
-        guard let rows = viewModel.categoriesCount() else { return }
+        let rows = viewModel.categoriesList().count
         for row in 0..<rows {
             let indexPath = IndexPath(row: row, section: 0)
             let cell = tableView.cellForRow(at: indexPath)
@@ -190,7 +191,7 @@ extension CategoryView: SetupSubviewsProtocol {
 extension CategoryView: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let numberOfRows = viewModel.categoriesCount() ?? 0
+        let numberOfRows = viewModel.categoriesList().count
         showStubsOrCategories(numberOfRows)
         return numberOfRows
     }
@@ -198,13 +199,14 @@ extension CategoryView: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(
             withIdentifier: CategoryCell.identifier,
-            for: indexPath) as? CategoryCell,
-              let categoryText = viewModel.getCategoryTitle(at: indexPath)
+            for: indexPath) as? CategoryCell
         else { return UITableViewCell() }
-        cell.configure(category: categoryText,
-                       isMarked: category == categoryText,
+        let categories = viewModel.categoriesList()
+        let isMarked = viewModel.isCellMarked(at: indexPath)
+        cell.configure(category: categories[indexPath.row],
+                       isMarked: isMarked,
                        indexPath: indexPath,
-                       rowsCount: tableView.numberOfRows(inSection: 0))
+                       rowsCount: categories.count)
         return cell
     }
     
@@ -220,9 +222,24 @@ extension CategoryView: UITableViewDelegate {
                    indexPath: IndexPath,
                    point: CGPoint
     ) -> UIContextMenuConfiguration? {
-        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { suggestedActions in
-            let deleteAction = UIAction(title: "Удалить", image: nil, attributes: .destructive) { [weak self] _ in
-                self?.viewModel.deleteCategory(at: indexPath)
+        let alertModel = AlertModel(message: "Эта категория точно не нужна?",
+                                    actionTitle: "Удалить")
+        return UIContextMenuConfiguration(
+            identifier: nil,
+            previewProvider: nil
+        ) { [weak self] _ in
+            let deleteAction = UIAction(
+                title: "Удалить",
+                image: nil,
+                attributes: .destructive
+            ) { _ in
+                self?.showAlertWithCancel(
+                    with: alertModel,
+                    alertStyle: .actionSheet,
+                    actionStyle: .destructive
+                ) { _ in
+                    self?.viewModel.deleteCategory(at: indexPath)
+                }
             }
             return UIMenu(title: "", children: [deleteAction])
         }
@@ -241,10 +258,7 @@ extension CategoryView: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let cell = tableView.cellForRow(at: indexPath)
-        guard let text = cell?.textLabel?.text else { return }
-        viewModel.selectCategory(text)
-        dismiss(animated: true)
+        viewModel.selectCategory(indexPath)
     }
 }
 
