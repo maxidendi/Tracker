@@ -200,10 +200,10 @@ final class NewTrackerView: UIViewController {
                                           schedule.compactMap{ $0.short }.joined(separator: ", ")
             self?.dismiss(animated: true)
         }
-        viewModel.onShowCategoryView = { [weak self] viewModel in
-            let categoryView = CategoryView(viewModel: viewModel)
-            categoryView.modalPresentationStyle = .popover
-            self?.present(categoryView, animated: true)
+        viewModel.onShowCategoriesView = { [weak self] viewModel in
+            let categoriesView = CategoriesView(viewModel: viewModel)
+            categoriesView.modalPresentationStyle = .popover
+            self?.present(categoriesView, animated: true)
         }
         viewModel.onShowScheduleView = { [weak self] viewModel in
             let scheduleView = ScheduleView(viewModel: viewModel)

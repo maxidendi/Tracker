@@ -22,9 +22,10 @@ final class TrackerTabBarController: UITabBarController {
     //MARK: - Methods
     
     private func setTabBarControllers() {
-        let trackersViewController = TrackersViewController(dataProvider: DataProvider())
-        let navigationControllerTrack = UINavigationController(rootViewController: trackersViewController)
-        trackersViewController.tabBarItem = UITabBarItem(
+        let trackersViewModel = TrackersViewModel(dataProvider: DataProvider())
+        let trackersView = TrackersView(viewModel: trackersViewModel)
+        let navigationControllerTrack = UINavigationController(rootViewController: trackersView)
+        trackersView.tabBarItem = UITabBarItem(
             title: Constants.TrackersViewControllerConstants.title,
             image: .tabTrackersIcon,
             selectedImage: nil)

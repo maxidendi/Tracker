@@ -15,7 +15,7 @@ protocol NewTrackerViewModelProtocol: AnyObject {
     var onChangeCategory: ((String?) -> Void)? { get set }
     var onSelectSchedule: ((Set<WeekDay>) -> Void)? { get set }
     var onSelectCategory: ((String?) -> Void)? { get set }
-    var onShowCategoryView: ((CategoryViewModel) -> Void)? { get set }
+    var onShowCategoriesView: ((CategoriesViewModel) -> Void)? { get set }
     var onShowScheduleView: ((ScheduleViewModel) -> Void)? { get set }
     var isHabit: Bool { get }
     func createTracker()
@@ -47,7 +47,7 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
     var onChangeCategory: ((String?) -> Void)?
     var onSelectCategory: ((String?) -> Void)?
     var onSelectSchedule: ((Set<WeekDay>) -> Void)?
-    var onShowCategoryView: ((CategoryViewModel) -> Void)?
+    var onShowCategoriesView: ((CategoriesViewModel) -> Void)?
     var onShowScheduleView: ((ScheduleViewModel) -> Void)?
     let isHabit: Bool
     private var dataProvider: DataProviderProtocol
@@ -143,10 +143,10 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
     }
     
     func setupCategoryViewModel() {
-        let categoryViewModel = CategoryViewModel(dataProvider: dataProvider,
-                                                  category: newTrackerCategory)
-        categoryViewModel.delegate = self
-        onShowCategoryView?(categoryViewModel)
+        let categoriesViewModel = CategoriesViewModel(dataProvider: dataProvider,
+                                                      category: newTrackerCategory)
+        categoriesViewModel.delegate = self
+        onShowCategoriesView?(categoriesViewModel)
     }
     
     func setupScheduleViewModel() {

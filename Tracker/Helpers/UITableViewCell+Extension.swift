@@ -25,6 +25,7 @@ extension UITableViewCell {
             self.separatorInset = .init(top: .zero, left: .zero, bottom: .zero, right: self.bounds.width)
         } else {
             self.separatorInset = Constants.General.separatorInsets
+            self.layer.maskedCorners = []
         }
         self.layoutSublayers(of: self.layer)
     }

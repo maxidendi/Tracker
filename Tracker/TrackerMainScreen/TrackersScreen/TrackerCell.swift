@@ -94,15 +94,20 @@ final class TrackerCell: UICollectionViewCell {
         switchCounterButtonImage(isCompleted)
     }
     
+    func topViewForPreview() -> UIView {
+        return topView
+    }
+    
     //MARK: - Private methods
         
     @objc private func counterButtonTapped() {
         guard let id else { return }
-        delegate?.counterButtonTapped(with: id, isCompleted: !isCompleted) { [weak self] in
-            guard let self else { return }
-            switchCounterButtonImage(!isCompleted)
-            changeCounterLabelText(isCompleted)
-        }
+        delegate?.counterButtonTapped(with: id, isCompleted: !isCompleted)
+//        { [weak self] in
+//            guard let self else { return }
+//            switchCounterButtonImage(!isCompleted)
+//            changeCounterLabelText(isCompleted)
+//        }
     }
     
     private func switchCounterButtonImage(_ isCompleted: Bool) {
@@ -117,11 +122,11 @@ final class TrackerCell: UICollectionViewCell {
             counterButton.backgroundColor = .ypWhite
         }
     }
-    
-    private func changeCounterLabelText(_ isCompleted: Bool) {
-        counter = isCompleted ? counter + 1 : counter - 1
-        counterLabel.text = counterTitle
-    }
+//    
+//    private func changeCounterLabelText(_ isCompleted: Bool) {
+//        counter = isCompleted ? counter + 1 : counter - 1
+//        counterLabel.text = counterTitle
+//    }
 }
 
 //MARK: - Extensions

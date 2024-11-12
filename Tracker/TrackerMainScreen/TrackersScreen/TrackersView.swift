@@ -7,12 +7,12 @@
 
 import UIKit
 
-final class TrackersViewController: UIViewController {
+final class TrackersView: UIViewController {
     
     //MARK: - Init
     
-    init(dataProvider: DataProviderProtocol) {
-        self.dataProvider = dataProvider
+    init(viewModel: TrackersViewModel) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -22,12 +22,8 @@ final class TrackersViewController: UIViewController {
     
     //MARK: - Properties
     
-    private var currentDate: Date {
-        calendar.onlyDate(from: datePicker.date)
-    }
-    private let calendar = Calendar.current
+    private let viewModel: TrackersViewModelProtocol
     private let constants = Constants.TrackersViewControllerConstants.self
-    private var dataProvider: DataProviderProtocol
     private lazy var collectionView: UICollectionView = {
         let collection = UICollectionView(frame: .zero,
                                           collectionViewLayout: UICollectionViewFlowLayout())
@@ -85,7 +81,7 @@ final class TrackersViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
-        dataProvider.trackersDelegate = self
+        bind()
         setupToHideKeyboard()
         addSubviews()
         layoutSubviews()
@@ -94,6 +90,18 @@ final class TrackersViewController: UIViewController {
     }
     
     //MARK: - Methods
+    
+    private func bind() {
+        viewModel.onUpdateTrackers = { [weak self] indexes in
+            self?.collectionView.performBatchUpdates{
+                self?.collectionView.insertSections(indexes.insertedSections)
+                self?.collectionView.deleteSections(indexes.deletedSections)
+                self?.collectionView.insertItems(at: Array(indexes.insertedIndexes))
+                self?.collectionView.deleteItems(at: Array(indexes.deletedIndexes))
+                self?.collectionView.reloadItems(at: Array(indexes.updatedIndexes))
+            }
+        }
+    }
     
     private func setupNavigationBar() {
         navigationController?.navigationBar.prefersLargeTitles = true
@@ -116,7 +124,7 @@ final class TrackersViewController: UIViewController {
     //MARK: - Objc methods
     
     @objc private func datePickerValueChanged() {
-        dataProvider.fetchTrackersCoreData(for: currentDate)
+        viewModel.updateTrackers(for: datePicker.date)
         collectionView.reloadData()
         dismiss(animated: true)
     }
@@ -133,7 +141,7 @@ final class TrackersViewController: UIViewController {
 //MARK: - SetupSubviewsProtocol extension
 //
 
-extension TrackersViewController: SetupSubviewsProtocol {
+extension TrackersView: SetupSubviewsProtocol {
     func addSubviews() {
         [imageStubView, labelStub, collectionView].forEach {
             view.addSubview($0)
@@ -167,15 +175,15 @@ extension TrackersViewController: SetupSubviewsProtocol {
 //MARK: - UICollectionView extensions
 //
 
-extension TrackersViewController: UICollectionViewDataSource {
+extension TrackersView: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        let numberOfSection = dataProvider.numberOfCategories() ?? 0
+        let numberOfSection = viewModel.numberOfcategories() ?? 0
         numberOfSection == 0 ? stubsIsHidden(false) : stubsIsHidden(true)
         return numberOfSection
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        dataProvider.numberOfTrackersInSection(section)
+        viewModel.numberOfTrackers(for: section)
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
@@ -186,7 +194,7 @@ extension TrackersViewController: UICollectionViewDataSource {
         as? TrackersSupplementaryView else {
             return UICollectionReusableView()
         }
-        headerView.setTitle(dataProvider.titleForSection(indexPath.section) ?? "")
+        headerView.setTitle(viewModel.titleForCategory(indexPath.section) ?? "")
         return headerView
     }
     
@@ -194,7 +202,7 @@ extension TrackersViewController: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: TrackerCell.reuseIdentifier,
             for: indexPath) as? TrackerCell,
-              let trackerCellModel = dataProvider.getTracker(at: indexPath, currentDate: currentDate)
+              let trackerCellModel = viewModel.getTrackerCellModel(at: indexPath)
         else {
             return UICollectionViewCell()
         }
@@ -202,9 +210,39 @@ extension TrackersViewController: UICollectionViewDataSource {
         cell.configureCell(model: trackerCellModel)
         return cell
     }
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        let alertModel = AlertModel(message: "Уверены что хотите удалить трекер?",
+                                    actionTitle: "Удалить")
+        return UIContextMenuConfiguration(
+            identifier: indexPath as NSCopying,
+            previewProvider: nil
+        ) { [weak self] _ in
+            let deleteAction = UIAction(
+                title: "Удалить",
+                image: nil,
+                attributes: .destructive
+            ) { _ in
+                self?.showAlertWithCancel(
+                    with: alertModel,
+                    alertStyle: .actionSheet,
+                    actionStyle: .destructive
+                ) { _ in
+                    self?.viewModel.deleteTracker(indexPath)
+                }
+            }
+            return UIMenu(title: "", children: [deleteAction])
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, previewForHighlightingContextMenuWithConfiguration configuration: UIContextMenuConfiguration) -> UITargetedPreview? {
+        guard let indexPath = configuration.identifier as? IndexPath else { return nil }
+        guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell else { return nil }
+        let preview = UITargetedPreview(view: cell.topViewForPreview())
+        return preview
+    }
 }
 
-extension TrackersViewController: UICollectionViewDelegateFlowLayout {
+extension TrackersView: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let availableWidth = collectionView.bounds.width - constants.geometricParams.paddingWidth
         let itemWidth = availableWidth / CGFloat(constants.geometricParams.cellCount)
@@ -231,7 +269,7 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
         let headerView: UICollectionReusableView
         if #available(iOS 18.0, *) {
             return CGSize(width: collectionView.bounds.width - 2 * Constants.General.supplementaryViewHorizontalPadding,
-                          height: Constants.General.labelTextHeight)
+                          height: Constants.General.labelTextHeight + 2)
         } else {
             headerView = self.collectionView(collectionView,
                                              viewForSupplementaryElementOfKind: UICollectionView.elementKindSectionHeader,
@@ -242,74 +280,24 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
                                                   withHorizontalFittingPriority: .required,
                                                   verticalFittingPriority: .fittingSizeLevel)
     }
-    
-    func collectionView(
-        _ collectionView: UICollectionView,
-        contextMenuConfigurationForItemsAt indexPaths: [IndexPath],
-        point: CGPoint
-    ) -> UIContextMenuConfiguration? {
-        let alertModel = AlertModel(message: "Уверены что хотите удалить трекер?",
-                                    actionTitle: "Удалить")
-        return UIContextMenuConfiguration(
-            identifier: nil,
-            previewProvider: nil
-        ) { [weak self] _ in
-            let deleteAction = UIAction(
-                title: "Удалить",
-                image: nil,
-                attributes: .destructive
-            ) { _ in
-                self?.showAlertWithCancel(
-                    with: alertModel,
-                    alertStyle: .actionSheet,
-                    actionStyle: .destructive
-                ) { _ in
-                    self?.dataProvider.removeTrackers(indexPaths)
-                }
-            }
-            return UIMenu(title: "", children: [deleteAction])
-        }
-    }
 }
 
 //
 //MARK: - Delegates extensions
 //
 
-extension TrackersViewController: TrackerCellDelegate {
-    func counterButtonTapped(with id: UUID, isCompleted: Bool, completion: @escaping () -> Void) {
-        let trackerRecord = TrackerRecord(id: id, date: currentDate)
-        if isCompleted {
-            guard let numberOfDays = calendar.numberOfDaysBetween(currentDate),
-                  numberOfDays >= .zero
-            else { return }
-            dataProvider.addTrackerRecord(trackerRecord)
-            completion()
-        } else {
-            dataProvider.removeTrackerRecord(trackerRecord)
-            completion()
-        }
+extension TrackersView: TrackerCellDelegate {
+    func counterButtonTapped(with id: UUID, isCompleted: Bool) {
+        viewModel.trackerRecordChanged(id, isCompleted: isCompleted)
     }
 }
 
-extension TrackersViewController: HabitOrEventViewControllerDelegate {
+extension TrackersView: HabitOrEventViewControllerDelegate {
     func getDataProvider() -> DataProviderProtocol {
-        dataProvider
+        viewModel.getDataProvider()
     }
     
     func needToReloadCollectionView() {
         dismiss(animated: true)
-    }
-}
-
-extension TrackersViewController: TrackersDelegate {
-    func updateTrackers(_ indexes: TrackerIndexes) {
-        collectionView.performBatchUpdates{
-            collectionView.insertSections(indexes.insertedSections)
-            collectionView.deleteSections(indexes.deletedSections)
-            collectionView.insertItems(at: Array(indexes.insertedIndexes))
-            collectionView.deleteItems(at: Array(indexes.deletedIndexes))
-            collectionView.reloadItems(at: Array(indexes.updatedIndexes))
-        }
     }
 }

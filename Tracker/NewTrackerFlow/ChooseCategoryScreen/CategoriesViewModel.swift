@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class CategoryViewModel: CategoryViewModelProtocol {
+final class CategoriesViewModel: CategoryViewModelProtocol {
     
     //MARK: - Init
     
@@ -55,7 +55,7 @@ final class CategoryViewModel: CategoryViewModelProtocol {
 
 //MARK: - Extensions
 
-extension CategoryViewModel: CategoriesDelegate {
+extension CategoriesViewModel: CategoriesDelegate {
     func categoriesDidChange(_ indexes: CategoryIndexes) {
         onCategoriesListStateChange?(indexes)
     }

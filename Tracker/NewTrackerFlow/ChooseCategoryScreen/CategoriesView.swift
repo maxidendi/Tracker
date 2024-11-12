@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class CategoryView: UIViewController {
+final class CategoriesView: UIViewController {
     
     //MARK: - Init
     
@@ -24,14 +24,6 @@ final class CategoryView: UIViewController {
     
     private var viewModel: CategoryViewModelProtocol
     private let constants = Constants.CategoryViewControllerConstants.self
-    private lazy var blurEffectView: UIVisualEffectView = {
-        let blurEffect = UIBlurEffect(style: .systemMaterial)
-        let visualEffectView = UIVisualEffectView(effect: blurEffect)
-        visualEffectView.alpha = 0
-        visualEffectView.frame = view.bounds
-        return visualEffectView
-    } ()
-
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = constants.title
@@ -133,10 +125,10 @@ final class CategoryView: UIViewController {
 
 //MARK: - Extensions
 
-extension CategoryView: SetupSubviewsProtocol {
+extension CategoriesView: SetupSubviewsProtocol {
     
     func addSubviews() {
-        [titleLabel, tableView, addCategoryButton, imageStubView, labelStub, blurEffectView].forEach {
+        [titleLabel, tableView, addCategoryButton, imageStubView, labelStub].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
         }
@@ -177,7 +169,7 @@ extension CategoryView: SetupSubviewsProtocol {
     }
 }
 
-extension CategoryView: UITableViewDataSource {
+extension CategoriesView: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let numberOfRows = viewModel.categoriesList().count
@@ -204,7 +196,7 @@ extension CategoryView: UITableViewDataSource {
     }
 }
 
-extension CategoryView: UITableViewDelegate {
+extension CategoriesView: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView,
                    contextMenuConfigurationForRowAt
@@ -234,16 +226,12 @@ extension CategoryView: UITableViewDelegate {
         }
     }
     
-    func tableView(_ tableView: UITableView, willBeginEditingRowAt indexPath: IndexPath) {
-        UIView.animate(withDuration: 0.25) {
-            self.blurEffectView.alpha = 1
-        }
-    }
-    
-    func tableView(_ tableView: UITableView, didEndEditingRowAt indexPath: IndexPath?) {
-        UIView.animate(withDuration: 0.25) {
-            self.blurEffectView.alpha = 0
-        }
+    func tableView(_ tableView: UITableView, previewForHighlightingContextMenuWithConfiguration configuration: UIContextMenuConfiguration) -> UITargetedPreview? {
+        guard let indexPath = configuration.identifier as? IndexPath,
+              let cell = tableView.cellForRow(at: indexPath)
+        else { return nil }
+        let preview = UITargetedPreview(view: cell)
+        return preview
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -251,7 +239,7 @@ extension CategoryView: UITableViewDelegate {
     }
 }
 
-extension CategoryView: AddCategoryDelegate {
+extension CategoriesView: AddCategoryDelegate {
     
     func addCategory() {
         dismiss(animated: true)

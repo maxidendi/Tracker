@@ -19,7 +19,7 @@ protocol DataProviderProtocol {
     func addCategory(_ category: String)
     func removeCategory(_ index: IndexPath)
     func addTracker(_ tracker: Tracker, to category: String)
-    func removeTrackers(_ indexPath: [IndexPath])
+    func removeTracker(_ indexPath: IndexPath)
     func addTrackerRecord(_ record: TrackerRecord)
     func removeTrackerRecord(_ record: TrackerRecord)
 }

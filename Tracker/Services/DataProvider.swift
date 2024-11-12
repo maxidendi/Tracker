@@ -89,8 +89,8 @@ final class DataProvider: DataProviderProtocol {
         trackerStore.addTrackerCoreData(tracker, to: category)
     }
     
-    func removeTrackers(_ indexPaths: [IndexPath]) {
-        indexPaths.forEach { trackerStore.deleteTrackerCoreData($0) }
+    func removeTracker(_ indexPath: IndexPath) {
+        trackerStore.deleteTrackerCoreData(indexPath)
     }
     
     //CategoriesStore
