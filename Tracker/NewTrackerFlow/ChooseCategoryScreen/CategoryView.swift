@@ -11,11 +11,8 @@ final class CategoryView: UIViewController {
     
     //MARK: - Init
     
-    init(viewModel: CategoryViewModelProtocol,
-         delegate: CategoryViewControllerDelegate? = nil
-    ) {
+    init(viewModel: CategoryViewModelProtocol) {
         self.viewModel = viewModel
-        self.delegate = delegate
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -25,10 +22,8 @@ final class CategoryView: UIViewController {
     
     //MARK: - Properties
     
-    weak var delegate: CategoryViewControllerDelegate?
     private var viewModel: CategoryViewModelProtocol
     private let constants = Constants.CategoryViewControllerConstants.self
-    
     private lazy var blurEffectView: UIVisualEffectView = {
         let blurEffect = UIBlurEffect(style: .systemMaterial)
         let visualEffectView = UIVisualEffectView(effect: blurEffect)
@@ -100,12 +95,6 @@ final class CategoryView: UIViewController {
     private func bind() {
         viewModel.onCategoriesListStateChange = { [weak self] indexes in
             self?.updateTableView(with: indexes)
-        }
-        viewModel.onCategorySelected = { [weak self] category in
-            self?.delegate?.didSelectCategory(category)
-        }
-        viewModel.onCategoryChanged = { [weak self] category in
-            self?.delegate?.didRecieveCategory(category)
         }
     }
     

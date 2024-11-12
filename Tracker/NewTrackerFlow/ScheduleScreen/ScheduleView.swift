@@ -7,16 +7,13 @@
 
 import UIKit
 
-final class ScheduleViewController: UIViewController {
+final class ScheduleView: UIViewController, UITableViewDelegate {
     
     //MARK: - Init
     
-    init(delegate: ScheduleViewControllerDelegate? = nil,
-         schedule: Set<WeekDay>) {
+    init(viewModel: ScheduleViewModelProtocol) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
-        self.delegate = delegate
-        self.schedule = schedule
-        addObserver()
     }
     
     required init?(coder: NSCoder) {
@@ -25,19 +22,8 @@ final class ScheduleViewController: UIViewController {
     
     //MARK: - Properties
     
-    weak var delegate: ScheduleViewControllerDelegate?
-    private var schedule: Set<WeekDay> = [] {
-        didSet {
-            if schedule.isEmpty {
-                scheduleIsEmpty = true
-            } else {
-                scheduleIsEmpty = false
-            }
-        }
-    }
-    @objc dynamic private var scheduleIsEmpty: Bool = false
+    private var viewModel: ScheduleViewModelProtocol
     private let constants = Constants.ScheduleViewControllerConstants.self
-    private var scheduleObserver: NSKeyValueObservation?
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = constants.title
@@ -60,8 +46,8 @@ final class ScheduleViewController: UIViewController {
     
     private lazy var doneButton: UIButton = {
         let button = UIButton(type: .system)
-        button.isEnabled = schedule.isEmpty ? false : true
-        button.backgroundColor = schedule.isEmpty ? .ypGray : .ypBlack
+        button.isEnabled = viewModel.isScheduleEmpty() ? false : true
+        button.backgroundColor = viewModel.isScheduleEmpty() ? .ypGray : .ypBlack
         button.setTitle(constants.doneButtonTitle, for: .normal)
         button.setTitleColor(.ypWhite, for: .normal)
         button.titleLabel?.font = Constants.Typography.medium16
@@ -78,30 +64,27 @@ final class ScheduleViewController: UIViewController {
         view.backgroundColor = .ypWhite
         addSubviews()
         layoutSubviews()
+        bind()
     }
     
     //MARK: - Methods
     
-    @objc private func appendWeekday(_ sender: UISwitch) {
+    private func bind() {
+        viewModel.onScheduleIsEmpty = { [weak self] isEmpty in
+            self?.changeDoneButtonState(isEmpty)
+        }
+    }
+    
+    @objc private func changeWeekdays(_ sender: UISwitch) {
         if sender.isOn {
-            schedule.insert(WeekDay.allCases[sender.tag])
+            viewModel.insertWeekday(tag: sender.tag)
         } else {
-            schedule.remove(WeekDay.allCases[sender.tag])
+            viewModel.removeWeekday(tag: sender.tag)
         }
     }
     
     @objc private func buttonTapped() {
-        delegate?.didRecieveSchedule(schedule)
-        dismiss(animated: true)
-    }
-    
-    private func addObserver() {
-        scheduleObserver = self.observe(\.scheduleIsEmpty,
-                                         options: [.new],
-                                         changeHandler: { [weak self] _, isEmpty  in
-            guard let self, let isEmpty = isEmpty.newValue else { return }
-            changeDoneButtonState(isEmpty)
-        })
+        viewModel.doneButtonTapped()
     }
     
     private func changeDoneButtonState(_ scheduleIsEmpty: Bool) {
@@ -112,7 +95,7 @@ final class ScheduleViewController: UIViewController {
 
 //MARK: - Extensions
 
-extension ScheduleViewController: SetupSubviewsProtocol {
+extension ScheduleView: SetupSubviewsProtocol {
     
     func addSubviews() {
         [titleLabel, tableView, doneButton].forEach {
@@ -147,7 +130,7 @@ extension ScheduleViewController: SetupSubviewsProtocol {
     }
 }
 
-extension ScheduleViewController: UITableViewDataSource {
+extension ScheduleView: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         WeekDay.allCases.count
@@ -161,33 +144,17 @@ extension ScheduleViewController: UITableViewDataSource {
         cell.selectionStyle = .none
         let switcher = UISwitch()
         switcher.tag = indexPath.row
-        switcher.isOn = schedule.contains(weekDay[indexPath.row]) ? true : false
+        switcher.isOn = viewModel.isWeekdayAdded(tag: indexPath.row) ? true : false
         switcher.onTintColor = .ypBlue
         switcher.addTarget(self,
-                           action: #selector(appendWeekday),
+                           action: #selector(changeWeekdays),
                            for: .valueChanged)
         cell.accessoryView = switcher
-        if weekDay.count == 1 {
-            cell.layer.cornerRadius = Constants.General.radius16
-        } else if indexPath.row == .zero {
-            cell.layer.cornerRadius = Constants.General.radius16
-            cell.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-            cell.separatorInset = Constants.General.separatorInsets
-        } else if indexPath.row == weekDay.count - 1 {
-            cell.layer.cornerRadius = Constants.General.radius16
-            cell.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
-            cell.separatorInset = .init(top: .zero, left: .zero, bottom: .zero, right: tableView.bounds.width)
-        } else {
-            cell.separatorInset = Constants.General.separatorInsets
-        }
+        cell.setSeparatorAndCorners(rows: WeekDay.allCases.count, indexPath: indexPath)
         return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return Constants.General.itemHeight
     }
-}
-
-extension ScheduleViewController: UITableViewDelegate {
-    
 }

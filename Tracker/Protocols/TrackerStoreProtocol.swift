@@ -12,6 +12,7 @@ protocol TrackerStoreProtocol: AnyObject {
     var delegate: TrackerStoreDelegate? { get set }
     var trackerCoreDataFRC: NSFetchedResultsController<TrackerCoreData>? { get }
     func fetchTrackers(for weekDay: Int, date: Date)
-    func addTrackerCoreData(_ tracker: Tracker, to category: String)
     func getTracker(from trackerCoreData: TrackerCoreData) -> Tracker?
+    func addTrackerCoreData(_ tracker: Tracker, to category: String)
+    func deleteTrackerCoreData(_ index: IndexPath)
 }

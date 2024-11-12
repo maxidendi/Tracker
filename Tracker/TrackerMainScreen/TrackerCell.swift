@@ -13,6 +13,7 @@ final class TrackerCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        contentView.backgroundColor = .clear
         addSubviews()
     }
     
@@ -82,16 +83,7 @@ final class TrackerCell: UICollectionViewCell {
     
     //MARK: - Methods
     
-    func configureCell(
-//        id: UUID,
-//        title: String,
-//        emoji: String,
-//        color: UIColor,
-//        tracker: Tracker,
-//        counter: Int,
-//        isCompleted: Bool
-        model: TrackerCellModel
-    ) {
+    func configureCell(model: TrackerCellModel) {
         self.id = model.tracker.id
         self.isCompleted = model.isCompleted
         self.counter = model.count

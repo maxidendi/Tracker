@@ -7,6 +7,6 @@
 
 import Foundation
 
-protocol NewCategoryViewControllerDelegate: AnyObject {
+protocol NewTrackerViewDelegate: AnyObject {
     func dismissNewTrackerFlow()
 }

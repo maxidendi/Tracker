@@ -15,11 +15,11 @@ protocol DataProviderProtocol {
     func titleForSection(_ section: Int) -> String?
     func numberOfTrackersInSection(_ section: Int) -> Int
     func getTracker(at indexPath: IndexPath, currentDate: Date) -> TrackerCellModel?
-//    func getCategory(at indexPath: IndexPath) -> String?
     func getCategoriesList() -> [String]
     func addCategory(_ category: String)
     func removeCategory(_ index: IndexPath)
     func addTracker(_ tracker: Tracker, to category: String)
+    func removeTrackers(_ indexPath: [IndexPath])
     func addTrackerRecord(_ record: TrackerRecord)
     func removeTrackerRecord(_ record: TrackerRecord)
 }

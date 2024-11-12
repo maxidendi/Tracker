@@ -20,10 +20,9 @@ final class CategoryViewModel: CategoryViewModelProtocol {
     //MARK: - Properties
     
     var onCategoriesListStateChange: ((CategoryIndexes) -> Void)?
-    var onCategorySelected: ((String?) -> Void)?
-    var onCategoryChanged: ((String?) -> Void)?
-    private var category: String? 
+    private var category: String?
     private var dataProvider: DataProviderProtocol
+    weak var delegate: CategoryViewModelDelegate?
     
     //MARK: - Methods
     
@@ -38,7 +37,7 @@ final class CategoryViewModel: CategoryViewModelProtocol {
     func deleteCategory(at indexPath: IndexPath) {
         if categoriesList()[indexPath.row] == category {
             category = nil
-            onCategoryChanged?(category)
+            delegate?.didRecieveCategory(category)
         }
         dataProvider.removeCategory(indexPath)
     }
@@ -46,7 +45,7 @@ final class CategoryViewModel: CategoryViewModelProtocol {
     func selectCategory(_ indexPath: IndexPath) {
         let category = categoriesList()[indexPath.row]
         self.category = category
-        onCategorySelected?(self.category)
+        delegate?.didSelectCategory(category)
     }
     
     func getDataProvider() -> DataProviderProtocol {
@@ -61,3 +60,5 @@ extension CategoryViewModel: CategoriesDelegate {
         onCategoriesListStateChange?(indexes)
     }
 }
+
+

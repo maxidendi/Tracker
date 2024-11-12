@@ -7,8 +7,7 @@
 
 import Foundation
 
-protocol CategoryViewControllerDelegate: AnyObject {
+protocol CategoryViewModelDelegate: AnyObject {
     func didSelectCategory(_ category: String?)
-    
     func didRecieveCategory(_ category: String?)
 }

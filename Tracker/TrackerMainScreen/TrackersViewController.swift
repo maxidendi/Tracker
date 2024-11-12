@@ -118,6 +118,7 @@ final class TrackersViewController: UIViewController {
     @objc private func datePickerValueChanged() {
         dataProvider.fetchTrackersCoreData(for: currentDate)
         collectionView.reloadData()
+        dismiss(animated: true)
     }
     
     @objc private func didTapPlusButton() {
@@ -240,6 +241,34 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
                                                          height: UIView.layoutFittingExpandedSize.height),
                                                   withHorizontalFittingPriority: .required,
                                                   verticalFittingPriority: .fittingSizeLevel)
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        contextMenuConfigurationForItemsAt indexPaths: [IndexPath],
+        point: CGPoint
+    ) -> UIContextMenuConfiguration? {
+        let alertModel = AlertModel(message: "Уверены что хотите удалить трекер?",
+                                    actionTitle: "Удалить")
+        return UIContextMenuConfiguration(
+            identifier: nil,
+            previewProvider: nil
+        ) { [weak self] _ in
+            let deleteAction = UIAction(
+                title: "Удалить",
+                image: nil,
+                attributes: .destructive
+            ) { _ in
+                self?.showAlertWithCancel(
+                    with: alertModel,
+                    alertStyle: .actionSheet,
+                    actionStyle: .destructive
+                ) { _ in
+                    self?.dataProvider.removeTrackers(indexPaths)
+                }
+            }
+            return UIMenu(title: "", children: [deleteAction])
+        }
     }
 }
 

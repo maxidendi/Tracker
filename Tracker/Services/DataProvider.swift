@@ -5,14 +5,6 @@
 //  Created by Денис Максимов on 26.10.2024.
 //
 
-protocol CategoriesDelegate: AnyObject {
-    func categoriesDidChange(_ indexes: CategoryIndexes)
-}
-
-protocol TrackerCategoriesStoreDelegate: AnyObject {
-    func didUpdateCategories(_ indexes: CategoryIndexes)
-}
-
 import UIKit
 import CoreData
 
@@ -32,12 +24,7 @@ final class DataProvider: DataProviderProtocol {
     }
     
     convenience init() {
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-            assertionFailure("no AppDelegate")
-            self.init()
-            return
-        }
-        let context = appDelegate.persistentContainer.viewContext
+        let context = DataProvider.persistentContainer.viewContext
         self.init(categoryStore: TrackerCategoryStore(context: context),
                   recordsStore: TrackerRecordsStore(context: context),
                   trackerStore: TrackerStore(context: context))
@@ -51,6 +38,16 @@ final class DataProvider: DataProviderProtocol {
     private let categoryStore: CategoryStoreProtocol
     private let recordsStore: RecordsStoreProtocol
     private let trackerStore: TrackerStoreProtocol
+    static let persistentContainer: NSPersistentContainer = {
+        let container = NSPersistentContainer(name: "Trackers")
+        container.loadPersistentStores(completionHandler: { _, error in
+            if let error {
+                fatalError("Unable to load persistent stores: \(error)")
+            }
+        })
+        return container
+    } ()
+
     
     //MARK: - Methods
     
@@ -66,8 +63,7 @@ final class DataProvider: DataProviderProtocol {
     }
     
     func titleForSection(_ section: Int) -> String? {
-        let trackerCoreData = trackerStore.trackerCoreDataFRC?.sections?[section].objects?.first as? TrackerCoreData
-        return trackerCoreData?.category?.title
+        return trackerStore.trackerCoreDataFRC?.sections?[section].name
     }
     
     func numberOfTrackersInSection(_ section: Int) -> Int {
@@ -92,14 +88,12 @@ final class DataProvider: DataProviderProtocol {
     func addTracker(_ tracker: Tracker, to category: String) {
         trackerStore.addTrackerCoreData(tracker, to: category)
     }
-
-    //Other Stores
-//    
-//    func getCategory(at indexPath: IndexPath) -> String? {
-//        guard let categoryCoreData = categoryStore.trackerCategoryCoreDataFRC?.object(at: indexPath) as? TrackerCategoryCoreData,
-//              let categoryTitle = categoryCoreData.title else { return nil }
-//        return categoryTitle
-//    }
+    
+    func removeTrackers(_ indexPaths: [IndexPath]) {
+        indexPaths.forEach { trackerStore.deleteTrackerCoreData($0) }
+    }
+    
+    //CategoriesStore
     
     func getCategoriesList() -> [String] {
         categoryStore.getCategoriesList()
@@ -112,6 +106,8 @@ final class DataProvider: DataProviderProtocol {
     func removeCategory(_ index: IndexPath) {
         categoryStore.deleteCategoryCoreData(index)
     }
+
+    //RecordsStore
     
     func addTrackerRecord(_ record: TrackerRecord) {
         recordsStore.addTrackerRecord(record)

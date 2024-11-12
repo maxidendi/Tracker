@@ -127,6 +127,13 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         }
         saveContext()
     }
+    
+    func deleteTrackerCoreData(_ index: IndexPath) {
+        guard let trackerCoreData = trackerCoreDataFRC?.fetchedObjects?[index.row] as? TrackerCoreData
+        else { return }
+        context.delete(trackerCoreData)
+        saveContext()
+    }
 }
 
 extension TrackerStore: NSFetchedResultsControllerDelegate {
