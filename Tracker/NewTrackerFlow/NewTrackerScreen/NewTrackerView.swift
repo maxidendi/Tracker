@@ -193,16 +193,6 @@ final class NewTrackerView: UIViewController {
                                           schedule.compactMap{ $0.short }.joined(separator: ", ")
             self?.dismiss(animated: true)
         }
-        viewModel.onShowCategoriesView = { [weak self] viewModel in
-            let categoriesView = CategoriesView(viewModel: viewModel)
-            categoriesView.modalPresentationStyle = .popover
-            self?.present(categoriesView, animated: true)
-        }
-        viewModel.onShowScheduleView = { [weak self] viewModel in
-            let scheduleView = ScheduleView(viewModel: viewModel)
-            scheduleView.modalPresentationStyle = .popover
-            self?.present(scheduleView, animated: true)
-        }
     }
     
     @objc func cancelButtonTapped() {
@@ -443,9 +433,15 @@ extension NewTrackerView: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch indexPath.row {
         case 0:
-        viewModel.setupCategoryViewModel()
+            let viewModel = viewModel.setupCategoryViewModel()
+            let categoriesView = CategoriesView(viewModel: viewModel)
+            categoriesView.modalPresentationStyle = .popover
+            present(categoriesView, animated: true)
         case 1:
-        viewModel.setupScheduleViewModel()
+            let viewModel = viewModel.setupScheduleViewModel()
+            let scheduleView = ScheduleView(viewModel: viewModel)
+            scheduleView.modalPresentationStyle = .popover
+            present(scheduleView, animated: true)
         default: break
         }
     }

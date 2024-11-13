@@ -5,7 +5,7 @@
 //  Created by Денис Максимов on 04.11.2024.
 //
 
-import UIKit
+import Foundation
 
 struct TrackerCellModel {
     let tracker: Tracker

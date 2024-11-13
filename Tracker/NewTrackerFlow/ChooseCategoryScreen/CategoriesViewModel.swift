@@ -51,6 +51,10 @@ final class CategoriesViewModel: CategoryViewModelProtocol {
     func getDataProvider() -> DataProviderProtocol {
         dataProvider
     }
+    
+    func setupAddCategoryViewModel() -> AddCategoryViewModelProtocol {
+        AddCategoryViewModel(dataProvider: dataProvider)
+    }
 }
 
 //MARK: - Extensions

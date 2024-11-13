@@ -5,7 +5,7 @@
 //  Created by Денис Максимов on 22.10.2024.
 //
 
-import UIKit
+import Foundation
 import CoreData
 
 final class TrackerRecordsStore: NSObject, RecordsStoreProtocol {

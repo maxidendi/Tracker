@@ -13,8 +13,6 @@ protocol NewTrackerViewModelProtocol: AnyObject {
     var onChangeSelectedColorCell: ((_ from: IndexPath?, _ to: IndexPath) -> Void)? { get set }
     var onSelectSchedule: ((Set<WeekDay>) -> Void)? { get set }
     var onSelectCategory: ((String?, _ isSelected: Bool) -> Void)? { get set }
-    var onShowCategoriesView: ((CategoriesViewModel) -> Void)? { get set }
-    var onShowScheduleView: ((ScheduleViewModel) -> Void)? { get set }
     var isHabit: Bool { get }
     func createTracker()
     func cancelButtonTapped()
@@ -23,8 +21,8 @@ protocol NewTrackerViewModelProtocol: AnyObject {
     func selectEmoji(at indexPath: IndexPath)
     func selectColor(at indexPath: IndexPath)
     func setNewTrackerTitle(_ title: String?)
-    func setupCategoryViewModel()
-    func setupScheduleViewModel()
+    func setupCategoryViewModel() -> CategoriesViewModel
+    func setupScheduleViewModel() -> ScheduleViewModel
 }
 
 final class NewTrackerViewModel: NewTrackerViewModelProtocol {
@@ -44,8 +42,6 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
     var onChangeSelectedColorCell: ((_ from: IndexPath?, _ to: IndexPath) -> Void)?
     var onSelectCategory: ((String?, _ isSelected: Bool) -> Void)?
     var onSelectSchedule: ((Set<WeekDay>) -> Void)?
-    var onShowCategoriesView: ((CategoriesViewModel) -> Void)?
-    var onShowScheduleView: ((ScheduleViewModel) -> Void)?
     let isHabit: Bool
     private var dataProvider: DataProviderProtocol
     private var newTracker: Tracker?
@@ -135,17 +131,17 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
         isReadyToCreateTracker()
     }
     
-    func setupCategoryViewModel() {
+    func setupCategoryViewModel() -> CategoriesViewModel {
         let categoriesViewModel = CategoriesViewModel(dataProvider: dataProvider,
                                                       category: newTrackerCategory)
         categoriesViewModel.delegate = self
-        onShowCategoriesView?(categoriesViewModel)
+        return categoriesViewModel
     }
     
-    func setupScheduleViewModel() {
+    func setupScheduleViewModel() -> ScheduleViewModel {
         let scheduleViewModel = ScheduleViewModel(schedule: newTrackerSchedule)
         scheduleViewModel.delegate = self
-        onShowScheduleView?(scheduleViewModel)
+        return scheduleViewModel
     }
 }
 

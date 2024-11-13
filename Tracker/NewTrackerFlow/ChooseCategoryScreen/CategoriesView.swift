@@ -116,10 +116,10 @@ final class CategoriesView: UIViewController {
     }
     
     @objc private func addCategoryButtonTapped() {
-        let addCategoryViewController = AddCategoryViewController(dataProvider: viewModel.getDataProvider(),
-                                                                  delegate: self)
-        addCategoryViewController.modalPresentationStyle = .popover
-        present(addCategoryViewController, animated: true)
+        let viewModel = viewModel.setupAddCategoryViewModel()
+        let addCategoryView = AddCategoryView(viewModel: viewModel)
+        addCategoryView.modalPresentationStyle = .popover
+        present(addCategoryView, animated: true)
     }
 }
 
@@ -236,12 +236,5 @@ extension CategoriesView: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         viewModel.selectCategory(indexPath)
-    }
-}
-
-extension CategoriesView: AddCategoryDelegate {
-    
-    func addCategory() {
-        dismiss(animated: true)
     }
 }

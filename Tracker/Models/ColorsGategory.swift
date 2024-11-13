@@ -5,7 +5,7 @@
 //  Created by Денис Максимов on 08.10.2024.
 //
 
-import UIKit
+import Foundation
 
 struct ColorsGategory {
     let title: String

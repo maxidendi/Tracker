@@ -5,7 +5,7 @@
 //  Created by Денис Максимов on 26.10.2024.
 //
 
-import UIKit
+import Foundation
 import CoreData
 
 final class DataProvider: DataProviderProtocol {

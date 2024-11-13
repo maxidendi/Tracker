@@ -7,15 +7,12 @@
 
 import UIKit
 
-final class AddCategoryViewController: UIViewController, SetupSubviewsProtocol {
+final class AddCategoryView: UIViewController, SetupSubviewsProtocol {
     
     //MARK: - Init
     
-    init(dataProvider: DataProviderProtocol,
-         delegate: AddCategoryDelegate? = nil
-    ) {
-        self.dataProvider = dataProvider
-        self.delegate = delegate
+    init(viewModel: AddCategoryViewModelProtocol) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -25,11 +22,8 @@ final class AddCategoryViewController: UIViewController, SetupSubviewsProtocol {
     
     //MARK: - Properties
     
-    weak var delegate: AddCategoryDelegate?
-    private let dataProvider: DataProviderProtocol
+    private let viewModel: AddCategoryViewModelProtocol
     private let constants = Constants.AddCategoryViewControllerConstants.self
-    private var categoriesList: [String] = []
-    private var newCategory: String?
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = constants.title
@@ -72,7 +66,7 @@ final class AddCategoryViewController: UIViewController, SetupSubviewsProtocol {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
-        categoriesList = dataProvider.getCategoriesList()
+        bind()
         addSubviews()
         layoutSubviews()
         setupToHideKeyboard()
@@ -80,10 +74,18 @@ final class AddCategoryViewController: UIViewController, SetupSubviewsProtocol {
     
     //MARK: - Methods
     
+    private func bind() {
+        viewModel.onDoneButtonStateChanged = { [weak self] isChanged in
+            self?.changeDoneButtonState(isChanged)
+        }
+        viewModel.onShowAlert = { [weak self] alert in
+            self?.showAlert(with: alert, alertStyle: .alert, actionStyle: .default, handler: nil)
+        }
+    }
+    
     @objc private func doneButtonuttonTapped() {
-        guard let newCategory else { return }
-        dataProvider.addCategory(newCategory)
-        delegate?.addCategory()
+        viewModel.doneButtonTapped()
+        dismiss(animated: true)
     }
     
     private func changeDoneButtonState(_ isEnabled: Bool) {
@@ -125,7 +127,7 @@ final class AddCategoryViewController: UIViewController, SetupSubviewsProtocol {
 
 //MARK: - Extensions
 
-extension AddCategoryViewController: UITextFieldDelegate {
+extension AddCategoryView: UITextFieldDelegate {
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
         textField.becomeFirstResponder()
@@ -133,15 +135,7 @@ extension AddCategoryViewController: UITextFieldDelegate {
     
     func textFieldDidEndEditing(_ textField: UITextField) {
         guard let text = textField.text else { return }
-        guard !categoriesList.contains(where: { $0 == text }) && !text.isEmpty else {
-            let alertModel = AlertModel(message: Constants.AlertModelConstants.messageAddCategory,
-                                        actionTitle: Constants.AlertModelConstants.actionTitleAddCategory)
-            showAlert(with: alertModel, alertStyle: .alert, actionStyle: .default, handler: nil)
-            changeDoneButtonState(false)
-            return
-        }
-        self.newCategory = text
-        changeDoneButtonState(true)
+        viewModel.checkCategoryName(text)
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
