@@ -90,7 +90,7 @@ final class TrackerCell: UICollectionViewCell {
         counterLabel.text = counterTitle
         trackerTitleLabel.text = model.tracker.title
         emojiLabel.text = model.tracker.emoji
-        topView.backgroundColor = model.tracker.color
+        topView.backgroundColor = UIColor.fromCodedString(model.tracker.color) 
         switchCounterButtonImage(isCompleted)
     }
     

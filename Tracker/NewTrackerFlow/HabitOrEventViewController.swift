@@ -76,10 +76,10 @@ final class HabitOrEventViewController: UIViewController {
         let viewModel = sender == habitTrackerButton ?
                             NewTrackerViewModel(dataProvider: dataProvider, isHabit: true) :
                             NewTrackerViewModel(dataProvider: dataProvider, isHabit: false)
-        let vc = NewTrackerView(viewModel: viewModel)
-        vc.delegate = self
-        vc.modalPresentationStyle = .popover
-        present(vc, animated: true)
+        viewModel.delegate = self
+        let newTrackerView = NewTrackerView(viewModel: viewModel)
+        newTrackerView.modalPresentationStyle = .popover
+        present(newTrackerView, animated: true)
     }
 }
 
@@ -112,7 +112,7 @@ extension HabitOrEventViewController: SetupSubviewsProtocol {
     }
 }
 
-extension HabitOrEventViewController: NewTrackerViewDelegate {
+extension HabitOrEventViewController: NewTrackerViewModelDelegate {
     
     func dismissNewTrackerFlow() {
         dismiss(animated: true)

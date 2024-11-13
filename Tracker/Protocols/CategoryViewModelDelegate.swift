@@ -8,6 +8,6 @@
 import Foundation
 
 protocol CategoryViewModelDelegate: AnyObject {
-    func didSelectCategory(_ category: String?)
-    func didRecieveCategory(_ category: String?)
+    func didSelectCategory(_ category: String?, isSelected: Bool)
+//    func didRecieveCategory(_ category: String?)
 }

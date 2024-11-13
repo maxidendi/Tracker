@@ -96,7 +96,7 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
     func getTracker(from trackerCoreData: TrackerCoreData) -> Tracker? {
         guard let id = trackerCoreData.id,
               let title = trackerCoreData.title,
-              let color = trackerCoreData.color as? UIColor,
+              let color = trackerCoreData.color,
               let emoji = trackerCoreData.emoji,
               let weekdays = trackerCoreData.weekdays as? Set<TrackerWeekDayCoreData>,
               let schedule = weekdays.compactMap({ WeekDay(from: $0.weekDay) }) as? [WeekDay]

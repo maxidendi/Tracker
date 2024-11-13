@@ -72,10 +72,8 @@ final class TrackersViewModel: TrackersViewModelProtocol {
                   numberOfDays >= .zero
             else { return }
             dataProvider.addTrackerRecord(trackerRecord)
-//            completion()
         } else {
             dataProvider.removeTrackerRecord(trackerRecord)
-//            completion()
         }
     }
     

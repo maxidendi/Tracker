@@ -22,7 +22,6 @@ final class NewTrackerView: UIViewController {
     
     //MARK: - Properties
     
-    weak var delegate: NewTrackerViewDelegate?
     private let viewModel: NewTrackerViewModelProtocol
     private let constants = Constants.NewTrackerViewControllerConstants.self
     private var warningLabelHeightConstraint: NSLayoutConstraint?
@@ -165,9 +164,6 @@ final class NewTrackerView: UIViewController {
         viewModel.onChangeCreateButtonState = { [weak self] isReady in
             self?.changeCreateButtonState(isReady)
         }
-        viewModel.onNewTrackerCreated = { [weak self] in
-            self?.delegate?.dismissNewTrackerFlow()
-        }
         viewModel.onChangeSelectedEmojiCell = { [weak self] (from: IndexPath?, to: IndexPath) -> Void in
             if let from, let oldCell = self?.collectionView.cellForItem(at: from) as? EmojiCell {
                 oldCell.cellDidDeselected()
@@ -186,12 +182,9 @@ final class NewTrackerView: UIViewController {
             }
             newCell.cellDidSelected()
         }
-        viewModel.onChangeCategory = { [weak self] category in
+        viewModel.onSelectCategory = { [weak self] category, isSelected in
             self?.tableView.cellForRow(at: IndexPath(item: 0, section: 0))?.detailTextLabel?.text = category
-        }
-        viewModel.onSelectCategory = { [weak self] category in
-            self?.tableView.cellForRow(at: IndexPath(item: 0, section: 0))?.detailTextLabel?.text = category
-            self?.dismiss(animated: true)
+            if isSelected { self?.dismiss(animated: true) }
         }
         viewModel.onSelectSchedule = { [weak self] schedule in
             let cell = self?.tableView.cellForRow(at: IndexPath(item: 1, section: 0))
@@ -213,7 +206,7 @@ final class NewTrackerView: UIViewController {
     }
     
     @objc func cancelButtonTapped() {
-        delegate?.dismissNewTrackerFlow()
+        viewModel.cancelButtonTapped()
     }
     
     @objc func createButtonTapped() {
@@ -334,7 +327,8 @@ extension NewTrackerView: UICollectionViewDataSource {
                 withReuseIdentifier: ColorCell.reuseIdentifier,
                 for: indexPath) as? ColorCell
             else { return UICollectionViewCell() }
-            cell.configureCell(color: viewModel.getColorCategory().colors[indexPath.row])
+            let colorString = viewModel.getColorCategory().colors[indexPath.row]
+            cell.configureCell(color: UIColor.fromCodedString(colorString))
             return cell
         default:
             return UICollectionViewCell()
@@ -432,7 +426,6 @@ extension NewTrackerView: UITableViewDataSource {
         switch indexPath.row {
             case 0:
             cell.textLabel?.text = constants.categoryTitle
-            viewModel.setCategoryDetailTitle()
             case 1:
             cell.textLabel?.text = constants.scheduleTitle
             default: break

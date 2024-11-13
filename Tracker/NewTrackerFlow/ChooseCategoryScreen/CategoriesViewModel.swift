@@ -37,7 +37,7 @@ final class CategoriesViewModel: CategoryViewModelProtocol {
     func deleteCategory(at indexPath: IndexPath) {
         if categoriesList()[indexPath.row] == category {
             category = nil
-            delegate?.didRecieveCategory(category)
+            delegate?.didSelectCategory(category, isSelected: false)
         }
         dataProvider.removeCategory(indexPath)
     }
@@ -45,7 +45,7 @@ final class CategoriesViewModel: CategoryViewModelProtocol {
     func selectCategory(_ indexPath: IndexPath) {
         let category = categoriesList()[indexPath.row]
         self.category = category
-        delegate?.didSelectCategory(category)
+        delegate?.didSelectCategory(category, isSelected: true)
     }
     
     func getDataProvider() -> DataProviderProtocol {

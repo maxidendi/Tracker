@@ -7,6 +7,6 @@
 
 import Foundation
 
-protocol NewTrackerViewDelegate: AnyObject {
+protocol NewTrackerViewModelDelegate: AnyObject {
     func dismissNewTrackerFlow()
 }

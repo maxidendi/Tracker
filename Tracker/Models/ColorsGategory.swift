@@ -9,5 +9,5 @@ import UIKit
 
 struct ColorsGategory {
     let title: String
-    let colors: [UIColor]
+    let colors: [String]
 }

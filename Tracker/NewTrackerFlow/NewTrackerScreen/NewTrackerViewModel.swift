@@ -5,25 +5,23 @@
 //  Created by Денис Максимов on 10.11.2024.
 //
 
-import UIKit
+import Foundation
 
 protocol NewTrackerViewModelProtocol: AnyObject {
     var onChangeCreateButtonState: ((Bool) -> Void)? { get set }
-    var onNewTrackerCreated: (() -> Void)? { get set }
     var onChangeSelectedEmojiCell: ((_ from: IndexPath?, _ to: IndexPath) -> Void)? { get set }
     var onChangeSelectedColorCell: ((_ from: IndexPath?, _ to: IndexPath) -> Void)? { get set }
-    var onChangeCategory: ((String?) -> Void)? { get set }
     var onSelectSchedule: ((Set<WeekDay>) -> Void)? { get set }
-    var onSelectCategory: ((String?) -> Void)? { get set }
+    var onSelectCategory: ((String?, _ isSelected: Bool) -> Void)? { get set }
     var onShowCategoriesView: ((CategoriesViewModel) -> Void)? { get set }
     var onShowScheduleView: ((ScheduleViewModel) -> Void)? { get set }
     var isHabit: Bool { get }
     func createTracker()
+    func cancelButtonTapped()
     func getEmojiCategory() -> (emoji: [String], title: String)
-    func getColorCategory() -> (colors: [UIColor], title: String)
+    func getColorCategory() -> (colors: [String], title: String)
     func selectEmoji(at indexPath: IndexPath)
     func selectColor(at indexPath: IndexPath)
-    func setCategoryDetailTitle()
     func setNewTrackerTitle(_ title: String?)
     func setupCategoryViewModel()
     func setupScheduleViewModel()
@@ -40,12 +38,11 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
 
     //MARK: - Properties
     
+    weak var delegate: NewTrackerViewModelDelegate?
     var onChangeCreateButtonState: ((Bool) -> Void)?
-    var onNewTrackerCreated: (() -> Void)?
     var onChangeSelectedEmojiCell: ((_ from: IndexPath?, _ to: IndexPath) -> Void)?
     var onChangeSelectedColorCell: ((_ from: IndexPath?, _ to: IndexPath) -> Void)?
-    var onChangeCategory: ((String?) -> Void)?
-    var onSelectCategory: ((String?) -> Void)?
+    var onSelectCategory: ((String?, _ isSelected: Bool) -> Void)?
     var onSelectSchedule: ((Set<WeekDay>) -> Void)?
     var onShowCategoriesView: ((CategoriesViewModel) -> Void)?
     var onShowScheduleView: ((ScheduleViewModel) -> Void)?
@@ -54,7 +51,7 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
     private var newTracker: Tracker?
     private var newTrackerCategory: String?
     private var newTrackerTitle: String?
-    private var newTrackerColor: UIColor?
+    private var newTrackerColor: String?
     private var newTrackerEmoji: String?
     private var newTrackerSchedule: Set<WeekDay> = []
     private var selectedEmojiIndexPath: IndexPath?
@@ -94,14 +91,18 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
     func createTracker() {
         guard let newTracker, let newTrackerCategory else { return }
         dataProvider.addTracker(newTracker, to: newTrackerCategory)
-        onNewTrackerCreated?()
+        delegate?.dismissNewTrackerFlow()
+    }
+    
+    func cancelButtonTapped() {
+        delegate?.dismissNewTrackerFlow()
     }
     
     func getEmojiCategory() -> (emoji: [String], title: String) {
         (emoji: emojiCategory.emoji, title: emojiCategory.title)
     }
     
-    func getColorCategory() -> (colors: [UIColor], title: String) {
+    func getColorCategory() -> (colors: [String], title: String) {
         (colors: colorsCategory.colors, title: colorsCategory.title)
     }
     
@@ -129,14 +130,6 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
         isReadyToCreateTracker()
     }
     
-    func setCategoryDetailTitle() {
-        onChangeCategory?(newTrackerCategory)
-    }
-    
-    func setScheduleDetailTitle() {
-        onSelectSchedule?(newTrackerSchedule)
-    }
-    
     func setNewTrackerTitle(_ title: String?) {
         newTrackerTitle = title
         isReadyToCreateTracker()
@@ -160,15 +153,10 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
 //Extension
 
 extension NewTrackerViewModel: CategoryViewModelDelegate {
-    func didSelectCategory(_ category: String?) {
+    func didSelectCategory(_ category: String?, isSelected: Bool) {
         newTrackerCategory = category
         isReadyToCreateTracker()
-        onSelectCategory?(newTrackerCategory)
-    }
-    
-    func didRecieveCategory(_ category: String?) {
-        newTrackerCategory = category
-        onChangeCategory?(newTrackerCategory)
+        onSelectCategory?(newTrackerCategory, isSelected)
     }
 }
 
