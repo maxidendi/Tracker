@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum WeekDay: String, CaseIterable, Codable {
+enum WeekDay: CaseIterable, Codable {
     
     init?(from int32: Int32) {
         guard let weekDay = WeekDay.allCases.first(
@@ -18,23 +18,35 @@ enum WeekDay: String, CaseIterable, Codable {
         self = weekDay
     }
     
-    case monday = "Понедельник"
-    case tuesday = "Вторник"
-    case wednesday = "Среда"
-    case thursday = "Четверг"
-    case friday = "Пятница"
-    case saturday = "Суббота"
-    case sunday = "Воскресенье"
+    case monday
+    case tuesday
+    case wednesday
+    case thursday
+    case friday
+    case saturday
+    case sunday
     
-    var short: String {
+    var fullName: String {
         switch self {
-        case .monday: return "Пн"
-        case .tuesday: return "Вт"
-        case .wednesday: return "Ср"
-        case .thursday: return "Чт"
-        case .friday: return "Пт"
-        case .saturday: return "Сб"
-        case .sunday: return "Вс"
+        case .monday: return Constants.WeekdaySchedule.monday
+        case .tuesday: return Constants.WeekdaySchedule.tuesday
+        case .wednesday: return Constants.WeekdaySchedule.wednesday
+        case .thursday: return Constants.WeekdaySchedule.thursday
+        case .friday: return Constants.WeekdaySchedule.friday
+        case .saturday: return Constants.WeekdaySchedule.saturday
+        case .sunday: return Constants.WeekdaySchedule.sunday
+        }
+    }
+    
+    var shortName: String {
+        switch self {
+        case .monday: return Constants.WeekdaySchedule.shortMonday
+        case .tuesday: return Constants.WeekdaySchedule.shortTuesday
+        case .wednesday: return Constants.WeekdaySchedule.shortWednesday
+        case .thursday: return Constants.WeekdaySchedule.shortThursday
+        case .friday: return Constants.WeekdaySchedule.shortFriday
+        case .saturday: return Constants.WeekdaySchedule.shortSaturday
+        case .sunday: return Constants.WeekdaySchedule.shortSunday
         }
     }
     

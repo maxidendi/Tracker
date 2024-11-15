@@ -203,14 +203,15 @@ extension CategoriesView: UITableViewDelegate {
                    indexPath: IndexPath,
                    point: CGPoint
     ) -> UIContextMenuConfiguration? {
-        let alertModel = AlertModel(message: "Эта категория точно не нужна?",
-                                    actionTitle: "Удалить")
+        let alertModel = AlertModel(
+            message: Constants.AlertModelConstants.chooseCategoryAlertMessage,
+            actionTitle: Constants.AlertModelConstants.deleteActionTitle)
         return UIContextMenuConfiguration(
             identifier: nil,
             previewProvider: nil
         ) { [weak self] _ in
             let deleteAction = UIAction(
-                title: "Удалить",
+                title: Constants.AlertModelConstants.deleteActionTitle,
                 image: nil,
                 attributes: .destructive
             ) { _ in

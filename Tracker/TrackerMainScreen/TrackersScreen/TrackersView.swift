@@ -40,7 +40,7 @@ final class TrackersView: UIViewController {
     
     private lazy var datePicker: UIDatePicker = {
         let picker = UIDatePicker()
-        picker.locale = .init(identifier: "ru_RU")
+        picker.locale = .autoupdatingCurrent
         picker.preferredDatePickerStyle = .compact
         picker.datePickerMode = .date
         picker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
@@ -215,14 +215,14 @@ extension TrackersView: UICollectionViewDataSource {
     @available(iOS 16.0, *)
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
         guard let indexPath = indexPaths.first else { return nil }
-        let alertModel = AlertModel(message: "Уверены что хотите удалить трекер?",
-                                    actionTitle: "Удалить")
+        let alertModel = AlertModel(message: Constants.AlertModelConstants.trackersAlertMessage,
+                                    actionTitle: Constants.AlertModelConstants.deleteActionTitle)
         return UIContextMenuConfiguration(
             identifier: nil,
             previewProvider: nil
         ) { [weak self] _ in
             let deleteAction = UIAction(
-                title: "Удалить",
+                title: Constants.AlertModelConstants.deleteActionTitle,
                 image: nil,
                 attributes: .destructive
             ) { _ in
@@ -254,14 +254,14 @@ extension TrackersView: UICollectionViewDataSource {
     
     //Available context menu and preview for iOS 13.4 - 16.0
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-        let alertModel = AlertModel(message: "Уверены что хотите удалить трекер?",
-                                    actionTitle: "Удалить")
+        let alertModel = AlertModel(message: Constants.AlertModelConstants.trackersAlertMessage,
+                                    actionTitle: Constants.AlertModelConstants.deleteActionTitle)
         return UIContextMenuConfiguration(
             identifier: indexPath as NSCopying,
             previewProvider: nil
         ) { [weak self] _ in
             let deleteAction = UIAction(
-                title: "Удалить",
+                title: Constants.AlertModelConstants.deleteActionTitle,
                 image: nil,
                 attributes: .destructive
             ) { _ in

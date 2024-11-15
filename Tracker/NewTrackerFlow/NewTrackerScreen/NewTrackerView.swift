@@ -190,7 +190,7 @@ final class NewTrackerView: UIViewController {
             let cell = self?.tableView.cellForRow(at: IndexPath(item: 1, section: 0))
             cell?.detailTextLabel?.text = schedule.count == WeekDay.allCases.count ?
                                           self?.constants.scheduleEverydayTitle :
-                                          schedule.compactMap{ $0.short }.joined(separator: ", ")
+                                          schedule.compactMap{ $0.shortName }.joined(separator: ", ")
             self?.dismiss(animated: true)
         }
     }

@@ -39,8 +39,9 @@ final class AddCategoryViewModel: AddCategoryViewModelProtocol {
     func checkCategoryName(_ name: String) {
         let categoriesList = dataProvider.getCategoriesList()
         guard !categoriesList.contains(where: { $0 == name }) && !name.isEmpty else {
-            let alertModel = AlertModel(message: Constants.AlertModelConstants.messageAddCategory,
-                                        actionTitle: Constants.AlertModelConstants.actionTitleAddCategory)
+            let alertModel = AlertModel(
+                message: Constants.AlertModelConstants.addCategoryAlertMessage,
+                actionTitle: Constants.AlertModelConstants.actionTitleOk)
             onShowAlert?(alertModel)
             onDoneButtonStateChanged?(false)
             return
