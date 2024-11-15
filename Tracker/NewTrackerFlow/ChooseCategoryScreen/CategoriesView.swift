@@ -226,14 +226,6 @@ extension CategoriesView: UITableViewDelegate {
         }
     }
     
-    func tableView(_ tableView: UITableView, previewForHighlightingContextMenuWithConfiguration configuration: UIContextMenuConfiguration) -> UITargetedPreview? {
-        guard let indexPath = configuration.identifier as? IndexPath,
-              let cell = tableView.cellForRow(at: indexPath)
-        else { return nil }
-        let preview = UITargetedPreview(view: cell)
-        return preview
-    }
-    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         viewModel.selectCategory(indexPath)
     }

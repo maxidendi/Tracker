@@ -210,6 +210,49 @@ extension TrackersView: UICollectionViewDataSource {
         cell.configureCell(model: trackerCellModel)
         return cell
     }
+    
+    //Available context menu and preview for iOS 16.0 and higher
+    @available(iOS 16.0, *)
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
+        guard let indexPath = indexPaths.first else { return nil }
+        let alertModel = AlertModel(message: "Уверены что хотите удалить трекер?",
+                                    actionTitle: "Удалить")
+        return UIContextMenuConfiguration(
+            identifier: nil,
+            previewProvider: nil
+        ) { [weak self] _ in
+            let deleteAction = UIAction(
+                title: "Удалить",
+                image: nil,
+                attributes: .destructive
+            ) { _ in
+                self?.showAlertWithCancel(
+                    with: alertModel,
+                    alertStyle: .actionSheet,
+                    actionStyle: .destructive
+                ) { _ in
+                    self?.viewModel.deleteTracker(indexPath)
+                }
+            }
+            return UIMenu(title: "", children: [deleteAction])
+        }
+    }
+    
+    @available(iOS 16.0, *)
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfiguration configuration: UIContextMenuConfiguration, highlightPreviewForItemAt indexPath: IndexPath) -> UITargetedPreview? {
+        guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell else { return nil }
+        let preview = UITargetedPreview(view: cell.topViewForPreview())
+        return preview
+    }
+    
+    @available(iOS 16.0, *)
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfiguration configuration: UIContextMenuConfiguration, dismissalPreviewForItemAt indexPath: IndexPath) -> UITargetedPreview? {
+        guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell else { return nil }
+        let preview = UITargetedPreview(view: cell.topViewForPreview())
+        return preview
+    }
+    
+    //Available context menu and preview for iOS 13.4 - 16.0
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
         let alertModel = AlertModel(message: "Уверены что хотите удалить трекер?",
                                     actionTitle: "Удалить")
@@ -233,8 +276,15 @@ extension TrackersView: UICollectionViewDataSource {
             return UIMenu(title: "", children: [deleteAction])
         }
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, previewForHighlightingContextMenuWithConfiguration configuration: UIContextMenuConfiguration) -> UITargetedPreview? {
+        guard let indexPath = configuration.identifier as? IndexPath else { return nil }
+        guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell else { return nil }
+        let preview = UITargetedPreview(view: cell.topViewForPreview())
+        return preview
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, previewForDismissingContextMenuWithConfiguration configuration: UIContextMenuConfiguration) -> UITargetedPreview? {
         guard let indexPath = configuration.identifier as? IndexPath else { return nil }
         guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell else { return nil }
         let preview = UITargetedPreview(view: cell.topViewForPreview())

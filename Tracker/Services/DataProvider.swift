@@ -42,7 +42,7 @@ final class DataProvider: DataProviderProtocol {
         let container = NSPersistentContainer(name: "Trackers")
         container.loadPersistentStores(completionHandler: { _, error in
             if let error {
-                fatalError("Unable to load persistent stores: \(error)")
+                assertionFailure("Unable to load persistent stores: \(error)")
             }
         })
         return container
@@ -52,7 +52,6 @@ final class DataProvider: DataProviderProtocol {
     //MARK: - Methods
     
     //TrackerStore FRC to TrackersVC collectionView
-    
     func fetchTrackersCoreData(for currentDate: Date) {
         let weekDay = calendar.component(.weekday, from: currentDate)
         trackerStore.fetchTrackers(for: weekDay, date: currentDate)
@@ -94,7 +93,6 @@ final class DataProvider: DataProviderProtocol {
     }
     
     //CategoriesStore
-    
     func getCategoriesList() -> [String] {
         categoryStore.getCategoriesList()
     }
@@ -108,7 +106,6 @@ final class DataProvider: DataProviderProtocol {
     }
 
     //RecordsStore
-    
     func addTrackerRecord(_ record: TrackerRecord) {
         recordsStore.addTrackerRecord(record)
     }

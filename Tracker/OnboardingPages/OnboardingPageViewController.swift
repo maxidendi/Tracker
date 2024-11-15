@@ -12,8 +12,8 @@ final class OnboardingPagesViewController: UIPageViewController {
     //MARK: - Properties
     
     lazy var pages: [UIViewController] = {
-        [PageViewController(isFirstPage: true),
-         PageViewController(isFirstPage: false)]
+        [PageViewController(pageModel: .firstPage),
+         PageViewController(pageModel: .secondPage)]
     } ()
     lazy var pageControl: UIPageControl = {
         let pageControl = UIPageControl()

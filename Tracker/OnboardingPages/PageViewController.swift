@@ -11,8 +11,8 @@ final class PageViewController: UIViewController, SetupSubviewsProtocol {
     
     //MARK: - Init
     
-    init(isFirstPage: Bool) {
-        self.isFirstPage = isFirstPage
+    init(pageModel: PageModel) {
+        self.pageModel = pageModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -22,11 +22,10 @@ final class PageViewController: UIViewController, SetupSubviewsProtocol {
     
     //MARK: - Properties
     
-    private let isFirstPage: Bool
+    private let pageModel: PageModel
     private lazy var label: UILabel = {
         let label = UILabel()
-        label.text = isFirstPage ? "Отслеживайте только то, что хотите" :
-                                   "Даже если это не литры воды и йога"
+        label.text = pageModel.text
         label.textColor = .black
         label.numberOfLines = 0
         label.font = Constants.Typography.bold32
@@ -45,8 +44,7 @@ final class PageViewController: UIViewController, SetupSubviewsProtocol {
     } ()
     private lazy var imageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = isFirstPage ? UIImage(named: "onboardingFirstPageImage") :
-                                        UIImage(named: "onboardingSecondPageImage")
+        imageView.image = pageModel.image
         imageView.contentMode = .scaleAspectFill
         return imageView
     } ()

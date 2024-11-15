@@ -61,6 +61,8 @@
 		3FA6971B2CE37A1600C4F9D5 /* TrackersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA6971A2CE37A1600C4F9D5 /* TrackersViewModel.swift */; };
 		3FA697202CE4722C00C4F9D5 /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA6971F2CE4722C00C4F9D5 /* UIColor+Extension.swift */; };
 		3FA697232CE482CC00C4F9D5 /* AddCategoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA697222CE482CC00C4F9D5 /* AddCategoryViewModel.swift */; };
+		3FA697252CE7C6F200C4F9D5 /* UserDefaultsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA697242CE7C6F200C4F9D5 /* UserDefaultsService.swift */; };
+		3FA697272CE7C9EB00C4F9D5 /* PageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA697262CE7C9EB00C4F9D5 /* PageModel.swift */; };
 		3FB806832CC175F4005A35AE /* SetupSubviewsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB806822CC175F4005A35AE /* SetupSubviewsProtocol.swift */; };
 		3FB806852CC17FF4005A35AE /* ScheduleViewModelDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB806842CC17FF4005A35AE /* ScheduleViewModelDelegate.swift */; };
 		3FB806872CC1803E005A35AE /* HabitOrEventViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB806862CC1803E005A35AE /* HabitOrEventViewControllerDelegate.swift */; };
@@ -132,6 +134,8 @@
 		3FA6971A2CE37A1600C4F9D5 /* TrackersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackersViewModel.swift; sourceTree = "<group>"; };
 		3FA6971F2CE4722C00C4F9D5 /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
 		3FA697222CE482CC00C4F9D5 /* AddCategoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCategoryViewModel.swift; sourceTree = "<group>"; };
+		3FA697242CE7C6F200C4F9D5 /* UserDefaultsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsService.swift; sourceTree = "<group>"; };
+		3FA697262CE7C9EB00C4F9D5 /* PageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageModel.swift; sourceTree = "<group>"; };
 		3FB806822CC175F4005A35AE /* SetupSubviewsProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupSubviewsProtocol.swift; sourceTree = "<group>"; };
 		3FB806842CC17FF4005A35AE /* ScheduleViewModelDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleViewModelDelegate.swift; sourceTree = "<group>"; };
 		3FB806862CC1803E005A35AE /* HabitOrEventViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitOrEventViewControllerDelegate.swift; sourceTree = "<group>"; };
@@ -204,6 +208,7 @@
 				3F8C80AF2CD802C9008C1DB3 /* TrackerCellModel.swift */,
 				3FA697082CDE86A400C4F9D5 /* TrackerIndexes.swift */,
 				3FA6970A2CDE9F3500C4F9D5 /* CategoryIndexes.swift */,
+				3FA697262CE7C9EB00C4F9D5 /* PageModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -355,6 +360,7 @@
 			isa = PBXGroup;
 			children = (
 				3FD7FF972CCD5D1600D91C4D /* DataProvider.swift */,
+				3FA697242CE7C6F200C4F9D5 /* UserDefaultsService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -444,6 +450,7 @@
 				3F05FA4A2CC2D2100020C050 /* NewTrackerViewDelegate.swift in Sources */,
 				3FA696952CDBCEC000C4F9D5 /* OnboardingPageViewController.swift in Sources */,
 				3FD7FF982CCD5D1600D91C4D /* DataProvider.swift in Sources */,
+				3FA697252CE7C6F200C4F9D5 /* UserDefaultsService.swift in Sources */,
 				3FA697092CDE86A400C4F9D5 /* TrackerIndexes.swift in Sources */,
 				3F2438F92CBE2D2C00CB0B4F /* EmojiGategory.swift in Sources */,
 				3F2438FB2CBE2D2C00CB0B4F /* GeometricParams.swift in Sources */,
@@ -453,6 +460,7 @@
 				3F2439022CBE2D2C00CB0B4F /* TrackerRecord.swift in Sources */,
 				3F05FB922CC801310020C050 /* TrackerStore.swift in Sources */,
 				3FB806872CC1803E005A35AE /* HabitOrEventViewControllerDelegate.swift in Sources */,
+				3FA697272CE7C9EB00C4F9D5 /* PageModel.swift in Sources */,
 				3F2439042CBE2D2C00CB0B4F /* WeekDay.swift in Sources */,
 				3F2439062CBE2D2C00CB0B4F /* ColorCell.swift in Sources */,
 				3FD7FFA22CCEB65B00D91C4D /* CategoryStoreProtocol.swift in Sources */,
