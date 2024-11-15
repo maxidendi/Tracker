@@ -13,6 +13,7 @@ final class TrackerCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        contentView.backgroundColor = .clear
         addSubviews()
     }
     
@@ -82,33 +83,26 @@ final class TrackerCell: UICollectionViewCell {
     
     //MARK: - Methods
     
-    func configureCell(
-        id: UUID,
-        title: String,
-        emoji: String,
-        color: UIColor,
-        counter: Int,
-        isCompleted: Bool
-    ) {
-        self.id = id
-        self.isCompleted = isCompleted
-        self.counter = counter
+    func configureCell(model: TrackerCellModel) {
+        self.id = model.tracker.id
+        self.isCompleted = model.isCompleted
+        self.counter = model.count
         counterLabel.text = counterTitle
-        trackerTitleLabel.text = title
-        emojiLabel.text = emoji
-        topView.backgroundColor = color
+        trackerTitleLabel.text = model.tracker.title
+        emojiLabel.text = model.tracker.emoji
+        topView.backgroundColor = UIColor.fromCodedString(model.tracker.color) 
         switchCounterButtonImage(isCompleted)
+    }
+    
+    func topViewForPreview() -> UIView {
+        return topView
     }
     
     //MARK: - Private methods
         
     @objc private func counterButtonTapped() {
         guard let id else { return }
-        delegate?.counterButtonTapped(with: id, isCompleted: !isCompleted) { [weak self] in
-            guard let self else { return }
-            switchCounterButtonImage(!isCompleted)
-            changeCounterLabelText(isCompleted)
-        }
+        delegate?.counterButtonTapped(with: id, isCompleted: !isCompleted)
     }
     
     private func switchCounterButtonImage(_ isCompleted: Bool) {
@@ -122,11 +116,6 @@ final class TrackerCell: UICollectionViewCell {
             counterButton.tintColor = topView.backgroundColor
             counterButton.backgroundColor = .ypWhite
         }
-    }
-    
-    private func changeCounterLabelText(_ isCompleted: Bool) {
-        counter = isCompleted ? counter + 1 : counter - 1
-        counterLabel.text = counterTitle
     }
 }
 

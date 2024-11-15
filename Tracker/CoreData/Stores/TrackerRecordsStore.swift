@@ -5,7 +5,7 @@
 //  Created by Денис Максимов on 22.10.2024.
 //
 
-import UIKit
+import Foundation
 import CoreData
 
 final class TrackerRecordsStore: NSObject, RecordsStoreProtocol {
@@ -14,47 +14,13 @@ final class TrackerRecordsStore: NSObject, RecordsStoreProtocol {
     
     init(context: NSManagedObjectContext) {
         self.context = context
-    }
-    
-    convenience override init() {
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate
-        else {
-            fatalError("AppDelegate not found")
-        }
-        self.init(context: appDelegate.persistentContainer.viewContext)
+        super.init()
     }
     
     //MARK: - Properties
     
-    weak var delegate: RecordsStoreDelegate?
     private let context: NSManagedObjectContext
-    private let trackerStore = TrackerStore.shared
-    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerRecordCoreData> = {
-        let request = NSFetchRequest<TrackerRecordCoreData>(entityName: "TrackerRecordCoreData")
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \TrackerRecordCoreData.id,
-                                                    ascending: true)]
-        let fetchedResultsController = NSFetchedResultsController(
-            fetchRequest: request,
-            managedObjectContext: context,
-            sectionNameKeyPath: nil,
-            cacheName: nil)
-        fetchedResultsController.delegate = self
-        do {
-            try fetchedResultsController.performFetch()
-        } catch {
-            let nserror = error as NSError
-            assertionFailure("Unresolved error \(nserror), \(nserror.userInfo)")
-        }
-        return fetchedResultsController
-    } ()
-    var records: Set<TrackerRecord> {
-        let recordsCoreData = fetchedResultsController.fetchedObjects
-        guard let records = recordsCoreData?.compactMap({ getTrackerRecord(from: $0) })
-                else { return [] }
-        return Set(records)
-    }
 
-    
     //MARK: - Methods
     
     private func saveContext() {
@@ -75,11 +41,26 @@ final class TrackerRecordsStore: NSObject, RecordsStoreProtocol {
         return TrackerRecord(id: id, date: date)
     }
     
+    private func getTrackerFromId(_ id: UUID) -> TrackerCoreData? {
+        let request = TrackerCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        let tracker = try? context.fetch(request).first
+        return tracker
+    }
+    
+    func getTrackerRecords(for tracker: Tracker) -> [TrackerRecord] {
+        let request = TrackerRecordCoreData.fetchRequest()
+        let predicate = NSPredicate(format: "id == %@", tracker.id as CVarArg)
+        request.predicate = predicate
+        guard let trackerRecords = try? context.fetch(request) else { return [] }
+        return trackerRecords.compactMap { getTrackerRecord(from: $0) }
+    }
+    
     func addTrackerRecord(_ record: TrackerRecord) {
         let recordCoreData = TrackerRecordCoreData(context: context)
         recordCoreData.id = record.id
         recordCoreData.date = record.date
-        let tracker = trackerStore.getTrackerFromId(record.id)
+        let tracker = getTrackerFromId(record.id)
         recordCoreData.tracker = tracker
         saveContext()
     }
@@ -94,11 +75,5 @@ final class TrackerRecordsStore: NSObject, RecordsStoreProtocol {
         else { return }
         context.delete(recordCoreData)
         saveContext()
-    }
-}
-
-extension TrackerRecordsStore: NSFetchedResultsControllerDelegate {
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<any NSFetchRequestResult>) {
-        delegate?.didUpdateRecords()
     }
 }

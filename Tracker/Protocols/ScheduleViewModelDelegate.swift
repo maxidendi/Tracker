@@ -7,6 +7,6 @@
 
 import Foundation
 
-protocol ScheduleViewControllerDelegate: AnyObject {
+protocol ScheduleViewModelDelegate: AnyObject {
     func didRecieveSchedule(_ schedule: Set<WeekDay>)
 }

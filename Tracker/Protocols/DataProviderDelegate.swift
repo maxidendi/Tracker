@@ -7,9 +7,7 @@
 
 import Foundation
 
-protocol DataProviderDelegate: AnyObject {
-    
-    func updateCategories(_ categories: [TrackerCategory])
-    func updateRecords(_ records: Set<TrackerRecord>)
+protocol TrackersDelegate: AnyObject {
+    func updateTrackers(_ indexes: TrackerIndexes)
 }
 

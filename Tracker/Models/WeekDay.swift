@@ -8,6 +8,16 @@
 import Foundation
 
 enum WeekDay: String, CaseIterable, Codable {
+    
+    init?(from int32: Int32) {
+        guard let weekDay = WeekDay.allCases.first(
+            where: { $0.toIntRussian == int32 })
+        else {
+            return nil
+        }
+        self = weekDay
+    }
+    
     case monday = "Понедельник"
     case tuesday = "Вторник"
     case wednesday = "Среда"

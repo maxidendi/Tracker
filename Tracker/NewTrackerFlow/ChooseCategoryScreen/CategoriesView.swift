@@ -7,17 +7,12 @@
 
 import UIKit
 
-final class CategoryViewController: UIViewController {
+final class CategoriesView: UIViewController {
     
     //MARK: - Init
     
-    init(dataProvider: DataProviderProtocol,
-         category: String?,
-         delegate: CategoryViewControllerDelegate? = nil
-    ) {
-        self.dataProvider = dataProvider
-        self.category = category
-        self.delegate = delegate
+    init(viewModel: CategoryViewModelProtocol) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -27,13 +22,8 @@ final class CategoryViewController: UIViewController {
     
     //MARK: - Properties
     
-    weak var delegate: CategoryViewControllerDelegate?
-    private var category: String?
-    private let dataProvider: DataProviderProtocol
+    private var viewModel: CategoryViewModelProtocol
     private let constants = Constants.CategoryViewControllerConstants.self
-    private var categories: [TrackerCategory] {
-        dataProvider.getCategories()
-    }
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = constants.title
@@ -61,10 +51,11 @@ final class CategoryViewController: UIViewController {
         tableView.backgroundColor = .ypWhite
         tableView.separatorColor = .ypGray
         tableView.isScrollEnabled = true
+        tableView.clipsToBounds = false
         tableView.showsVerticalScrollIndicator = false
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        tableView.register(CategoryCell.self, forCellReuseIdentifier: CategoryCell.identifier)
         return tableView
     } ()
     
@@ -88,29 +79,53 @@ final class CategoryViewController: UIViewController {
         view.backgroundColor = .ypWhite
         addSubviews()
         layoutSubviews()
-        showStubsOrCategories()
+        bind()
     }
     
     //MARK: - Methods
     
-    @objc private func addCategoryButtonTapped() {
-        let addCategoryViewController = AddCategoryViewController(dataProvider: dataProvider,
-                                                                  delegate: self)
-        addCategoryViewController.modalPresentationStyle = .popover
-        present(addCategoryViewController, animated: true)
+    private func bind() {
+        viewModel.onCategoriesListStateChange = { [weak self] indexes in
+            self?.updateTableView(with: indexes)
+        }
     }
     
-    private func showStubsOrCategories() {
-        tableView.reloadData()
-        let isEmpty = categories.isEmpty
+    private func updateTableView(with indexes: CategoryIndexes) {
+        tableView.performBatchUpdates({
+            tableView.insertRows(at: Array(indexes.insertedIndexes), with: .automatic)
+            tableView.deleteRows(at: Array(indexes.deletedIndexes), with: .automatic)
+            tableView.reloadRows(at: Array(indexes.updatedIndexes), with: .automatic)
+        }, completion: { [weak self] _ in
+            self?.configureCells()
+        })
+    }
+    
+    private func configureCells() {
+        let rows = viewModel.categoriesList().count
+        for row in 0..<rows {
+            let indexPath = IndexPath(row: row, section: 0)
+            let cell = tableView.cellForRow(at: indexPath)
+            cell?.setSeparatorAndCorners(rows: rows, indexPath: indexPath)
+        }
+    }
+    
+    private func showStubsOrCategories(_ rows: Int) {
+        let isEmpty = rows == 0
         labelStub.isHidden = !isEmpty
         imageStubView.isHidden = !isEmpty
+    }
+    
+    @objc private func addCategoryButtonTapped() {
+        let viewModel = viewModel.setupAddCategoryViewModel()
+        let addCategoryView = AddCategoryView(viewModel: viewModel)
+        addCategoryView.modalPresentationStyle = .popover
+        present(addCategoryView, animated: true)
     }
 }
 
 //MARK: - Extensions
 
-extension CategoryViewController: SetupSubviewsProtocol {
+extension CategoriesView: SetupSubviewsProtocol {
     
     func addSubviews() {
         [titleLabel, tableView, addCategoryButton, imageStubView, labelStub].forEach {
@@ -154,33 +169,25 @@ extension CategoryViewController: SetupSubviewsProtocol {
     }
 }
 
-extension CategoryViewController: UITableViewDataSource {
+extension CategoriesView: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        categories.count
+        let numberOfRows = viewModel.categoriesList().count
+        showStubsOrCategories(numberOfRows)
+        return numberOfRows
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        cell.layer.cornerRadius = .zero
-        cell.selectionStyle = .none
-        cell.backgroundColor = .ypLightGray.withAlphaComponent(0.3)
-        cell.textLabel?.text = categories[indexPath.row].title
-        cell.accessoryType = cell.textLabel?.text == category ? .checkmark : .none
-        if categories.count == 1 {
-            cell.layer.cornerRadius = Constants.General.radius16
-            cell.separatorInset = .init(top: .zero, left: .zero, bottom: .zero, right: tableView.bounds.width)
-        } else if indexPath.row == .zero {
-            cell.layer.cornerRadius = Constants.General.radius16
-            cell.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-            cell.separatorInset = Constants.General.separatorInsets
-        } else if indexPath.row == categories.count - 1 {
-            cell.layer.cornerRadius = Constants.General.radius16
-            cell.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
-            cell.separatorInset = .init(top: .zero, left: .zero, bottom: .zero, right: tableView.bounds.width)
-        } else {
-            cell.separatorInset = Constants.General.separatorInsets
-        }
+        guard let cell = tableView.dequeueReusableCell(
+            withIdentifier: CategoryCell.identifier,
+            for: indexPath) as? CategoryCell
+        else { return UITableViewCell() }
+        let categories = viewModel.categoriesList()
+        let isMarked = viewModel.isCellMarked(at: indexPath)
+        cell.configure(category: categories[indexPath.row],
+                       isMarked: isMarked,
+                       indexPath: indexPath,
+                       rowsCount: categories.count)
         return cell
     }
     
@@ -189,24 +196,37 @@ extension CategoryViewController: UITableViewDataSource {
     }
 }
 
-extension CategoryViewController: UITableViewDelegate {
+extension CategoriesView: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView,
+                   contextMenuConfigurationForRowAt
+                   indexPath: IndexPath,
+                   point: CGPoint
+    ) -> UIContextMenuConfiguration? {
+        let alertModel = AlertModel(message: "Эта категория точно не нужна?",
+                                    actionTitle: "Удалить")
+        return UIContextMenuConfiguration(
+            identifier: nil,
+            previewProvider: nil
+        ) { [weak self] _ in
+            let deleteAction = UIAction(
+                title: "Удалить",
+                image: nil,
+                attributes: .destructive
+            ) { _ in
+                self?.showAlertWithCancel(
+                    with: alertModel,
+                    alertStyle: .actionSheet,
+                    actionStyle: .destructive
+                ) { _ in
+                    self?.viewModel.deleteCategory(at: indexPath)
+                }
+            }
+            return UIMenu(title: "", children: [deleteAction])
+        }
+    }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        for item in 0..<categories.count {
-            let cell = tableView.cellForRow(at: IndexPath(row: item, section: .zero))
-            cell?.accessoryType = .none
-        }
-        let cell = tableView.cellForRow(at: indexPath)
-        cell?.accessoryType = .checkmark
-        guard let text = cell?.textLabel?.text else { return }
-        delegate?.didRecieveCategory(text)
-        dismiss(animated: true)
-    }
-}
-
-extension CategoryViewController: AddCategoryDelegate {
-    
-    func addCategory(_ category: TrackerCategory) {
-        showStubsOrCategories()
+        viewModel.selectCategory(indexPath)
     }
 }

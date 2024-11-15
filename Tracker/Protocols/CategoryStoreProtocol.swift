@@ -6,10 +6,13 @@
 //
 
 import Foundation
+import CoreData
 
 protocol CategoryStoreProtocol: AnyObject {
-    var delegate: CategoriesStoreDelegate? { get set }
-    var categories: [TrackerCategory] { get }
-    func addCategoryCoreData(_ category: TrackerCategory)
-    func addTrackerCoreData(_ tracker: Tracker, to category: String)
+    var delegate: TrackerCategoriesStoreDelegate? { get set }
+    var trackerCategoryCoreDataFRC: NSFetchedResultsController<TrackerCategoryCoreData>? { get }
+    func getCategoriesList() -> [String]
+    func getTrackerCategoryCoreData(from category: String) -> TrackerCategoryCoreData?
+    func addCategoryCoreData(_ category: String)
+    func deleteCategoryCoreData(_ index: IndexPath)
 }

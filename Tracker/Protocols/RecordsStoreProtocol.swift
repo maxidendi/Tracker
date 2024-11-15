@@ -8,8 +8,7 @@
 import Foundation
 
 protocol RecordsStoreProtocol: AnyObject {
-    var delegate: RecordsStoreDelegate? { get set }
-    var records: Set<TrackerRecord> { get }
+    func getTrackerRecords(for tracker: Tracker) -> [TrackerRecord]
     func addTrackerRecord(_ record: TrackerRecord)
     func removeTrackerRecord(_ record: TrackerRecord)
 }

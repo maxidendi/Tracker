@@ -7,12 +7,12 @@
 
 import UIKit
 
-final class TrackersViewController: UIViewController {
+final class TrackersView: UIViewController {
     
     //MARK: - Init
     
-    init(dataProvider: DataProviderProtocol) {
-        self.dataProvider = dataProvider
+    init(viewModel: TrackersViewModel) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -22,13 +22,8 @@ final class TrackersViewController: UIViewController {
     
     //MARK: - Properties
     
-    private var visibleCategories: [TrackerCategory] = []
-    private var categories: [TrackerCategory] = []
-    private var completedTrackers: Set<TrackerRecord> = []
-    private var currentDate = Date()
-    private let calendar = Calendar.current
+    private let viewModel: TrackersViewModelProtocol
     private let constants = Constants.TrackersViewControllerConstants.self
-    private var dataProvider: DataProviderProtocol
     private lazy var collectionView: UICollectionView = {
         let collection = UICollectionView(frame: .zero,
                                           collectionViewLayout: UICollectionViewFlowLayout())
@@ -48,7 +43,7 @@ final class TrackersViewController: UIViewController {
         picker.locale = .init(identifier: "ru_RU")
         picker.preferredDatePickerStyle = .compact
         picker.datePickerMode = .date
-        picker.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .valueChanged)
+        picker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
         return picker
     } ()
     
@@ -86,17 +81,27 @@ final class TrackersViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
-        dataProvider.delegate = self
-        categories = dataProvider.getCategories()
-        completedTrackers = dataProvider.getRecords()
+        bind()
         setupToHideKeyboard()
         addSubviews()
         layoutSubviews()
         setupNavigationBar()
-        datePickerValueChanged(datePicker)
+        datePickerValueChanged()
     }
     
     //MARK: - Methods
+    
+    private func bind() {
+        viewModel.onUpdateTrackers = { [weak self] indexes in
+            self?.collectionView.performBatchUpdates{
+                self?.collectionView.insertSections(indexes.insertedSections)
+                self?.collectionView.deleteSections(indexes.deletedSections)
+                self?.collectionView.insertItems(at: Array(indexes.insertedIndexes))
+                self?.collectionView.deleteItems(at: Array(indexes.deletedIndexes))
+                self?.collectionView.reloadItems(at: Array(indexes.updatedIndexes))
+            }
+        }
+    }
     
     private func setupNavigationBar() {
         navigationController?.navigationBar.prefersLargeTitles = true
@@ -111,44 +116,17 @@ final class TrackersViewController: UIViewController {
         navigationItem.searchController = searchBarController
     }
     
-    private func showStubsOrTrackers() {
-        collectionView.reloadData()
-        let isEmpty = visibleCategories.isEmpty
-        labelStub.isHidden = !isEmpty
-        imageStubView.isHidden = !isEmpty
+    private func stubsIsHidden(_ isHidden: Bool) {
+        labelStub.isHidden = isHidden
+        imageStubView.isHidden = isHidden
     }
     
     //MARK: - Objc methods
     
-    @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
-        currentDate = calendar.onlyDate(from: sender.date)
-        let weekDay = calendar.component(.weekday, from: currentDate)
-        var visibleCategories: [TrackerCategory] = []
-        categories.forEach { category in
-            var trackers: [Tracker] = []
-            category.trackers.forEach { tracker in
-                guard tracker.schedule.isEmpty,
-                      !completedTrackers.contains(where: {
-                          $0.id == tracker.id &&
-                          $0.date != currentDate})
-                else {
-                    tracker.schedule.forEach { schedule in
-                        if schedule.toInt == weekDay {
-                            trackers.append(tracker)
-                        }
-                    }
-                    return
-                }
-                trackers.append(tracker)
-            }
-            let visibleCategory: TrackerCategory = TrackerCategory(title: category.title,
-                                                                   trackers: trackers)
-            if !visibleCategory.trackers.isEmpty {
-                visibleCategories.append(visibleCategory)
-            }
-        }
-        self.visibleCategories = visibleCategories
-        showStubsOrTrackers()
+    @objc private func datePickerValueChanged() {
+        viewModel.updateTrackers(for: datePicker.date)
+        collectionView.reloadData()
+        dismiss(animated: true)
     }
     
     @objc private func didTapPlusButton() {
@@ -163,8 +141,7 @@ final class TrackersViewController: UIViewController {
 //MARK: - SetupSubviewsProtocol extension
 //
 
-extension TrackersViewController: SetupSubviewsProtocol {
-    
+extension TrackersView: SetupSubviewsProtocol {
     func addSubviews() {
         [imageStubView, labelStub, collectionView].forEach {
             view.addSubview($0)
@@ -198,14 +175,15 @@ extension TrackersViewController: SetupSubviewsProtocol {
 //MARK: - UICollectionView extensions
 //
 
-extension TrackersViewController: UICollectionViewDataSource {
-    
+extension TrackersView: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        visibleCategories.count
+        let numberOfSection = viewModel.numberOfcategories() ?? 0
+        numberOfSection == 0 ? stubsIsHidden(false) : stubsIsHidden(true)
+        return numberOfSection
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        visibleCategories[section].trackers.count
+        viewModel.numberOfTrackers(for: section)
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
@@ -216,37 +194,105 @@ extension TrackersViewController: UICollectionViewDataSource {
         as? TrackersSupplementaryView else {
             return UICollectionReusableView()
         }
-        headerView.setTitle(visibleCategories[indexPath.section].title)
+        headerView.setTitle(viewModel.titleForCategory(indexPath.section) ?? "")
         return headerView
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let section = indexPath.section
         guard let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: TrackerCell.reuseIdentifier,
-            for: indexPath) as? TrackerCell
+            for: indexPath) as? TrackerCell,
+              let trackerCellModel = viewModel.getTrackerCellModel(at: indexPath)
         else {
             return UICollectionViewCell()
         }
         cell.delegate = self
-        let tracker = visibleCategories[section].trackers[indexPath.row]
-        let isCompleted = completedTrackers.contains(where: {
-            $0.id == tracker.id &&
-            calendar.numberOfDaysBetween($0.date, and: currentDate) == 0
-        })
-        let counter = completedTrackers.filter({$0.id == tracker.id}).count
-        cell.configureCell(id: tracker.id,
-                           title: tracker.title,
-                           emoji: tracker.emoji,
-                           color: tracker.color,
-                           counter: counter,
-                           isCompleted: isCompleted)
+        cell.configureCell(model: trackerCellModel)
         return cell
+    }
+    
+    //Available context menu and preview for iOS 16.0 and higher
+    @available(iOS 16.0, *)
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
+        guard let indexPath = indexPaths.first else { return nil }
+        let alertModel = AlertModel(message: "Уверены что хотите удалить трекер?",
+                                    actionTitle: "Удалить")
+        return UIContextMenuConfiguration(
+            identifier: nil,
+            previewProvider: nil
+        ) { [weak self] _ in
+            let deleteAction = UIAction(
+                title: "Удалить",
+                image: nil,
+                attributes: .destructive
+            ) { _ in
+                self?.showAlertWithCancel(
+                    with: alertModel,
+                    alertStyle: .actionSheet,
+                    actionStyle: .destructive
+                ) { _ in
+                    self?.viewModel.deleteTracker(indexPath)
+                }
+            }
+            return UIMenu(title: "", children: [deleteAction])
+        }
+    }
+    
+    @available(iOS 16.0, *)
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfiguration configuration: UIContextMenuConfiguration, highlightPreviewForItemAt indexPath: IndexPath) -> UITargetedPreview? {
+        guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell else { return nil }
+        let preview = UITargetedPreview(view: cell.topViewForPreview())
+        return preview
+    }
+    
+    @available(iOS 16.0, *)
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfiguration configuration: UIContextMenuConfiguration, dismissalPreviewForItemAt indexPath: IndexPath) -> UITargetedPreview? {
+        guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell else { return nil }
+        let preview = UITargetedPreview(view: cell.topViewForPreview())
+        return preview
+    }
+    
+    //Available context menu and preview for iOS 13.4 - 16.0
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        let alertModel = AlertModel(message: "Уверены что хотите удалить трекер?",
+                                    actionTitle: "Удалить")
+        return UIContextMenuConfiguration(
+            identifier: indexPath as NSCopying,
+            previewProvider: nil
+        ) { [weak self] _ in
+            let deleteAction = UIAction(
+                title: "Удалить",
+                image: nil,
+                attributes: .destructive
+            ) { _ in
+                self?.showAlertWithCancel(
+                    with: alertModel,
+                    alertStyle: .actionSheet,
+                    actionStyle: .destructive
+                ) { _ in
+                    self?.viewModel.deleteTracker(indexPath)
+                }
+            }
+            return UIMenu(title: "", children: [deleteAction])
+        }
+    }
+
+    func collectionView(_ collectionView: UICollectionView, previewForHighlightingContextMenuWithConfiguration configuration: UIContextMenuConfiguration) -> UITargetedPreview? {
+        guard let indexPath = configuration.identifier as? IndexPath else { return nil }
+        guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell else { return nil }
+        let preview = UITargetedPreview(view: cell.topViewForPreview())
+        return preview
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, previewForDismissingContextMenuWithConfiguration configuration: UIContextMenuConfiguration) -> UITargetedPreview? {
+        guard let indexPath = configuration.identifier as? IndexPath else { return nil }
+        guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell else { return nil }
+        let preview = UITargetedPreview(view: cell.topViewForPreview())
+        return preview
     }
 }
 
-extension TrackersViewController: UICollectionViewDelegateFlowLayout {
-    
+extension TrackersView: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let availableWidth = collectionView.bounds.width - constants.geometricParams.paddingWidth
         let itemWidth = availableWidth / CGFloat(constants.geometricParams.cellCount)
@@ -273,7 +319,7 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
         let headerView: UICollectionReusableView
         if #available(iOS 18.0, *) {
             return CGSize(width: collectionView.bounds.width - 2 * Constants.General.supplementaryViewHorizontalPadding,
-                          height: Constants.General.labelTextHeight)
+                          height: Constants.General.labelTextHeight + 2)
         } else {
             headerView = self.collectionView(collectionView,
                                              viewForSupplementaryElementOfKind: UICollectionView.elementKindSectionHeader,
@@ -290,43 +336,18 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 //MARK: - Delegates extensions
 //
 
-extension TrackersViewController: TrackerCellDelegate {
-    
-    func counterButtonTapped(with id: UUID, isCompleted: Bool, completion: @escaping () -> Void) {
-        let trackerRecord = TrackerRecord(id: id, date: currentDate)
-        if isCompleted {
-            guard let numberOfDays = calendar.numberOfDaysBetween(currentDate),
-                  numberOfDays >= .zero
-            else { return }
-            dataProvider.addTrackerRecord(trackerRecord)
-            completion()
-        } else {
-            dataProvider.removeTrackerRecord(trackerRecord)
-            completion()
-        }
+extension TrackersView: TrackerCellDelegate {
+    func counterButtonTapped(with id: UUID, isCompleted: Bool) {
+        viewModel.trackerRecordChanged(id, isCompleted: isCompleted)
     }
 }
 
-extension TrackersViewController: HabitOrEventViewControllerDelegate {
-    
+extension TrackersView: HabitOrEventViewControllerDelegate {
     func getDataProvider() -> DataProviderProtocol {
-        dataProvider
+        viewModel.getDataProvider()
     }
     
     func needToReloadCollectionView() {
         dismiss(animated: true)
-        datePickerValueChanged(datePicker)
-    }
-}
-
-extension TrackersViewController: DataProviderDelegate {
-    
-    func updateCategories(_ categories: [TrackerCategory]) {
-        self.categories = categories
-        collectionView.reloadData()
-    }
-    
-    func updateRecords(_ records: Set<TrackerRecord>) {
-        completedTrackers = records
     }
 }
