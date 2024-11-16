@@ -16,7 +16,6 @@
 		3F2438EB2CBE2D2C00CB0B4F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3F2438E42CBE2D2C00CB0B4F /* Assets.xcassets */; };
 		3F2438ED2CBE2D2C00CB0B4F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3F2438E82CBE2D2C00CB0B4F /* LaunchScreen.storyboard */; };
 		3F2438EE2CBE2D2C00CB0B4F /* Calendar+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F2438B12CBE2D2C00CB0B4F /* Calendar+Extension.swift */; };
-		3F2438F02CBE2D2C00CB0B4F /* Int+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F2438B32CBE2D2C00CB0B4F /* Int+Extension.swift */; };
 		3F2438F52CBE2D2C00CB0B4F /* ColorsGategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F2438B92CBE2D2C00CB0B4F /* ColorsGategory.swift */; };
 		3F2438F72CBE2D2C00CB0B4F /* EmojiAndColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F2438BB2CBE2D2C00CB0B4F /* EmojiAndColors.swift */; };
 		3F2438F92CBE2D2C00CB0B4F /* EmojiGategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F2438BD2CBE2D2C00CB0B4F /* EmojiGategory.swift */; };
@@ -64,6 +63,7 @@
 		3FA697252CE7C6F200C4F9D5 /* UserDefaultsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA697242CE7C6F200C4F9D5 /* UserDefaultsService.swift */; };
 		3FA697272CE7C9EB00C4F9D5 /* PageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA697262CE7C9EB00C4F9D5 /* PageModel.swift */; };
 		3FA6972B2CE7D4DE00C4F9D5 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3FA697292CE7D4DE00C4F9D5 /* Localizable.strings */; };
+		3FA697322CE872A600C4F9D5 /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 3FA697302CE872A600C4F9D5 /* Localizable.stringsdict */; };
 		3FB806832CC175F4005A35AE /* SetupSubviewsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB806822CC175F4005A35AE /* SetupSubviewsProtocol.swift */; };
 		3FB806852CC17FF4005A35AE /* ScheduleViewModelDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB806842CC17FF4005A35AE /* ScheduleViewModelDelegate.swift */; };
 		3FB806872CC1803E005A35AE /* HabitOrEventViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB806862CC1803E005A35AE /* HabitOrEventViewControllerDelegate.swift */; };
@@ -86,7 +86,6 @@
 		3F05FB932CC8014A0020C050 /* TrackerCategoriesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCategoriesStore.swift; sourceTree = "<group>"; };
 		3F05FB952CC8015A0020C050 /* TrackerRecordsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRecordsStore.swift; sourceTree = "<group>"; };
 		3F2438B12CBE2D2C00CB0B4F /* Calendar+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Calendar+Extension.swift"; sourceTree = "<group>"; };
-		3F2438B32CBE2D2C00CB0B4F /* Int+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+Extension.swift"; sourceTree = "<group>"; };
 		3F2438B92CBE2D2C00CB0B4F /* ColorsGategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorsGategory.swift; sourceTree = "<group>"; };
 		3F2438BB2CBE2D2C00CB0B4F /* EmojiAndColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiAndColors.swift; sourceTree = "<group>"; };
 		3F2438BD2CBE2D2C00CB0B4F /* EmojiGategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiGategory.swift; sourceTree = "<group>"; };
@@ -142,6 +141,9 @@
 		3FA6972D2CE7D53E00C4F9D5 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		3FA6972E2CE7D55C00C4F9D5 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		3FA6972F2CE7D55C00C4F9D5 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		3FA697312CE872A600C4F9D5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = en.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
+		3FA697332CE8740900C4F9D5 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = ru; path = ru.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
+		3FA697342CE8740A00C4F9D5 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = es; path = es.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		3FB806822CC175F4005A35AE /* SetupSubviewsProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupSubviewsProtocol.swift; sourceTree = "<group>"; };
 		3FB806842CC17FF4005A35AE /* ScheduleViewModelDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleViewModelDelegate.swift; sourceTree = "<group>"; };
 		3FB806862CC1803E005A35AE /* HabitOrEventViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitOrEventViewControllerDelegate.swift; sourceTree = "<group>"; };
@@ -191,7 +193,6 @@
 			children = (
 				3F2439202CBE30FB00CB0B4F /* UIViewController+Extension.swift */,
 				3F2438B12CBE2D2C00CB0B4F /* Calendar+Extension.swift */,
-				3F2438B32CBE2D2C00CB0B4F /* Int+Extension.swift */,
 				3FA6970C2CDF3E3500C4F9D5 /* UITableViewCell+Extension.swift */,
 				3FA697172CE3399200C4F9D5 /* Array+Extension.swift */,
 				3FA6971F2CE4722C00C4F9D5 /* UIColor+Extension.swift */,
@@ -343,6 +344,7 @@
 			isa = PBXGroup;
 			children = (
 				3FA697292CE7D4DE00C4F9D5 /* Localizable.strings */,
+				3FA697302CE872A600C4F9D5 /* Localizable.stringsdict */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -444,6 +446,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3F2438EB2CBE2D2C00CB0B4F /* Assets.xcassets in Resources */,
+				3FA697322CE872A600C4F9D5 /* Localizable.stringsdict in Resources */,
 				3FA6972B2CE7D4DE00C4F9D5 /* Localizable.strings in Resources */,
 				3F2438ED2CBE2D2C00CB0B4F /* LaunchScreen.storyboard in Resources */,
 			);
@@ -460,7 +463,6 @@
 				3F05FB942CC8014A0020C050 /* TrackerCategoriesStore.swift in Sources */,
 				3FA6969B2CDD325700C4F9D5 /* CategoriesViewModel.swift in Sources */,
 				3FA697202CE4722C00C4F9D5 /* UIColor+Extension.swift in Sources */,
-				3F2438F02CBE2D2C00CB0B4F /* Int+Extension.swift in Sources */,
 				3F2438F52CBE2D2C00CB0B4F /* ColorsGategory.swift in Sources */,
 				3FA697112CE11A0600C4F9D5 /* TrackerCategoriesStoreDelegate.swift in Sources */,
 				3F2438F72CBE2D2C00CB0B4F /* EmojiAndColors.swift in Sources */,
@@ -546,6 +548,16 @@
 				3FA6972F2CE7D55C00C4F9D5 /* es */,
 			);
 			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		3FA697302CE872A600C4F9D5 /* Localizable.stringsdict */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3FA697312CE872A600C4F9D5 /* en */,
+				3FA697332CE8740900C4F9D5 /* ru */,
+				3FA697342CE8740A00C4F9D5 /* es */,
+			);
+			name = Localizable.stringsdict;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

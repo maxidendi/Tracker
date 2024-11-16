@@ -6,3 +6,70 @@
   
 */
 
+//AlertModelConstants
+"alert.actionTitleOk" = "Ok";
+"alert.trackersAlertMessage" = "¿Estás seguro de que quieres eliminar el rastreador?";
+"alert.addCategoryAlertMessage" = "La categoría con esta denominación ya existe";
+"alert.chooseCategoryAlertMessage" = "¿Esta categoría no es necesaria?";
+"alert.deleteActionTitle" = "Eliminar";
+"alert.cancelActionTitle" = "Cancelar";
+
+//EmojiAndColors
+"emojiAndColors.emojiTitle" = "Emoji";
+"emojiAndColors.colorsTitle" = "Color";
+
+//WeekdaySchedule
+"weekdaySchedule.monday" = "Lunes";
+"weekdaySchedule.tuesday" = "Martes";
+"weekdaySchedule.wednesday" = "Entorno";
+"weekdaySchedule.thursday" = "Jueves";
+"weekdaySchedule.friday" = "Viernes";
+"weekdaySchedule.saturday" = "Sábado";
+"weekdaySchedule.sunday" = "Domingo";
+"weekdaySchedule.shortMonday" = "Lun";
+"weekdaySchedule.shortTuesday" = "Mar";
+"weekdaySchedule.shortWednesday" = "Mié";
+"weekdaySchedule.shortThursday" = "Jue";
+"weekdaySchedule.shortFriday" = "Vie";
+"weekdaySchedule.shortSaturday" = "Sáb";
+"weekdaySchedule.shortSunday" = "Dom";
+
+//TrackersViewControllerConstants
+"trackers.title" = "Rastreadores";
+"trackers.searchBarPlaceholder" = "Búsqueda";
+"trackers.searchBarCancelButtonTitle" = "Cancelar";
+"trackers.labelStubText" = "¿Qué vamos a seguir?";
+
+//StatisticViewControllerConstants
+"statistic.title" = "Estadísticas";
+"statistic.labelStubText" = "Todavía no hay nada que analizar";
+
+//NewTrackerViewControllerConstants
+"newTracker.newHabitTitle" = "Un nuevo hábito";
+"newTracker.newEventTitle" = "Nuevo evento";
+"newTracker.warningText" = "Límite de 38 caracteres";
+"newTracker.placeholderText" = "Introduzca el nombre del rastreador";
+"newTracker.cancelButtonTitle" = "Cancelar";
+"newTracker.createButtonTitle" = "Crear";
+"newTracker.categoryTitle" = "Categoría";
+"newTracker.scheduleTitle" = "Horario";
+"newTracker.scheduleEverydayTitle" = "Cada día";
+
+//HabitOrEventViewControllerConstants
+"habitOrEvent.habitButtonTitle" = "Hábito";
+"habitOrEvent.eventButtonTitle" = "Evento";
+"habitOrEvent.title" = "Crear un rastreador";
+
+//CategoryViewControllerConstants
+"category.title" = "Categoría";
+"category.labelStubText" = "Los hábitos y eventos se pueden combinar de \nacuerdo con el significado";
+"category.addCategoryButtonTitle" = "Añadir categoría";
+
+//AddCategoryViewControllerConstants
+"addCategory.title" = "Nueva categoría";
+"addCategory.textFieldPlaceholderText" = "Introduzca el nombre de la categoría";
+"addCategory.doneButtonTitle" = "Listo";
+
+//ScheduleViewControllerConstants
+"schedule.title" = "Horario";
+"schedule.doneButtonTitle" = "Listo";

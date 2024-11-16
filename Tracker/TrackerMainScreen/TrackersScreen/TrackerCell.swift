@@ -28,9 +28,13 @@ final class TrackerCell: UICollectionViewCell {
     weak var delegate: TrackerCellDelegate?
     private var id: UUID? = nil
     private var isCompleted: Bool = false
-    private var counter: Int = .zero
-    private var counterTitle: String {
-        counter.toString()
+    private var counter: Int = .zero {
+        didSet {
+            counterLabel.text = String.localizedStringWithFormat(
+                NSLocalizedString("numberOfDays", comment: ""),
+                counter
+            )
+        }
     }
     
     private lazy var counterButton: UIButton = {
@@ -45,7 +49,6 @@ final class TrackerCell: UICollectionViewCell {
     private lazy var counterLabel: UILabel = {
         let label = UILabel()
         label.font = Constants.Typography.medium12
-        label.text = counterTitle
         label.textColor = .ypBlack
         return label
     } ()
@@ -87,7 +90,6 @@ final class TrackerCell: UICollectionViewCell {
         self.id = model.tracker.id
         self.isCompleted = model.isCompleted
         self.counter = model.count
-        counterLabel.text = counterTitle
         trackerTitleLabel.text = model.tracker.title
         emojiLabel.text = model.tracker.emoji
         topView.backgroundColor = UIColor.fromCodedString(model.tracker.color) 
