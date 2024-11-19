@@ -9,6 +9,12 @@ import UIKit
 
 final class HabitOrEventViewController: UIViewController {
     
+    //MARK: - Init
+    
+    deinit {
+        delegate?.needToReloadCollectionView()
+    }
+    
     //MARK: - Properties
     
     weak var delegate: HabitOrEventViewControllerDelegate?

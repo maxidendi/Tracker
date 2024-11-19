@@ -14,5 +14,5 @@ protocol CategoryViewModelProtocol: AnyObject {
     func deleteCategory(at indexPath: IndexPath)
     func selectCategory(_ indexPath: IndexPath)
     func getDataProvider() -> DataProviderProtocol
-    func setupAddCategoryViewModel() -> AddCategoryViewModelProtocol
+    func setupAddCategoryViewModel(viewType: AddCategoryViewType) -> AddCategoryViewModelProtocol
 }

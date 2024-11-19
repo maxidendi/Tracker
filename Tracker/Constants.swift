@@ -38,6 +38,7 @@ enum Constants {
         static let cancelActionTitle = NSLocalizedString("alert.cancelActionTitle", comment: "")
         static let pinActionTitle = NSLocalizedString("alert.pinActionTitle", comment: "")
         static let unpinActionTitle = NSLocalizedString("alert.unpinActionTitle", comment: "")
+        static let editActionTitle = NSLocalizedString("alert.editActionTitle", comment: "")
     }
     enum EmojiAndColors {
         static let emojiTitle = NSLocalizedString("emojiAndColors.emojiTitle", comment: "")
@@ -64,6 +65,7 @@ enum Constants {
         static let searchBarPlaceholder = NSLocalizedString("trackers.searchBarPlaceholder", comment: "")
         static let searchBarCancelButtonTitle = NSLocalizedString("trackers.searchBarCancelButtonTitle", comment: "")
         static let labelStubText = NSLocalizedString("trackers.labelStubText", comment: "")
+        static let pinnedCategoryTitle = NSLocalizedString("trackers.pinnedCategoryTitle", comment: "")
         static let geometricParams = GeometricParams(
             cellCount: 2,
             topInset: 8,
@@ -137,7 +139,8 @@ enum Constants {
         static let verticalSpacing: CGFloat = 24
     }
     enum AddCategoryViewControllerConstants {
-        static let title = NSLocalizedString("addCategory.title", comment: "")
+        static let addTitle = NSLocalizedString("addCategory.addTitle", comment: "")
+        static let editTitle = NSLocalizedString("addCategory.editTitle", comment: "")
         static let textFieldPlaceholderText = NSLocalizedString("addCategory.textFieldPlaceholderText", comment: "")
         static let doneButtonTitle = NSLocalizedString("addCategory.doneButtonTitle", comment: "")
         static let titleHeigth: CGFloat = 50

@@ -15,6 +15,7 @@
 "alert.cancelActionTitle" = "Cancelar";
 "alert.pinActionTitle" = "Atar";
 "alert.unpinActionTitle" = "Desatar";
+"alert.editActionTitle" = "Corregir";
 
 //EmojiAndColors
 "emojiAndColors.emojiTitle" = "Emoji";
@@ -41,6 +42,7 @@
 "trackers.searchBarPlaceholder" = "Búsqueda";
 "trackers.searchBarCancelButtonTitle" = "Cancelar";
 "trackers.labelStubText" = "¿Qué vamos a seguir?";
+"trackers.pinnedCategoryTitle" = "Consagrado";
 
 //StatisticViewControllerConstants
 "statistic.title" = "Estadísticas";
@@ -68,7 +70,8 @@
 "category.addCategoryButtonTitle" = "Añadir categoría";
 
 //AddCategoryViewControllerConstants
-"addCategory.title" = "Nueva categoría";
+"addCategory.addTitle" = "Nueva categoría";
+"addCategory.editTitle" = "Editar categoría";
 "addCategory.textFieldPlaceholderText" = "Introduzca el nombre de la categoría";
 "addCategory.doneButtonTitle" = "Listo";
 

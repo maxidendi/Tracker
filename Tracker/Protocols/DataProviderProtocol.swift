@@ -17,6 +17,7 @@ protocol DataProviderProtocol {
     func getTracker(at indexPath: IndexPath, currentDate: Date) -> TrackerCellModel?
     func getCategoriesList() -> [String]
     func addCategory(_ category: String)
+    func updateCategory(_ category: String, withNewTitle title: String)
     func removeCategory(_ index: IndexPath)
     func pinOrUnpinTracker(_ indexPath: IndexPath)
     func addTracker(_ tracker: Tracker, to category: String)

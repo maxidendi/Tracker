@@ -15,6 +15,7 @@
 "alert.cancelActionTitle" = "Cancel";
 "alert.pinActionTitle" = "Pin";
 "alert.unpinActionTitle" = "Unpin";
+"alert.editActionTitle" = "Edit";
 
 //EmojiAndColors
 "emojiAndColors.emojiTitle" = "Emoji";
@@ -41,6 +42,7 @@
 "trackers.searchBarPlaceholder" = "Search";
 "trackers.searchBarCancelButtonTitle" = "Cancel";
 "trackers.labelStubText" = "What are we going to track?";
+"trackers.pinnedCategoryTitle" = "Pinned";
 
 //StatisticViewControllerConstants
 "statistic.title" = "Statistics";
@@ -68,7 +70,8 @@
 "category.addCategoryButtonTitle" = "Add category";
 
 //AddCategoryViewControllerConstants
-"addCategory.title" = "New category";
+"addCategory.addTitle" = "New category";
+"addCategory.editTitle" = "Editing a category";
 "addCategory.textFieldPlaceholderText" = "Enter the name of the category";
 "addCategory.doneButtonTitle" = "Done";
 

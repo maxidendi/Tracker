@@ -44,8 +44,7 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
     private func setupPinnedCategory() {
         if !UserDefaultsService.shared.isPinnedCategoryExists() {
             let pinnedCategory = TrackerCategoryCoreData(context: context)
-//            pinnedCategory.isPinnedCategory = true
-            pinnedCategory.title = "Pinned"
+            pinnedCategory.title = Constants.TrackersViewControllerConstants.pinnedCategoryTitle
             pinnedCategory.trackers = []
             saveContext()
         }
@@ -59,9 +58,13 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
     
     private func configureFetchedResultsController() {
         let fetchedRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
-        let sortDescriptorCategory = NSSortDescriptor(keyPath: \TrackerCategoryCoreData.title,
-                                                      ascending: true)
+        let sortDescriptorCategory = NSSortDescriptor(
+            keyPath: \TrackerCategoryCoreData.title,
+            ascending: true)
         fetchedRequest.sortDescriptors = [sortDescriptorCategory]
+        fetchedRequest.predicate = NSPredicate(
+            format: "title != %@",
+            Constants.TrackersViewControllerConstants.pinnedCategoryTitle)
         let fetchedResultsController = NSFetchedResultsController(
             fetchRequest: fetchedRequest,
             managedObjectContext: context,
@@ -79,12 +82,14 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
     
     func getTrackerCategoryCoreData(from category: String) -> TrackerCategoryCoreData? {
         let request = TrackerCategoryCoreData.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \TrackerCategoryCoreData.title, ascending: true)]
-        request.predicate = NSPredicate(format: "%K = %@",
-                                        #keyPath(TrackerCategoryCoreData.title),
-                                        category)
-        guard let categoryCoreData = try? context.fetch(request).first else { return nil }
-        return categoryCoreData
+        request.sortDescriptors = [NSSortDescriptor(
+            keyPath: \TrackerCategoryCoreData.title,
+            ascending: true)]
+        request.predicate = NSPredicate(
+            format: "%K = %@",
+            #keyPath(TrackerCategoryCoreData.title),
+            category)
+        return try? context.fetch(request).first
     }
     
     func getCategoriesList() -> [String] {
@@ -96,6 +101,13 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
         categoryCoreData.title = category
         categoryCoreData.createdAt = Date()
         categoryCoreData.trackers = []
+        saveContext()
+    }
+    
+    func updateCategoryCoreData(_ category: String, withNewTitle title: String) {
+        guard let categoryCoreData = getTrackerCategoryCoreData(from: category)
+        else { return }
+        categoryCoreData.title = title
         saveContext()
     }
     

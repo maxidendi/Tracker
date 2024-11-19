@@ -26,7 +26,6 @@ final class AddCategoryView: UIViewController, SetupSubviewsProtocol {
     private let constants = Constants.AddCategoryViewControllerConstants.self
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = constants.title
         label.textAlignment = .center
         label.font = Constants.Typography.medium16
         return label
@@ -69,6 +68,7 @@ final class AddCategoryView: UIViewController, SetupSubviewsProtocol {
         bind()
         addSubviews()
         layoutSubviews()
+        setupViewForViewModelType()
         setupToHideKeyboard()
     }
     
@@ -80,6 +80,16 @@ final class AddCategoryView: UIViewController, SetupSubviewsProtocol {
         }
         viewModel.onShowAlert = { [weak self] alert in
             self?.showAlert(with: alert, alertStyle: .alert, actionStyle: .default, handler: nil)
+        }
+    }
+    
+    private func setupViewForViewModelType() {
+        switch viewModel.viewType {
+        case .add:
+            titleLabel.text = constants.addTitle
+        case .edit(let categoryTitle):
+            titleLabel.text = constants.editTitle
+            textField.text = categoryTitle
         }
     }
     

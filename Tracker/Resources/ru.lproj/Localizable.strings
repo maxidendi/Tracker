@@ -15,6 +15,7 @@
 "alert.cancelActionTitle" = "Отменить";
 "alert.pinActionTitle" = "Закрепить";
 "alert.unpinActionTitle" = "Открепить";
+"alert.editActionTitle" = "Редактировать";
 
 //EmojiAndColors
 "emojiAndColors.emojiTitle" = "Emoji";
@@ -41,6 +42,7 @@
 "trackers.searchBarPlaceholder" = "Поиск";
 "trackers.searchBarCancelButtonTitle" = "Отменить";
 "trackers.labelStubText" = "Что будем отслеживать?";
+"trackers.pinnedCategoryTitle" = "Закрепленные";
 
 //StatisticViewControllerConstants
 "statistic.title" = "Статистика";
@@ -68,7 +70,8 @@
 "category.addCategoryButtonTitle" = "Добавить категорию";
 
 //AddCategoryViewControllerConstants
-"addCategory.title" = "Новая категория";
+"addCategory.addTitle" = "Новая категория";
+"addCategory.editTitle" = "Редактирование категории";
 "addCategory.textFieldPlaceholderText" = "Введите название категории";
 "addCategory.doneButtonTitle" = "Готово";
 

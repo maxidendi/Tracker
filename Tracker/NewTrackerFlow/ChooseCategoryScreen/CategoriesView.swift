@@ -116,7 +116,7 @@ final class CategoriesView: UIViewController {
     }
     
     @objc private func addCategoryButtonTapped() {
-        let viewModel = viewModel.setupAddCategoryViewModel()
+        let viewModel = viewModel.setupAddCategoryViewModel(viewType: .add)
         let addCategoryView = AddCategoryView(viewModel: viewModel)
         addCategoryView.modalPresentationStyle = .popover
         present(addCategoryView, animated: true)
@@ -203,6 +203,9 @@ extension CategoriesView: UITableViewDelegate {
                    indexPath: IndexPath,
                    point: CGPoint
     ) -> UIContextMenuConfiguration? {
+        guard let cell = tableView.cellForRow(at: indexPath) as? CategoryCell,
+              let text = cell.textLabel?.text
+        else { return nil }
         let alertModel = AlertModel(
             message: Constants.AlertModelConstants.chooseCategoryAlertMessage,
             actionTitle: Constants.AlertModelConstants.deleteActionTitle)
@@ -210,6 +213,15 @@ extension CategoriesView: UITableViewDelegate {
             identifier: nil,
             previewProvider: nil
         ) { [weak self] _ in
+            let editAction = UIAction(
+                title: Constants.AlertModelConstants.editActionTitle
+            ) { _ in
+                guard let model = self?.viewModel.setupAddCategoryViewModel(viewType: .edit(text))
+                else { return }
+                let addCategoryView = AddCategoryView(viewModel: model)
+                addCategoryView.modalPresentationStyle = .popover
+                self?.present(addCategoryView, animated: true)
+            }
             let deleteAction = UIAction(
                 title: Constants.AlertModelConstants.deleteActionTitle,
                 image: nil,
@@ -223,7 +235,7 @@ extension CategoriesView: UITableViewDelegate {
                     self?.viewModel.deleteCategory(at: indexPath)
                 }
             }
-            return UIMenu(title: "", children: [deleteAction])
+            return UIMenu(title: "", children: [editAction, deleteAction])
         }
     }
     

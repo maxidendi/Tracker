@@ -100,8 +100,6 @@ final class DataProvider: DataProviderProtocol {
         guard let trackerCoreData = trackerStore.trackerCoreDataFRC?.object(at: indexPath) else { return }
         if trackerCoreData.isPinned, let lastCategoryTitle = trackerCoreData.lastCategory {
             trackerCoreData.isPinned = false
-            let pinnedCategoryCoreData = categoryStore.getTrackerCategoryCoreData(from: "Pinned")
-            pinnedCategoryCoreData?.removeFromTrackers(trackerCoreData)
             let newCategoryCoreData = categoryStore.getTrackerCategoryCoreData(from: lastCategoryTitle)
             trackerCoreData.category = newCategoryCoreData
             trackerCoreData.lastCategory = nil
@@ -110,8 +108,8 @@ final class DataProvider: DataProviderProtocol {
             trackerCoreData.isPinned = true
             let lastCategoryCoreData = trackerCoreData.category
             trackerCoreData.lastCategory = lastCategoryCoreData?.title
-            lastCategoryCoreData?.removeFromTrackers(trackerCoreData)
-            trackerCoreData.category = categoryStore.getTrackerCategoryCoreData(from: "Pinned")
+            trackerCoreData.category = categoryStore.getTrackerCategoryCoreData(
+                from: Constants.TrackersViewControllerConstants.pinnedCategoryTitle)
             try? DataProvider.persistentContainer.viewContext.save()
         }
     }
@@ -131,6 +129,10 @@ final class DataProvider: DataProviderProtocol {
     
     func addCategory(_ category: String) {
         categoryStore.addCategoryCoreData(category)
+    }
+    
+    func updateCategory(_ category: String, withNewTitle title: String) {
+        categoryStore.updateCategoryCoreData(category, withNewTitle: title)
     }
     
     func removeCategory(_ index: IndexPath) {

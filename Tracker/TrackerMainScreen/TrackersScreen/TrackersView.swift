@@ -129,7 +129,8 @@ final class TrackersView: UIViewController {
     
     @objc private func datePickerValueChanged() {
         viewModel.updateTrackers(for: datePicker.date)
-//        dismiss(animated: true)
+        collectionView.reloadData()
+        dismiss(animated: true)
     }
     
     @objc private func didTapPlusButton() {
@@ -227,10 +228,11 @@ extension TrackersView: UICollectionViewDataSource {
         return UIContextMenuConfiguration(
             identifier: nil,
             previewProvider: nil
-        ) { [weak self] _ in
+        ) { [weak self, weak cell] _ in
             let pinAction = UIAction(
                 title: pinActionTitle) { _ in
                     self?.viewModel.updatePinnedTracker(indexPath)
+                    cell?.toggleCellPin()
                 }
             let deleteAction = UIAction(
                 title: Constants.AlertModelConstants.deleteActionTitle,
@@ -275,10 +277,11 @@ extension TrackersView: UICollectionViewDataSource {
         return UIContextMenuConfiguration(
             identifier: indexPath as NSCopying,
             previewProvider: nil
-        ) { [weak self] _ in
+        ) { [weak self, weak cell] _ in
             let pinAction = UIAction(
                 title: pinActionTitle) { _ in
                     self?.viewModel.updatePinnedTracker(indexPath)
+                    cell?.toggleCellPin()
                 }
             let deleteAction = UIAction(
                 title: Constants.AlertModelConstants.deleteActionTitle,
@@ -367,7 +370,7 @@ extension TrackersView: HabitOrEventViewControllerDelegate {
     }
     
     func needToReloadCollectionView() {
+        collectionView.reloadData()
         dismiss(animated: true)
-//        viewModel.updateTrackers(for: datePicker.date)
     }
 }
