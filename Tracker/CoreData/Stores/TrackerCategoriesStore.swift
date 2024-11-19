@@ -57,7 +57,7 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
     }
     
     private func configureFetchedResultsController() {
-        let fetchedRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+        let fetchedRequest = TrackerCategoryCoreData.fetchRequest()
         let sortDescriptorCategory = NSSortDescriptor(
             keyPath: \TrackerCategoryCoreData.title,
             ascending: true)
@@ -108,12 +108,30 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
         guard let categoryCoreData = getTrackerCategoryCoreData(from: category)
         else { return }
         categoryCoreData.title = title
+        let pinnedCategory = getTrackerCategoryCoreData(
+            from: Constants.TrackersViewControllerConstants.pinnedCategoryTitle)
+        let pinnedTrackers = pinnedCategory?.trackers as? NSSet
+        pinnedTrackers?.forEach{
+            if let trackerCoreData = $0 as? TrackerCoreData,
+               trackerCoreData.lastCategory == category {
+                trackerCoreData.lastCategory = title
+            }
+        }
         saveContext()
     }
     
     func deleteCategoryCoreData(_ index: IndexPath) {
         guard let categoryCoreData = trackerCategoryCoreDataFRC?.fetchedObjects?[index.row] as? TrackerCategoryCoreData
         else { return }
+        let pinnedCategory = getTrackerCategoryCoreData(
+            from: Constants.TrackersViewControllerConstants.pinnedCategoryTitle)
+        let pinnedTrackers = pinnedCategory?.trackers as? NSSet
+        pinnedTrackers?.forEach{
+            if let trackerCoreData = $0 as? TrackerCoreData,
+               trackerCoreData.lastCategory == categoryCoreData.title {
+                context.delete(trackerCoreData)
+            }
+        }
         context.delete(categoryCoreData)
         saveContext()
     }
