@@ -13,6 +13,8 @@
 "alert.chooseCategoryAlertMessage" = "¿Esta categoría no es necesaria?";
 "alert.deleteActionTitle" = "Eliminar";
 "alert.cancelActionTitle" = "Cancelar";
+"alert.pinActionTitle" = "Atar";
+"alert.unpinActionTitle" = "Desatar";
 
 //EmojiAndColors
 "emojiAndColors.emojiTitle" = "Emoji";

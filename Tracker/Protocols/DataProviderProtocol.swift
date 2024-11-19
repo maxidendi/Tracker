@@ -18,6 +18,7 @@ protocol DataProviderProtocol {
     func getCategoriesList() -> [String]
     func addCategory(_ category: String)
     func removeCategory(_ index: IndexPath)
+    func pinOrUnpinTracker(_ indexPath: IndexPath)
     func addTracker(_ tracker: Tracker, to category: String)
     func removeTracker(_ indexPath: IndexPath)
     func addTrackerRecord(_ record: TrackerRecord)

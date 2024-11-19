@@ -72,6 +72,7 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
                                  title: title,
                                  color: color,
                                  emoji: emoji,
+                                 isPinned: false,
                                  schedule: Array(newTrackerSchedule))
             onChangeCreateButtonState?(true)
         } else if !isHabit {
@@ -79,6 +80,7 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
                                  title: title,
                                  color: color,
                                  emoji: emoji,
+                                 isPinned: false,
                                  schedule: [])
             onChangeCreateButtonState?(true)
         }

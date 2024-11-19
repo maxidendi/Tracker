@@ -13,6 +13,8 @@
 "alert.chooseCategoryAlertMessage" = "Эта категория точно не нужна?";
 "alert.deleteActionTitle" = "Удалить";
 "alert.cancelActionTitle" = "Отменить";
+"alert.pinActionTitle" = "Закрепить";
+"alert.unpinActionTitle" = "Открепить";
 
 //EmojiAndColors
 "emojiAndColors.emojiTitle" = "Emoji";

@@ -8,6 +8,16 @@
 import Foundation
 import CoreData
 
+enum UpdateTrackers {
+    case insertCell([IndexPath])
+    case deleteCell([IndexPath])
+    case updateCell([IndexPath])
+    case moveCell((from: IndexPath, to: IndexPath))
+    case insertSection([Int])
+    case deleteSection([Int])
+    case reloadSection([Int])
+}
+
 final class DataProvider: DataProviderProtocol {
     
     //MARK: - Init
@@ -62,7 +72,9 @@ final class DataProvider: DataProviderProtocol {
     }
     
     func titleForSection(_ section: Int) -> String? {
-        return trackerStore.trackerCoreDataFRC?.sections?[section].name
+        guard let trackerCoreData = trackerStore.trackerCoreDataFRC?.sections?[section].objects?.first as? TrackerCoreData
+        else { return nil }
+        return trackerCoreData.category?.title
     }
     
     func numberOfTrackersInSection(_ section: Int) -> Int {
@@ -82,6 +94,26 @@ final class DataProvider: DataProviderProtocol {
             isCompleted: isCompleted,
             count: records.count)
         return trackerCellModel
+    }
+    
+    func pinOrUnpinTracker(_ indexPath: IndexPath) {
+        guard let trackerCoreData = trackerStore.trackerCoreDataFRC?.object(at: indexPath) else { return }
+        if trackerCoreData.isPinned, let lastCategoryTitle = trackerCoreData.lastCategory {
+            trackerCoreData.isPinned = false
+            let pinnedCategoryCoreData = categoryStore.getTrackerCategoryCoreData(from: "Pinned")
+            pinnedCategoryCoreData?.removeFromTrackers(trackerCoreData)
+            let newCategoryCoreData = categoryStore.getTrackerCategoryCoreData(from: lastCategoryTitle)
+            trackerCoreData.category = newCategoryCoreData
+            trackerCoreData.lastCategory = nil
+            try? DataProvider.persistentContainer.viewContext.save()
+        } else {
+            trackerCoreData.isPinned = true
+            let lastCategoryCoreData = trackerCoreData.category
+            trackerCoreData.lastCategory = lastCategoryCoreData?.title
+            lastCategoryCoreData?.removeFromTrackers(trackerCoreData)
+            trackerCoreData.category = categoryStore.getTrackerCategoryCoreData(from: "Pinned")
+            try? DataProvider.persistentContainer.viewContext.save()
+        }
     }
     
     func addTracker(_ tracker: Tracker, to category: String) {

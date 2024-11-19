@@ -15,6 +15,7 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
     init(context: NSManagedObjectContext) {
         self.context = context
         super.init()
+        setupPinnedCategory()
         configureFetchedResultsController()
     }
     
@@ -37,6 +38,16 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
                 let nserror = error as NSError
                 assertionFailure("Unresolved error \(nserror), \(nserror.userInfo)")
             }
+        }
+    }
+    
+    private func setupPinnedCategory() {
+        if !UserDefaultsService.shared.isPinnedCategoryExists() {
+            let pinnedCategory = TrackerCategoryCoreData(context: context)
+//            pinnedCategory.isPinnedCategory = true
+            pinnedCategory.title = "Pinned"
+            pinnedCategory.trackers = []
+            saveContext()
         }
     }
     
@@ -83,6 +94,7 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
     func addCategoryCoreData(_ category: String) {
         let categoryCoreData = TrackerCategoryCoreData(context: context)
         categoryCoreData.title = category
+        categoryCoreData.createdAt = Date()
         categoryCoreData.trackers = []
         saveContext()
     }

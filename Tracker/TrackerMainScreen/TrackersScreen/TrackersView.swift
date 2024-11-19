@@ -94,10 +94,14 @@ final class TrackersView: UIViewController {
     private func bind() {
         viewModel.onUpdateTrackers = { [weak self] indexes in
             self?.collectionView.performBatchUpdates{
-                self?.collectionView.insertSections(indexes.insertedSections)
-                self?.collectionView.deleteSections(indexes.deletedSections)
-                self?.collectionView.insertItems(at: Array(indexes.insertedIndexes))
                 self?.collectionView.deleteItems(at: Array(indexes.deletedIndexes))
+                self?.collectionView.deleteSections(indexes.deletedSections)
+                self?.collectionView.insertSections(indexes.insertedSections)
+                self?.collectionView.insertItems(at: Array(indexes.insertedIndexes))
+                indexes.movedIndexes.forEach{
+                    self?.collectionView.moveItem(at: $0.from, to: $0.to)
+                }
+                self?.collectionView.reloadSections(indexes.updatedSections)
                 self?.collectionView.reloadItems(at: Array(indexes.updatedIndexes))
             }
         }
@@ -125,8 +129,7 @@ final class TrackersView: UIViewController {
     
     @objc private func datePickerValueChanged() {
         viewModel.updateTrackers(for: datePicker.date)
-        collectionView.reloadData()
-        dismiss(animated: true)
+//        dismiss(animated: true)
     }
     
     @objc private func didTapPlusButton() {
@@ -179,7 +182,7 @@ extension TrackersView: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         let numberOfSection = viewModel.numberOfcategories() ?? 0
         numberOfSection == 0 ? stubsIsHidden(false) : stubsIsHidden(true)
-        return numberOfSection
+        return numberOfSection 
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -215,12 +218,20 @@ extension TrackersView: UICollectionViewDataSource {
     @available(iOS 16.0, *)
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
         guard let indexPath = indexPaths.first else { return nil }
+        guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell else { return nil }
+        let pinActionTitle = cell.isPinned() ?
+            Constants.AlertModelConstants.unpinActionTitle :
+            Constants.AlertModelConstants.pinActionTitle
         let alertModel = AlertModel(message: Constants.AlertModelConstants.trackersAlertMessage,
                                     actionTitle: Constants.AlertModelConstants.deleteActionTitle)
         return UIContextMenuConfiguration(
             identifier: nil,
             previewProvider: nil
         ) { [weak self] _ in
+            let pinAction = UIAction(
+                title: pinActionTitle) { _ in
+                    self?.viewModel.updatePinnedTracker(indexPath)
+                }
             let deleteAction = UIAction(
                 title: Constants.AlertModelConstants.deleteActionTitle,
                 image: nil,
@@ -234,7 +245,7 @@ extension TrackersView: UICollectionViewDataSource {
                     self?.viewModel.deleteTracker(indexPath)
                 }
             }
-            return UIMenu(title: "", children: [deleteAction])
+            return UIMenu(title: "", children: [pinAction, deleteAction])
         }
     }
     
@@ -254,15 +265,23 @@ extension TrackersView: UICollectionViewDataSource {
     
     //Available context menu and preview for iOS 13.4 - 16.0
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-        let alertModel = AlertModel(message: Constants.AlertModelConstants.trackersAlertMessage,
-                                    actionTitle: Constants.AlertModelConstants.deleteActionTitle)
+        guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell else { return nil }
+        let pinActionTitle = cell.isPinned() ?
+            Constants.AlertModelConstants.unpinActionTitle :
+            Constants.AlertModelConstants.pinActionTitle
+        let alertModel = AlertModel(
+            message: Constants.AlertModelConstants.trackersAlertMessage,
+            actionTitle: Constants.AlertModelConstants.deleteActionTitle)
         return UIContextMenuConfiguration(
             identifier: indexPath as NSCopying,
             previewProvider: nil
         ) { [weak self] _ in
+            let pinAction = UIAction(
+                title: pinActionTitle) { _ in
+                    self?.viewModel.updatePinnedTracker(indexPath)
+                }
             let deleteAction = UIAction(
                 title: Constants.AlertModelConstants.deleteActionTitle,
-                image: nil,
                 attributes: .destructive
             ) { _ in
                 self?.showAlertWithCancel(
@@ -273,7 +292,7 @@ extension TrackersView: UICollectionViewDataSource {
                     self?.viewModel.deleteTracker(indexPath)
                 }
             }
-            return UIMenu(title: "", children: [deleteAction])
+            return UIMenu(title: "", children: [pinAction ,deleteAction])
         }
     }
 
@@ -349,5 +368,6 @@ extension TrackersView: HabitOrEventViewControllerDelegate {
     
     func needToReloadCollectionView() {
         dismiss(animated: true)
+//        viewModel.updateTrackers(for: datePicker.date)
     }
 }

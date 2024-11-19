@@ -10,6 +10,7 @@ import Foundation
 protocol TrackersViewModelProtocol: AnyObject {
     var onUpdateTrackers: ((TrackerIndexes) -> Void)? { get set }
     func updateTrackers(for date: Date)
+    func updatePinnedTracker(_ index: IndexPath)
     func numberOfcategories() -> Int?
     func numberOfTrackers(for category: Int) -> Int
     func titleForCategory(_ category: Int) -> String?
@@ -43,6 +44,10 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     
     func updateTrackers(for date: Date) {
         currentDate = calendar.onlyDate(from: date)
+    }
+    
+    func updatePinnedTracker(_ index: IndexPath) {
+        dataProvider.pinOrUnpinTracker(index)
     }
     
     func numberOfcategories() -> Int? {

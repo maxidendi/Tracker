@@ -24,9 +24,11 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
     private let context: NSManagedObjectContext
     var insertedSections = IndexSet()
     var deletedSections = IndexSet()
+    var updatedSections = IndexSet()
     var insertedIndexes: Set<IndexPath> = []
-    var updatedIndexes: Set<IndexPath> = []
     var deletedIndexes: Set<IndexPath> = []
+    var updatedIndexes: Set<IndexPath> = []
+    var movedIndexes: [(from: IndexPath, to: IndexPath)] = []
     var trackerCoreDataFRC: NSFetchedResultsController<TrackerCoreData>?
 
     //MARK: - Methods
@@ -46,19 +48,25 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         insertedIndexes = []
         updatedIndexes = []
         deletedIndexes = []
+        movedIndexes = []
         insertedSections = IndexSet()
         deletedSections = IndexSet()
+        updatedSections = IndexSet()
     }
     
     private func configureFetchedResultsController() {
         let fetchedRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
-        let sortDescriptorCategory = NSSortDescriptor(keyPath: \TrackerCoreData.category?.title,
-                                                      ascending: true)
-        fetchedRequest.sortDescriptors = [sortDescriptorCategory]
+        let sortDescriptorCategoryTitle = NSSortDescriptor(
+            keyPath: \TrackerCoreData.title,
+            ascending: true)
+        let sortDescriptorCategoryDate = NSSortDescriptor(
+            keyPath: \TrackerCoreData.category?.createdAt,
+            ascending: false)
+        fetchedRequest.sortDescriptors = [sortDescriptorCategoryDate, sortDescriptorCategoryTitle]
         let fetchedResultsController = NSFetchedResultsController(
             fetchRequest: fetchedRequest,
             managedObjectContext: context,
-            sectionNameKeyPath: #keyPath(TrackerCoreData.category.title),
+            sectionNameKeyPath: #keyPath(TrackerCoreData.category.createdAt),
             cacheName: nil)
         trackerCoreDataFRC = fetchedResultsController
         fetchedResultsController.delegate = self
@@ -106,6 +114,7 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
             title: title,
             color: color,
             emoji: emoji,
+            isPinned: trackerCoreData.isPinned,
             schedule: schedule)
         return tracker
     }
@@ -149,6 +158,8 @@ extension TrackerStore: NSFetchedResultsControllerDelegate {
             insertedSections.insert(sectionIndex)
         case .delete:
             deletedSections.insert(sectionIndex)
+        case .update:
+            updatedSections.insert(sectionIndex)
         default:
             break
         }
@@ -174,6 +185,10 @@ extension TrackerStore: NSFetchedResultsControllerDelegate {
             if let indexPath {
                 updatedIndexes.insert(indexPath)
             }
+        case .move:
+            if let indexPath, let newIndexPath {
+                movedIndexes.append((indexPath, newIndexPath))
+            }
         default:
             break
         }
@@ -183,9 +198,11 @@ extension TrackerStore: NSFetchedResultsControllerDelegate {
         let indexes = TrackerIndexes(
             insertedSections: insertedSections,
             deletedSections: deletedSections,
+            updatedSections: updatedSections,
             insertedIndexes: insertedIndexes,
             updatedIndexes: updatedIndexes,
-            deletedIndexes: deletedIndexes)
+            deletedIndexes: deletedIndexes,
+            movedIndexes: movedIndexes)
         delegate?.didUpdateTrackers(indexes)
         clearChanges()
     }
