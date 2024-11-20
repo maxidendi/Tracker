@@ -80,8 +80,8 @@ final class HabitOrEventViewController: UIViewController {
     @objc private func showHabitOrEventViewController(_ sender: UIButton) {
         guard let dataProvider = delegate?.getDataProvider() else { return }
         let viewModel = sender == habitTrackerButton ?
-                            NewTrackerViewModel(dataProvider: dataProvider, isHabit: true) :
-                            NewTrackerViewModel(dataProvider: dataProvider, isHabit: false)
+        NewTrackerViewModel(dataProvider: dataProvider, viewType: .add, isHabit: true) :
+        NewTrackerViewModel(dataProvider: dataProvider, viewType: .add, isHabit: false)
         viewModel.delegate = self
         let newTrackerView = NewTrackerView(viewModel: viewModel)
         newTrackerView.modalPresentationStyle = .popover

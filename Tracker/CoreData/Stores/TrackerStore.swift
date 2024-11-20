@@ -55,7 +55,7 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
     }
     
     private func configureFetchedResultsController() {
-        let fetchedRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        let fetchedRequest = TrackerCoreData.fetchRequest()
         let sortDescriptorCategoryTitle = NSSortDescriptor(
             keyPath: \TrackerCoreData.title,
             ascending: true)
@@ -133,6 +133,30 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
             let trackerWeekDay = TrackerWeekDayCoreData(context: context)
             trackerWeekDay.weekDay = Int32($0.toInt)
             trackerCoreData.addToWeekdays(trackerWeekDay)
+        }
+        saveContext()
+    }
+    
+    func updateTrackerCoreData(_ tracker: Tracker, asNewTracker newTracker: Tracker, for category: String) {
+        let request = TrackerCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", tracker.id as CVarArg)
+        guard let trackerCoreData = try? context.fetch(request).first,
+              let categoryCoreData =  delegate?.getCategoryCoreData(from: category),
+              let weekdays = trackerCoreData.weekdays as? Set<TrackerWeekDayCoreData>
+        else { return }
+        trackerCoreData.title = newTracker.title
+        trackerCoreData.color = newTracker.color
+        trackerCoreData.emoji = newTracker.emoji
+        weekdays.forEach{ context.delete($0) }
+        newTracker.schedule.forEach{
+            let trackerWeekDay = TrackerWeekDayCoreData(context: context)
+            trackerWeekDay.weekDay = Int32($0.toInt)
+            trackerCoreData.addToWeekdays(trackerWeekDay)
+        }
+        if trackerCoreData.lastCategory == nil {
+            trackerCoreData.category = categoryCoreData
+        } else {
+            trackerCoreData.lastCategory = categoryCoreData.title
         }
         saveContext()
     }

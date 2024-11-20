@@ -9,6 +9,7 @@ import Foundation
 
 protocol TrackersViewModelProtocol: AnyObject {
     var onUpdateTrackers: ((TrackerIndexes) -> Void)? { get set }
+    
     func updateTrackers(for date: Date)
     func updatePinnedTracker(_ index: IndexPath)
     func numberOfcategories() -> Int?
@@ -18,6 +19,7 @@ protocol TrackersViewModelProtocol: AnyObject {
     func deleteTracker(_ index: IndexPath)
     func trackerRecordChanged(_ id: UUID, isCompleted: Bool)
     func getDataProvider() -> DataProviderProtocol
+    func setupNewTrackerViewModel(for indexPath: IndexPath) -> NewTrackerViewModelProtocol?
 }
 
 final class TrackersViewModel: TrackersViewModelProtocol {
@@ -84,6 +86,16 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     
     func getDataProvider() -> DataProviderProtocol {
         dataProvider
+    }
+    
+    func setupNewTrackerViewModel(for indexPath: IndexPath) -> NewTrackerViewModelProtocol? {
+        guard let trackerCellModel = getTrackerCellModel(at: indexPath)
+        else { return nil }
+        let isHabit = !trackerCellModel.tracker.schedule.isEmpty
+        return NewTrackerViewModel(
+            dataProvider: dataProvider,
+            viewType: .edit(trackerCellModel),
+            isHabit: isHabit)
     }
 }
 

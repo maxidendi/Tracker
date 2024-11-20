@@ -51,6 +51,8 @@
 //NewTrackerViewControllerConstants
 "newTracker.newHabitTitle" = "Новая привычка";
 "newTracker.newEventTitle" = "Новое нерегулярное событие";
+"newTracker.createHabitTitle" = "Создание привычки";
+"newTracker.createEventTitle" = "Создание нерегулярного события";
 "newTracker.warningText" = "Ограничение 38 символов";
 "newTracker.placeholderText" = "Введите название трекера";
 "newTracker.cancelButtonTitle" = "Отменить";

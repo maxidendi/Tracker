@@ -230,13 +230,22 @@ extension TrackersView: UICollectionViewDataSource {
             previewProvider: nil
         ) { [weak self, weak cell] _ in
             let pinAction = UIAction(
-                title: pinActionTitle) { _ in
+                title: pinActionTitle
+            ) { _ in
                     self?.viewModel.updatePinnedTracker(indexPath)
                     cell?.toggleCellPin()
                 }
+            let editAction = UIAction(
+                title: Constants.AlertModelConstants.editActionTitle
+            ) { _ in
+                guard let model = self?.viewModel.setupNewTrackerViewModel(for: indexPath)
+                else { return }
+                let newTrackerView = NewTrackerView(viewModel: model)
+                newTrackerView.modalPresentationStyle = .popover
+                self?.present(newTrackerView, animated: true)
+            }
             let deleteAction = UIAction(
                 title: Constants.AlertModelConstants.deleteActionTitle,
-                image: nil,
                 attributes: .destructive
             ) { _ in
                 self?.showAlertWithCancel(
@@ -247,7 +256,7 @@ extension TrackersView: UICollectionViewDataSource {
                     self?.viewModel.deleteTracker(indexPath)
                 }
             }
-            return UIMenu(title: "", children: [pinAction, deleteAction])
+            return UIMenu(title: "", children: [pinAction, editAction, deleteAction])
         }
     }
     
@@ -283,6 +292,15 @@ extension TrackersView: UICollectionViewDataSource {
                     self?.viewModel.updatePinnedTracker(indexPath)
                     cell?.toggleCellPin()
                 }
+            let editAction = UIAction(
+                title: Constants.AlertModelConstants.editActionTitle
+            ) { _ in
+                guard let model = self?.viewModel.setupNewTrackerViewModel(for: indexPath)
+                else { return }
+                let newTrackerView = NewTrackerView(viewModel: model)
+                newTrackerView.modalPresentationStyle = .popover
+                self?.present(newTrackerView, animated: true)
+            }
             let deleteAction = UIAction(
                 title: Constants.AlertModelConstants.deleteActionTitle,
                 attributes: .destructive
@@ -295,7 +313,7 @@ extension TrackersView: UICollectionViewDataSource {
                     self?.viewModel.deleteTracker(indexPath)
                 }
             }
-            return UIMenu(title: "", children: [pinAction ,deleteAction])
+            return UIMenu(title: "", children: [pinAction, editAction, deleteAction])
         }
     }
 

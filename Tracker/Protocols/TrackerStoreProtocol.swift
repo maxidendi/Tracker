@@ -14,5 +14,6 @@ protocol TrackerStoreProtocol: AnyObject {
     func fetchTrackers(for weekDay: Int, date: Date)
     func getTracker(from trackerCoreData: TrackerCoreData) -> Tracker?
     func addTrackerCoreData(_ tracker: Tracker, to category: String)
+    func updateTrackerCoreData(_ tracker: Tracker, asNewTracker newTracker: Tracker, for category: String)
     func deleteTrackerCoreData(_ index: IndexPath)
 }

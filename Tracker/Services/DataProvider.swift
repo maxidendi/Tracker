@@ -83,7 +83,10 @@ final class DataProvider: DataProviderProtocol {
     
     func getTracker(at indexPath: IndexPath, currentDate: Date) -> TrackerCellModel? {
         guard let trackerCoreData = trackerStore.trackerCoreDataFRC?.object(at: indexPath) as? TrackerCoreData,
-              let tracker = trackerStore.getTracker(from: trackerCoreData)
+              let tracker = trackerStore.getTracker(from: trackerCoreData),
+              let categoryTitle = trackerCoreData.lastCategory != nil ?
+              trackerCoreData.lastCategory :
+              trackerCoreData.category?.title
         else { return nil }
         let records = getRecords(for: tracker)
         let isCompleted = records.contains(where: {
@@ -91,6 +94,7 @@ final class DataProvider: DataProviderProtocol {
         })
         let trackerCellModel = TrackerCellModel(
             tracker: tracker,
+            category: categoryTitle,
             isCompleted: isCompleted,
             count: records.count)
         return trackerCellModel
@@ -116,6 +120,10 @@ final class DataProvider: DataProviderProtocol {
     
     func addTracker(_ tracker: Tracker, to category: String) {
         trackerStore.addTrackerCoreData(tracker, to: category)
+    }
+    
+    func updateTracker(_ tracker: Tracker, asNewTracker newTracker: Tracker, for category: String) {
+        trackerStore.updateTrackerCoreData(tracker, asNewTracker: newTracker, for: category)
     }
     
     func removeTracker(_ indexPath: IndexPath) {

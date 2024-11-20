@@ -51,6 +51,8 @@
 //NewTrackerViewControllerConstants
 "newTracker.newHabitTitle" = "Un nuevo hábito";
 "newTracker.newEventTitle" = "Nuevo evento";
+"newTracker.createHabitTitle" = "Сreando un hábito";
+"newTracker.createEventTitle" = "Сrear un evento irregular";
 "newTracker.warningText" = "Límite de 38 caracteres";
 "newTracker.placeholderText" = "Introduzca el nombre del rastreador";
 "newTracker.cancelButtonTitle" = "Cancelar";

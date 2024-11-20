@@ -92,6 +92,8 @@ enum Constants {
     enum NewTrackerViewControllerConstants {
         static let newHabitTitle = NSLocalizedString("newTracker.newHabitTitle", comment: "")
         static let newEventTitle = NSLocalizedString("newTracker.newEventTitle", comment: "")
+        static let createHabitTitle = NSLocalizedString("newTracker.createHabitTitle", comment: "")
+        static let createEventTitle = NSLocalizedString("newTracker.createEventTitle", comment: "")
         static let warningText = NSLocalizedString("newTracker.warningText", comment: "")
         static let placeholderText = NSLocalizedString("newTracker.placeholderText", comment: "")
         static let cancelButtonTitle = NSLocalizedString("newTracker.cancelButtonTitle", comment: "")

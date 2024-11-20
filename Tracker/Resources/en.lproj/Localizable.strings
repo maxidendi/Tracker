@@ -51,6 +51,8 @@
 //NewTrackerViewControllerConstants
 "newTracker.newHabitTitle" = "New habit";
 "newTracker.newEventTitle" = "New event";
+"newTracker.createHabitTitle" = "Creating a habit";
+"newTracker.createEventTitle" = "Creating a event";
 "newTracker.warningText" = "The limit is 38 characters";
 "newTracker.placeholderText" = "Enter the name of the tracker";
 "newTracker.cancelButtonTitle" = "Cancel";

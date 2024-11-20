@@ -25,15 +25,7 @@ final class NewTrackerView: UIViewController {
     private let viewModel: NewTrackerViewModelProtocol
     private let constants = Constants.NewTrackerViewControllerConstants.self
     private var warningLabelHeightConstraint: NSLayoutConstraint?
-    private lazy var titleLabel: UILabel = {
-        let label = UILabel()
-        label.text = viewModel.isHabit ? constants.newHabitTitle :
-                               constants.newEventTitle
-        label.textAlignment = .center
-        label.font = Constants.Typography.medium16
-        return label
-    } ()
-    
+    private var textFieldTopConstraint: NSLayoutConstraint?
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.showsVerticalScrollIndicator = false
@@ -48,12 +40,18 @@ final class NewTrackerView: UIViewController {
         return contentView
     } ()
     
-    private lazy var warningLabel: UILabel = {
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = constants.warningText
         label.textAlignment = .center
-        label.font = Constants.Typography.regular17
-        label.textColor = .ypRed
+        label.font = Constants.Typography.medium16
+        return label
+    } ()
+    
+    private lazy var countLabel: UILabel = {
+        let label = UILabel()
+        label.textAlignment = .center
+        label.font = Constants.Typography.bold32
+        label.textColor = .ypBlack
         return label
     } ()
     
@@ -72,6 +70,15 @@ final class NewTrackerView: UIViewController {
         textField.layer.cornerRadius = Constants.General.radius16
         textField.layer.masksToBounds = true
         return textField
+    } ()
+    
+    private lazy var warningLabel: UILabel = {
+        let label = UILabel()
+        label.text = constants.warningText
+        label.textAlignment = .center
+        label.font = Constants.Typography.regular17
+        label.textColor = .ypRed
+        return label
     } ()
     
     private lazy var tableView: UITableView = {
@@ -139,17 +146,24 @@ final class NewTrackerView: UIViewController {
         layoutSubviews()
         setupToHideKeyboard()
         bind()
+        setupViewForViewModelType()
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.register(UITableViewCell.self,
-                           forCellReuseIdentifier: "cell")
+        tableView.register(
+            UITableViewCell.self,
+            forCellReuseIdentifier: "cell")
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(EmojiCell.self, forCellWithReuseIdentifier: EmojiCell.reuseIdentifier)
         collectionView.register(ColorCell.self, forCellWithReuseIdentifier: ColorCell.reuseIdentifier)
-        collectionView.register(NewTrackerSupplementaryView.self,
-                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-                                withReuseIdentifier: NewTrackerSupplementaryView.identifier)
+        collectionView.register(
+            NewTrackerSupplementaryView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: NewTrackerSupplementaryView.identifier)
+    }
+    
+    override func viewDidLayoutSubviews() {
+        viewModel.setupForEditViewType()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -161,6 +175,9 @@ final class NewTrackerView: UIViewController {
     //MARK: - Methods
     
     private func bind() {
+//        viewModel.onChangeTitle = { [weak self] title in
+//            self?.textField.text = title
+//        }
         viewModel.onChangeCreateButtonState = { [weak self] isReady in
             self?.changeCreateButtonState(isReady)
         }
@@ -186,21 +203,53 @@ final class NewTrackerView: UIViewController {
             self?.tableView.cellForRow(at: IndexPath(item: 0, section: 0))?.detailTextLabel?.text = category
             if isSelected { self?.dismiss(animated: true) }
         }
-        viewModel.onSelectSchedule = { [weak self] schedule in
+        viewModel.onSelectSchedule = { [weak self] schedule, isSelected in
             let cell = self?.tableView.cellForRow(at: IndexPath(item: 1, section: 0))
             cell?.detailTextLabel?.text = schedule.count == WeekDay.allCases.count ?
                                           self?.constants.scheduleEverydayTitle :
                                           schedule.compactMap{ $0.shortName }.joined(separator: ", ")
-            self?.dismiss(animated: true)
+            if isSelected { self?.dismiss(animated: true) }
+        }
+    }
+    
+    private func setupViewForViewModelType() {
+        switch viewModel.viewType {
+        case .add:
+            titleLabel.text = viewModel.isHabit ?
+            constants.newHabitTitle :
+            constants.newEventTitle
+        case .edit(let trackerCellModel):
+            titleLabel.text = viewModel.isHabit ?
+            constants.createHabitTitle :
+            constants.createEventTitle
+            countLabel.text = String.localizedStringWithFormat(
+                NSLocalizedString("numberOfDays", comment: ""),
+                trackerCellModel.count)
+            textFieldTopConstraint?.constant = 40
+            NSLayoutConstraint.activate([
+                countLabel.heightAnchor.constraint(equalToConstant: 38),
+            ])
+            textField.text = trackerCellModel.tracker.title
         }
     }
     
     @objc func cancelButtonTapped() {
-        viewModel.cancelButtonTapped()
+        switch viewModel.viewType {
+        case .add:
+            viewModel.cancelButtonTapped()
+        case .edit(_):
+            dismiss(animated: true)
+        }
     }
     
     @objc func createButtonTapped() {
-        viewModel.createTracker()
+        switch viewModel.viewType {
+        case .add:
+            viewModel.createTracker()
+        case .edit(_):
+            viewModel.createTracker()
+            dismiss(animated: true)
+        }
     }
     
     private func changeCreateButtonState(_ isEnabled: Bool) {
@@ -222,7 +271,7 @@ extension NewTrackerView: SetupSubviewsProtocol {
         }
         scrollView.addSubview(contentView)
         contentView.translatesAutoresizingMaskIntoConstraints = false
-        [textField, warningLabel, tableView, collectionView, buttonsStackView].forEach {
+        [countLabel, textField, warningLabel, tableView, collectionView, buttonsStackView].forEach {
             contentView.addSubview($0)
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
@@ -231,6 +280,8 @@ extension NewTrackerView: SetupSubviewsProtocol {
     func layoutSubviews() {
         warningLabelHeightConstraint = warningLabel.heightAnchor.constraint(equalToConstant: .zero)
         warningLabelHeightConstraint?.isActive = true
+        textFieldTopConstraint = textField.topAnchor.constraint(equalTo: countLabel.bottomAnchor)
+        textFieldTopConstraint?.isActive = true
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor,
                                             constant: constants.titleTopInset),
@@ -246,12 +297,13 @@ extension NewTrackerView: SetupSubviewsProtocol {
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            countLabel.widthAnchor.constraint(equalTo: contentView.widthAnchor),
+            countLabel.topAnchor.constraint(equalTo: contentView.topAnchor,
+                                           constant: constants.geometricParams.topInset),
             textField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,
                                                constant: Constants.General.inset16),
             textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor,
                                                 constant: -Constants.General.inset16),
-            textField.topAnchor.constraint(equalTo: contentView.topAnchor,
-                                           constant: constants.geometricParams.topInset),
             textField.heightAnchor.constraint(equalToConstant: Constants.General.itemHeight),
             warningLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,
                                                   constant: Constants.General.inset16),
@@ -311,6 +363,7 @@ extension NewTrackerView: UICollectionViewDataSource {
                 for: indexPath) as? EmojiCell
             else { return UICollectionViewCell() }
             cell.configureCell(emoji: viewModel.getEmojiCategory().emoji[indexPath.row])
+            
             return cell
         case 1:
             guard let cell = collectionView.dequeueReusableCell(
