@@ -162,7 +162,7 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
     }
     
     func deleteTrackerCoreData(_ index: IndexPath) {
-        guard let trackerCoreData = trackerCoreDataFRC?.sections?[index.section].objects?[index.row] as? TrackerCoreData
+        guard let trackerCoreData = trackerCoreDataFRC?.object(at: index) as? TrackerCoreData
         else { return }
         context.delete(trackerCoreData)
         saveContext()

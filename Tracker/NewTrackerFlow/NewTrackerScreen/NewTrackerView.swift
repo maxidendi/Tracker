@@ -162,10 +162,6 @@ final class NewTrackerView: UIViewController {
             withReuseIdentifier: NewTrackerSupplementaryView.identifier)
     }
     
-    override func viewDidLayoutSubviews() {
-        viewModel.setupForEditViewType()
-    }
-    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         let height = collectionView.contentSize.height
@@ -175,9 +171,9 @@ final class NewTrackerView: UIViewController {
     //MARK: - Methods
     
     private func bind() {
-//        viewModel.onChangeTitle = { [weak self] title in
-//            self?.textField.text = title
-//        }
+        viewModel.onChangeTitle = { [weak self] title in
+            self?.textField.text = title
+        }
         viewModel.onChangeCreateButtonState = { [weak self] isReady in
             self?.changeCreateButtonState(isReady)
         }
@@ -230,6 +226,7 @@ final class NewTrackerView: UIViewController {
                 countLabel.heightAnchor.constraint(equalToConstant: 38),
             ])
             textField.text = trackerCellModel.tracker.title
+            changeCreateButtonState(true)
         }
     }
     
@@ -363,7 +360,10 @@ extension NewTrackerView: UICollectionViewDataSource {
                 for: indexPath) as? EmojiCell
             else { return UICollectionViewCell() }
             cell.configureCell(emoji: viewModel.getEmojiCategory().emoji[indexPath.row])
-            
+            if let emoji = viewModel.defaultCellModel?.tracker.emoji,
+                viewModel.getEmojiCategory().emoji.firstIndex(of: emoji) == indexPath.row {
+                cell.cellDidSelected()
+            }
             return cell
         case 1:
             guard let cell = collectionView.dequeueReusableCell(
@@ -372,6 +372,10 @@ extension NewTrackerView: UICollectionViewDataSource {
             else { return UICollectionViewCell() }
             let colorString = viewModel.getColorCategory().colors[indexPath.row]
             cell.configureCell(color: UIColor.fromCodedString(colorString))
+            if let color = viewModel.defaultCellModel?.tracker.color,
+               viewModel.getColorCategory().colors.firstIndex(of: color) == indexPath.row {
+                cell.cellDidSelected()
+            }
             return cell
         default:
             return UICollectionViewCell()
@@ -469,8 +473,13 @@ extension NewTrackerView: UITableViewDataSource {
         switch indexPath.row {
             case 0:
             cell.textLabel?.text = constants.categoryTitle
+            cell.detailTextLabel?.text = viewModel.defaultCellModel?.category
             case 1:
             cell.textLabel?.text = constants.scheduleTitle
+            let schedule = viewModel.defaultCellModel?.tracker.schedule
+            cell.detailTextLabel?.text = schedule?.count == WeekDay.allCases.count ?
+            constants.scheduleEverydayTitle :
+            schedule?.sorted(by: { $0.toIntRussian < $1.toIntRussian } ).map{ $0.shortName }.joined(separator: ", ")
             default: break
         }
         return cell

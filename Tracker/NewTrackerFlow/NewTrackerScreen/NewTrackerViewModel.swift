@@ -8,7 +8,7 @@
 import Foundation
 
 protocol NewTrackerViewModelProtocol: AnyObject {
-//    var onChangeTitle: ((String) -> Void)? { get set }
+    var onChangeTitle: ((String) -> Void)? { get set }
     var onChangeCreateButtonState: ((Bool) -> Void)? { get set }
     var onChangeSelectedEmojiCell: ((_ from: IndexPath?, _ to: IndexPath) -> Void)? { get set }
     var onChangeSelectedColorCell: ((_ from: IndexPath?, _ to: IndexPath) -> Void)? { get set }
@@ -16,9 +16,9 @@ protocol NewTrackerViewModelProtocol: AnyObject {
     var onSelectCategory: ((String?, _ isSelected: Bool) -> Void)? { get set }
     var isHabit: Bool { get }
     var viewType: NewTrackerViewType { get }
+    var defaultCellModel: TrackerCellModel? { get }
     func createTracker()
     func cancelButtonTapped()
-    func setupForEditViewType()
     func getEmojiCategory() -> (emoji: [String], title: String)
     func getColorCategory() -> (colors: [String], title: String)
     func selectEmoji(at indexPath: IndexPath)
@@ -50,7 +50,7 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
     //MARK: - Properties
     
     weak var delegate: NewTrackerViewModelDelegate?
-//    var onChangeTitle: ((String) -> Void)?
+    var onChangeTitle: ((String) -> Void)?
     var onChangeCreateButtonState: ((Bool) -> Void)?
     var onChangeSelectedEmojiCell: ((_ from: IndexPath?, _ to: IndexPath) -> Void)?
     var onChangeSelectedColorCell: ((_ from: IndexPath?, _ to: IndexPath) -> Void)?
@@ -58,6 +58,7 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
     var onSelectSchedule: (([WeekDay], _ isSelected: Bool) -> Void)?
     let isHabit: Bool
     let viewType: NewTrackerViewType
+    private(set) var defaultCellModel: TrackerCellModel?
     private var dataProvider: DataProviderProtocol
     private var newTracker: Tracker?
     private var newTrackerCategory: String?
@@ -100,29 +101,24 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
             onChangeCreateButtonState?(true)
         }
     }
-    
-    func setupForEditViewType() {
+
+    private func setupForEditViewType() {
         switch viewType {
         case .add:
             return
         case .edit(let trackerCellModel):
+            defaultCellModel = trackerCellModel
             newTracker = trackerCellModel.tracker
             newTrackerCategory = trackerCellModel.category
             newTrackerTitle = trackerCellModel.tracker.title
             newTrackerColor = trackerCellModel.tracker.color
             newTrackerEmoji = trackerCellModel.tracker.emoji
             newTrackerSchedule = trackerCellModel.tracker.schedule
-            onSelectCategory?(trackerCellModel.category, false)
-            onSelectSchedule?(trackerCellModel.tracker.schedule, false)
-//            onChangeTitle?(trackerCellModel.tracker.title)
             guard let colorIndex = colorsCategory.colors.firstIndex(of: trackerCellModel.tracker.color),
-                  let emojiIndex = emojiCategory.emoji.firstIndex(of: trackerCellModel.tracker.emoji)
+                    let emojiIndex = emojiCategory.emoji.firstIndex(of: trackerCellModel.tracker.emoji)
             else { return }
             selectedColorIndexPath = IndexPath(row: colorIndex, section: 1)
             selectedEmojiIndexPath = IndexPath(row: emojiIndex, section: 0)
-            onChangeSelectedColorCell?(nil, IndexPath(row: colorIndex, section: 1))
-            onChangeSelectedEmojiCell?(nil, IndexPath(row: emojiIndex, section: 0))
-            isReadyToCreateTracker()
         }
     }
 
@@ -154,6 +150,7 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
     
     func setNewTrackerTitle(_ title: String?) {
         newTrackerTitle = title
+        defaultCellModel = nil
         isReadyToCreateTracker()
     }
     
@@ -166,6 +163,7 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
             onChangeSelectedEmojiCell?(nil, indexPath)
         }
         newTrackerEmoji = emojiCategory.emoji[indexPath.row]
+        defaultCellModel = nil
         isReadyToCreateTracker()
     }
     
@@ -178,6 +176,7 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
             onChangeSelectedColorCell?(nil, indexPath)
         }
         newTrackerColor = colorsCategory.colors[indexPath.row]
+        defaultCellModel = nil
         isReadyToCreateTracker()
     }
     
@@ -201,6 +200,7 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
 extension NewTrackerViewModel: CategoryViewModelDelegate {
     func didSelectCategory(_ category: String?, isSelected: Bool) {
         newTrackerCategory = category
+        defaultCellModel = nil
         isReadyToCreateTracker()
         onSelectCategory?(newTrackerCategory, isSelected)
     }
@@ -209,6 +209,7 @@ extension NewTrackerViewModel: CategoryViewModelDelegate {
 extension NewTrackerViewModel: ScheduleViewModelDelegate {
     func didRecieveSchedule(_ schedule: Set<WeekDay>) {
         newTrackerSchedule = Array(schedule).sorted(by: { $0.toIntRussian < $1.toIntRussian } )
+        defaultCellModel = nil
         isReadyToCreateTracker()
         onSelectSchedule?(newTrackerSchedule, true)
     }

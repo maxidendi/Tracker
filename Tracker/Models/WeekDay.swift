@@ -11,7 +11,7 @@ enum WeekDay: CaseIterable, Codable {
     
     init?(from int32: Int32) {
         guard let weekDay = WeekDay.allCases.first(
-            where: { $0.toIntRussian == int32 })
+            where: { $0.toInt == int32 })
         else {
             return nil
         }
