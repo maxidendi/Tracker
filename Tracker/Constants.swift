@@ -60,12 +60,19 @@ enum Constants {
         static let shortSaturday = NSLocalizedString("weekdaySchedule.shortSaturday", comment: "")
         static let shortSunday = NSLocalizedString("weekdaySchedule.shortSunday", comment: "")
     }
+    enum Filters {
+        static let allTrackers = NSLocalizedString("filters.allTrackers", comment: "")
+        static let todayTrackers = NSLocalizedString("filters.todayTrackers", comment: "")
+        static let doneTrackers = NSLocalizedString("filters.doneTrackers", comment: "")
+        static let undoneTrackers = NSLocalizedString("filters.undoneTrackers", comment: "")
+    }
     enum TrackersViewControllerConstants {
         static let title = NSLocalizedString("trackers.title", comment: "")
         static let searchBarPlaceholder = NSLocalizedString("trackers.searchBarPlaceholder", comment: "")
         static let searchBarCancelButtonTitle = NSLocalizedString("trackers.searchBarCancelButtonTitle", comment: "")
         static let labelStubText = NSLocalizedString("trackers.labelStubText", comment: "")
-        static let pinnedCategoryTitle = NSLocalizedString("trackers.pinnedCategoryTitle", comment: "")
+        static let pinnedCategoryTitle = "pinnedCategory"
+        static let filterButtonTitle = NSLocalizedString("trackers.filterButtonTitle", comment: "")
         static let geometricParams = GeometricParams(
             cellCount: 2,
             topInset: 8,
@@ -75,11 +82,19 @@ enum Constants {
             cellSpacing: 9)
         static let datePickerWidth: CGFloat = 100
         static let collectionViewCellHeight: CGFloat = 148
+        static let filterButtonHeight: CGFloat = 50
+        static let filterButtonWidth: CGFloat = 114
     }
     enum StatisticViewControllerConstants {
         static let title = NSLocalizedString("statistic.title", comment: "")
         static let labelStubText = NSLocalizedString("statistic.labelStubText", comment: "")
         static let stubsSpacing: CGFloat = 8
+    }
+    enum FiltersViewControllerConstants {
+        static let title = NSLocalizedString("filters.title", comment: "")
+        static let titleHeigth: CGFloat = 50
+        static let titleTopInset: CGFloat = 14
+        static let verticalSpacing: CGFloat = 24
     }
     enum TrackerCellConstants {
         static let topViewHeight: CGFloat = 90

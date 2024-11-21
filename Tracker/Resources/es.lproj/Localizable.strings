@@ -37,16 +37,25 @@
 "weekdaySchedule.shortSaturday" = "Sáb";
 "weekdaySchedule.shortSunday" = "Dom";
 
+//Filters
+"filters.allTrackers" = "Todos los rastreadores";
+"filters.todayTrackers" = "Rastreadores para hoy";
+"filters.doneTrackers" = "Completo";
+"filters.undoneTrackers" = "Pendientes";
+
 //TrackersViewControllerConstants
 "trackers.title" = "Rastreadores";
 "trackers.searchBarPlaceholder" = "Búsqueda";
 "trackers.searchBarCancelButtonTitle" = "Cancelar";
 "trackers.labelStubText" = "¿Qué vamos a seguir?";
-"trackers.pinnedCategoryTitle" = "Consagrado";
+"trackers.filterButtonTitle" = "Filtros";
 
 //StatisticViewControllerConstants
 "statistic.title" = "Estadísticas";
 "statistic.labelStubText" = "Todavía no hay nada que analizar";
+
+//FiltersViewController
+"filters.title" = "Filtros";
 
 //NewTrackerViewControllerConstants
 "newTracker.newHabitTitle" = "Un nuevo hábito";

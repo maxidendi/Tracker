@@ -37,16 +37,25 @@
 "weekdaySchedule.shortSaturday" = "Sat";
 "weekdaySchedule.shortSunday" = "Sun";
 
+//Filters
+"filters.allTrackers" = "All trackers";
+"filters.todayTrackers" = "Trackers for today";
+"filters.doneTrackers" = "Done trackers";
+"filters.undoneTrackers" = "Undone trackers";
+
 //TrackersViewControllerConstants
 "trackers.title" = "Trackers";
 "trackers.searchBarPlaceholder" = "Search";
 "trackers.searchBarCancelButtonTitle" = "Cancel";
 "trackers.labelStubText" = "What are we going to track?";
-"trackers.pinnedCategoryTitle" = "Pinned";
+"trackers.filterButtonTitle" = "Filters";
 
 //StatisticViewControllerConstants
 "statistic.title" = "Statistics";
 "statistic.labelStubText" = "There is nothing to analyze yet";
+
+//FiltersViewController
+"filters.title" = "Filters";
 
 //NewTrackerViewControllerConstants
 "newTracker.newHabitTitle" = "New habit";

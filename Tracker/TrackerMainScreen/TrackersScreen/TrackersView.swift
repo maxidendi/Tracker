@@ -57,6 +57,17 @@ final class TrackersView: UIViewController {
         return searchBarController
     } ()
     
+    private lazy var filtersButton: UIButton = {
+        let button = UIButton()
+        button.backgroundColor = .ypBlue
+        button.setTitle(constants.filterButtonTitle, for: .normal)
+        button.titleLabel?.font = Constants.Typography.regular17
+        button.layer.masksToBounds = true
+        button.layer.cornerRadius = Constants.General.radius16
+        button.addTarget(self, action: #selector(filterButtonTapped), for: .touchUpInside)
+        return button
+    } ()
+    
     private lazy var imageStubView: UIImageView = {
         let imageView = UIImageView(image: .trackersImageStub)
         return imageView
@@ -123,9 +134,16 @@ final class TrackersView: UIViewController {
     private func stubsIsHidden(_ isHidden: Bool) {
         labelStub.isHidden = isHidden
         imageStubView.isHidden = isHidden
+        filtersButton.isHidden = !isHidden
     }
     
     //MARK: - Objc methods
+    
+    @objc private func filterButtonTapped() {
+        let filterViewController = FiltersViewController()
+        filterViewController.modalPresentationStyle = .popover
+        present(filterViewController, animated: true)
+    }
     
     @objc private func datePickerValueChanged() {
         viewModel.updateTrackers(for: datePicker.date)
@@ -137,17 +155,15 @@ final class TrackersView: UIViewController {
         let createTrackerViewController = HabitOrEventViewController()
         createTrackerViewController.delegate = self
         createTrackerViewController.modalPresentationStyle = .popover
-        present(createTrackerViewController, animated: true, completion: nil)
+        present(createTrackerViewController, animated: true)
     }
 }
 
-//
 //MARK: - SetupSubviewsProtocol extension
-//
 
 extension TrackersView: SetupSubviewsProtocol {
     func addSubviews() {
-        [imageStubView, labelStub, collectionView].forEach {
+        [imageStubView, labelStub, collectionView, filtersButton].forEach {
             view.addSubview($0)
             $0.translatesAutoresizingMaskIntoConstraints = false }
         tabBarController?.tabBar.addSubview(tabBarSeparatorView)
@@ -165,6 +181,11 @@ extension TrackersView: SetupSubviewsProtocol {
                                                 constant: -constants.geometricParams.rightInset),
             labelStub.topAnchor.constraint(equalTo: imageStubView.bottomAnchor,
                                            constant: Constants.General.stubsSpacing),
+            filtersButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            filtersButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,
+                                                 constant: -Constants.General.inset16),
+            filtersButton.widthAnchor.constraint(equalToConstant: constants.filterButtonWidth),
+            filtersButton.heightAnchor.constraint(equalToConstant: constants.filterButtonHeight),
             datePicker.widthAnchor.constraint(equalToConstant: constants.datePickerWidth),
             collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor,
                                                 constant: Constants.General.inset16),
@@ -175,9 +196,7 @@ extension TrackersView: SetupSubviewsProtocol {
     }
 }
 
-//
 //MARK: - UICollectionView extensions
-//
 
 extension TrackersView: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {

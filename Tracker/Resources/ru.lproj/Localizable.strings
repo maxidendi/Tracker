@@ -37,16 +37,25 @@
 "weekdaySchedule.shortSaturday" = "Сб";
 "weekdaySchedule.shortSunday" = "Вс";
 
+//Filters
+"filters.allTrackers" = "Все трекеры";
+"filters.todayTrackers" = "Трекеры на сегодня";
+"filters.doneTrackers" = "Завершенные";
+"filters.undoneTrackers" = "Не завершенные";
+
 //TrackersViewControllerConstants
 "trackers.title" = "Трекеры";
 "trackers.searchBarPlaceholder" = "Поиск";
 "trackers.searchBarCancelButtonTitle" = "Отменить";
 "trackers.labelStubText" = "Что будем отслеживать?";
-"trackers.pinnedCategoryTitle" = "Закрепленные";
+"trackers.filterButtonTitle" = "Фильтры";
 
 //StatisticViewControllerConstants
 "statistic.title" = "Статистика";
 "statistic.labelStubText" = "Анализировать пока нечего";
+
+//FiltersViewController
+"filters.title" = "Фильтры";
 
 //NewTrackerViewControllerConstants
 "newTracker.newHabitTitle" = "Новая привычка";
