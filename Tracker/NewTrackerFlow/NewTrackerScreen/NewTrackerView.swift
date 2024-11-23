@@ -214,7 +214,7 @@ final class NewTrackerView: UIViewController {
             titleLabel.text = viewModel.isHabit ?
             constants.newHabitTitle :
             constants.newEventTitle
-        case .edit(let trackerCellModel):
+        case .edit(let trackerCellModel, _):
             titleLabel.text = viewModel.isHabit ?
             constants.createHabitTitle :
             constants.createEventTitle
@@ -234,7 +234,7 @@ final class NewTrackerView: UIViewController {
         switch viewModel.viewType {
         case .add:
             viewModel.cancelButtonTapped()
-        case .edit(_):
+        case .edit(_, _):
             dismiss(animated: true)
         }
     }
@@ -243,7 +243,7 @@ final class NewTrackerView: UIViewController {
         switch viewModel.viewType {
         case .add:
             viewModel.createTracker()
-        case .edit(_):
+        case .edit(_, _):
             viewModel.createTracker()
             dismiss(animated: true)
         }
@@ -255,9 +255,7 @@ final class NewTrackerView: UIViewController {
     }
 }
 
-//
 //MARK: - SetupSubviewsProtocol extension
-//
 
 extension NewTrackerView: SetupSubviewsProtocol {
     
@@ -334,9 +332,7 @@ extension NewTrackerView: SetupSubviewsProtocol {
     }
 }
 
-//
 //MARK: - UICollectionView extensions
-//
 
 extension NewTrackerView: UICollectionViewDataSource {
     
@@ -452,9 +448,7 @@ extension NewTrackerView: UICollectionViewDelegateFlowLayout {
     }
 }
 
-//
 //MARK: - UITableView extensions
-//
 
 extension NewTrackerView: UITableViewDataSource {
     
@@ -509,9 +503,7 @@ extension NewTrackerView: UITableViewDelegate {
     }
 }
 
-//
 //MARK: - UITextField extension
-//
 
 extension NewTrackerView: UITextFieldDelegate {
     

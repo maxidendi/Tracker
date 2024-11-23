@@ -27,4 +27,12 @@ final class FiltersCell: UITableViewCell {
         self.accessoryType = isMarked ? .checkmark : .none
         setSeparatorAndCorners(rows: rowsCount, indexPath: indexPath)
     }
+    
+    func didSelect() {
+        self.accessoryType = .checkmark
+    }
+    
+    func didDeselect() {
+        self.accessoryType = .none
+    }
 }

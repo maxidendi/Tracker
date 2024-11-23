@@ -8,16 +8,6 @@
 import Foundation
 import CoreData
 
-enum UpdateTrackers {
-    case insertCell([IndexPath])
-    case deleteCell([IndexPath])
-    case updateCell([IndexPath])
-    case moveCell((from: IndexPath, to: IndexPath))
-    case insertSection([Int])
-    case deleteSection([Int])
-    case reloadSection([Int])
-}
-
 final class DataProvider: DataProviderProtocol {
     
     //MARK: - Init
@@ -62,28 +52,28 @@ final class DataProvider: DataProviderProtocol {
     //MARK: - Methods
     
     //TrackerStore FRC to TrackersVC collectionView
-    func fetchTrackersCoreData(for currentDate: Date) {
+    func fetchTrackersCoreData(for currentDate: Date, filter: Filters) {
         let weekDay = calendar.component(.weekday, from: currentDate)
-        trackerStore.fetchTrackers(for: weekDay, date: currentDate)
+        trackerStore.fetchTrackers(for: weekDay, date: currentDate, filter: filter)
     }
     
     func numberOfCategories() -> Int? {
-        trackerStore.trackerCoreDataFRC?.sections?.count
+        trackerStore.trackerCoreDataFRC.sections?.count
     }
     
     func titleForSection(_ section: Int) -> String? {
-        guard let trackerCoreData = trackerStore.trackerCoreDataFRC?.sections?[section].objects?.first as? TrackerCoreData
+        guard let trackerCoreData = trackerStore.trackerCoreDataFRC.sections?[section].objects?.first as? TrackerCoreData
         else { return nil }
         return trackerCoreData.category?.title
     }
     
     func numberOfTrackersInSection(_ section: Int) -> Int {
-        trackerStore.trackerCoreDataFRC?.sections?[section].numberOfObjects ?? 0
+        trackerStore.trackerCoreDataFRC.sections?[section].numberOfObjects ?? 0
     }
     
     func getTracker(at indexPath: IndexPath, currentDate: Date) -> TrackerCellModel? {
-        guard let trackerCoreData = trackerStore.trackerCoreDataFRC?.object(at: indexPath) as? TrackerCoreData,
-              let tracker = trackerStore.getTracker(from: trackerCoreData),
+        let trackerCoreData = trackerStore.trackerCoreDataFRC.object(at: indexPath) as TrackerCoreData
+        guard let tracker = trackerStore.getTracker(from: trackerCoreData),
               let categoryTitle = trackerCoreData.lastCategory != nil ?
               trackerCoreData.lastCategory :
               trackerCoreData.category?.title
@@ -101,7 +91,7 @@ final class DataProvider: DataProviderProtocol {
     }
     
     func pinOrUnpinTracker(_ indexPath: IndexPath) {
-        guard let trackerCoreData = trackerStore.trackerCoreDataFRC?.object(at: indexPath) else { return }
+        let trackerCoreData = trackerStore.trackerCoreDataFRC.object(at: indexPath)
         if trackerCoreData.isPinned, let lastCategoryTitle = trackerCoreData.lastCategory {
             trackerCoreData.isPinned = false
             let newCategoryCoreData = categoryStore.getTrackerCategoryCoreData(from: lastCategoryTitle)
@@ -122,8 +112,8 @@ final class DataProvider: DataProviderProtocol {
         trackerStore.addTrackerCoreData(tracker, to: category)
     }
     
-    func updateTracker(_ tracker: Tracker, asNewTracker newTracker: Tracker, for category: String) {
-        trackerStore.updateTrackerCoreData(tracker, asNewTracker: newTracker, for: category)
+    func updateTracker(_ indexPath: IndexPath, asNewTracker newTracker: Tracker, for category: String) {
+        trackerStore.updateTrackerCoreData(indexPath, asNewTracker: newTracker, for: category)
     }
     
     func removeTracker(_ indexPath: IndexPath) {

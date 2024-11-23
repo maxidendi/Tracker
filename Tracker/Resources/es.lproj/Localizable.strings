@@ -49,6 +49,7 @@
 "trackers.searchBarCancelButtonTitle" = "Cancelar";
 "trackers.labelStubText" = "¿Qué vamos a seguir?";
 "trackers.filterButtonTitle" = "Filtros";
+"trackers.pinnedCategoryTitle" = "Consagrado";
 
 //StatisticViewControllerConstants
 "statistic.title" = "Estadísticas";

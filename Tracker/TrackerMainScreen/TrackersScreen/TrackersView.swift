@@ -25,16 +25,20 @@ final class TrackersView: UIViewController {
     private let viewModel: TrackersViewModelProtocol
     private let constants = Constants.TrackersViewControllerConstants.self
     private lazy var collectionView: UICollectionView = {
-        let collection = UICollectionView(frame: .zero,
-                                          collectionViewLayout: UICollectionViewFlowLayout())
+        let collection = UICollectionView(
+            frame: .zero,
+            collectionViewLayout: UICollectionViewFlowLayout())
+        collection.contentInset = .init(top: .zero, left: .zero, bottom: 50, right: .zero)
         collection.backgroundColor = .clear
         collection.delegate = self
         collection.dataSource = self
-        collection.register(TrackerCell.self,
-                            forCellWithReuseIdentifier: TrackerCell.reuseIdentifier)
-        collection.register(TrackersSupplementaryView.self,
-                            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-                            withReuseIdentifier: TrackersSupplementaryView.identifier)
+        collection.register(
+            TrackerCell.self,
+            forCellWithReuseIdentifier: TrackerCell.reuseIdentifier)
+        collection.register(
+            TrackersSupplementaryView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: TrackersSupplementaryView.identifier)
         return collection
     } ()
     
@@ -49,8 +53,9 @@ final class TrackersView: UIViewController {
     
     private lazy var searchBarController: UISearchController = {
         let searchBarController = UISearchController(searchResultsController: nil)
-        searchBarController.searchBar.setValue(constants.searchBarCancelButtonTitle,
-                                               forKey: "cancelButtonText")
+        searchBarController.searchBar.setValue(
+            constants.searchBarCancelButtonTitle,
+            forKey: "cancelButtonText")
         searchBarController.searchBar.placeholder = constants.searchBarPlaceholder
         searchBarController.hidesNavigationBarDuringPresentation = false
         searchBarController.searchBar.searchTextField.clearButtonMode = .never
@@ -116,6 +121,12 @@ final class TrackersView: UIViewController {
                 self?.collectionView.reloadItems(at: Array(indexes.updatedIndexes))
             }
         }
+        viewModel.onSetDatePickerValue = { [weak self] date in
+            self?.datePicker.date = date
+        }
+        viewModel.onReloadData = { [weak self] in
+            self?.collectionView.reloadData()
+        }
     }
     
     private func setupNavigationBar() {
@@ -140,14 +151,13 @@ final class TrackersView: UIViewController {
     //MARK: - Objc methods
     
     @objc private func filterButtonTapped() {
-        let filterViewController = FiltersViewController()
+        let filterViewController = viewModel.setupFiltersViewController()
         filterViewController.modalPresentationStyle = .popover
         present(filterViewController, animated: true)
     }
     
     @objc private func datePickerValueChanged() {
         viewModel.updateTrackers(for: datePicker.date)
-        collectionView.reloadData()
         dismiss(animated: true)
     }
     
@@ -391,9 +401,7 @@ extension TrackersView: UICollectionViewDelegateFlowLayout {
     }
 }
 
-//
 //MARK: - Delegates extensions
-//
 
 extension TrackersView: TrackerCellDelegate {
     func counterButtonTapped(with id: UUID, isCompleted: Bool) {
@@ -407,7 +415,6 @@ extension TrackersView: HabitOrEventViewControllerDelegate {
     }
     
     func needToReloadCollectionView() {
-        collectionView.reloadData()
         dismiss(animated: true)
     }
 }

@@ -30,7 +30,7 @@ protocol NewTrackerViewModelProtocol: AnyObject {
 
 enum NewTrackerViewType {
     case add
-    case edit(TrackerCellModel)
+    case edit(TrackerCellModel, IndexPath)
 }
 
 final class NewTrackerViewModel: NewTrackerViewModelProtocol {
@@ -106,7 +106,7 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
         switch viewType {
         case .add:
             return
-        case .edit(let trackerCellModel):
+        case .edit(let trackerCellModel, _):
             defaultCellModel = trackerCellModel
             newTracker = trackerCellModel.tracker
             newTrackerCategory = trackerCellModel.category
@@ -115,7 +115,7 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
             newTrackerEmoji = trackerCellModel.tracker.emoji
             newTrackerSchedule = trackerCellModel.tracker.schedule
             guard let colorIndex = colorsCategory.colors.firstIndex(of: trackerCellModel.tracker.color),
-                    let emojiIndex = emojiCategory.emoji.firstIndex(of: trackerCellModel.tracker.emoji)
+                  let emojiIndex = emojiCategory.emoji.firstIndex(of: trackerCellModel.tracker.emoji)
             else { return }
             selectedColorIndexPath = IndexPath(row: colorIndex, section: 1)
             selectedEmojiIndexPath = IndexPath(row: emojiIndex, section: 0)
@@ -128,9 +128,9 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
         case .add:
             dataProvider.addTracker(newTracker, to: newTrackerCategory)
             delegate?.dismissNewTrackerFlow()
-        case .edit(let trackerCellModel):
+        case .edit(_, let indexPath):
             dataProvider.updateTracker(
-                trackerCellModel.tracker,
+                indexPath,
                 asNewTracker: newTracker,
                 for: newTrackerCategory)
         }

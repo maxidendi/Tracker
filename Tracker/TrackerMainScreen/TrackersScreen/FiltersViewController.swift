@@ -7,12 +7,31 @@
 
 import UIKit
 
+protocol FiltersViewControllerDelegate: AnyObject {
+    func filtersViewController(didSelect filter: Filters)
+}
+
 final class FiltersViewController: UIViewController {
     
     //MARK: - Init
     
+    init(filter: Filters,
+         delegate: FiltersViewControllerDelegate? = nil
+    ) {
+        self.selectedFilter = filter
+        self.delegate = delegate
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     //MARK: - Properties
     
+    weak var delegate: FiltersViewControllerDelegate?
+    private var selectedFilter: Filters
+    private var selectedIndexPath: IndexPath?
     private let constants = Constants.FiltersViewControllerConstants.self
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -44,8 +63,6 @@ final class FiltersViewController: UIViewController {
         addSubviews()
         layoutSubviews()
     }
-    
-    //MARK: - Methods
 }
 
 //MARK: - Extensions
@@ -87,9 +104,13 @@ extension FiltersViewController: UITableViewDataSource {
             withIdentifier: FiltersCell.identifier,
             for: indexPath) as? FiltersCell
         else { return UITableViewCell() }
+        let filter = Filters.allCases[indexPath.row]
+        if filter == selectedFilter {
+            selectedIndexPath = indexPath
+        }
         cell.configure(
-            title: Filters.allCases[indexPath.row].name,
-            isMarked: false,
+            title: filter.name,
+            isMarked: filter == selectedFilter,
             indexPath: indexPath,
             rowsCount: Filters.allCases.count)
         return cell
@@ -99,5 +120,17 @@ extension FiltersViewController: UITableViewDataSource {
 extension FiltersViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         Constants.General.itemHeight
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let oldIndexPath = selectedIndexPath,
+              let deselectedCell = tableView.cellForRow(at: oldIndexPath) as? FiltersCell,
+              let selectedCell = tableView.cellForRow(at: indexPath) as? FiltersCell
+        else { return }
+        deselectedCell.didDeselect()
+        selectedCell.didSelect()
+        selectedIndexPath = indexPath
+        delegate?.filtersViewController(didSelect: Filters.allCases[indexPath.row])
+        dismiss(animated: true)
     }
 }

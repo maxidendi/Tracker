@@ -36,7 +36,7 @@ final class TrackersSupplementaryView: UICollectionReusableView {
         let label = UILabel()
         label.font = Constants.Typography.bold19
         label.textColor = .ypBlack
-        label.numberOfLines = 2
+        label.numberOfLines = 0
         return label
     } ()
     

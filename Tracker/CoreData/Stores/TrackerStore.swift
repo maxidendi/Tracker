@@ -15,21 +15,43 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
     init(context: NSManagedObjectContext) {
         self.context = context
         super.init()
-        configureFetchedResultsController()
     }
     
     //MARK: - Properties
     
     weak var delegate: TrackerStoreDelegate?
     private let context: NSManagedObjectContext
-    var insertedSections = IndexSet()
-    var deletedSections = IndexSet()
-    var updatedSections = IndexSet()
-    var insertedIndexes: Set<IndexPath> = []
-    var deletedIndexes: Set<IndexPath> = []
-    var updatedIndexes: Set<IndexPath> = []
-    var movedIndexes: [(from: IndexPath, to: IndexPath)] = []
-    var trackerCoreDataFRC: NSFetchedResultsController<TrackerCoreData>?
+    private var insertedSections = IndexSet()
+    private var deletedSections = IndexSet()
+    private var updatedSections = IndexSet()
+    private var insertedIndexes: Set<IndexPath> = []
+    private var deletedIndexes: Set<IndexPath> = []
+    private var updatedIndexes: Set<IndexPath> = []
+    private var movedIndexes: [(from: IndexPath, to: IndexPath)] = []
+    lazy var trackerCoreDataFRC: NSFetchedResultsController<TrackerCoreData> = {
+        let fetchedRequest = TrackerCoreData.fetchRequest()
+        let sortDescriptorCategoryTitle = NSSortDescriptor(
+            keyPath: \TrackerCoreData.title,
+            ascending: true)
+        let sortDescriptorCategoryDate = NSSortDescriptor(
+            keyPath: \TrackerCoreData.category?.createdAt,
+            ascending: false)
+        fetchedRequest.sortDescriptors = [sortDescriptorCategoryDate, sortDescriptorCategoryTitle]
+        let fetchedResultsController = NSFetchedResultsController(
+            fetchRequest: fetchedRequest,
+            managedObjectContext: context,
+            sectionNameKeyPath: #keyPath(TrackerCoreData.category.createdAt),
+            cacheName: nil)
+        trackerCoreDataFRC = fetchedResultsController
+        fetchedResultsController.delegate = self
+        do {
+            try fetchedResultsController.performFetch()
+        } catch {
+            let nserror = error as NSError
+            assertionFailure("Unresolved error \(nserror), \(nserror.userInfo)")
+        }
+        return fetchedResultsController
+    } ()
 
     //MARK: - Methods
     
@@ -54,49 +76,60 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         updatedSections = IndexSet()
     }
     
-    private func configureFetchedResultsController() {
-        let fetchedRequest = TrackerCoreData.fetchRequest()
-        let sortDescriptorCategoryTitle = NSSortDescriptor(
-            keyPath: \TrackerCoreData.title,
-            ascending: true)
-        let sortDescriptorCategoryDate = NSSortDescriptor(
-            keyPath: \TrackerCoreData.category?.createdAt,
-            ascending: false)
-        fetchedRequest.sortDescriptors = [sortDescriptorCategoryDate, sortDescriptorCategoryTitle]
-        let fetchedResultsController = NSFetchedResultsController(
-            fetchRequest: fetchedRequest,
-            managedObjectContext: context,
-            sectionNameKeyPath: #keyPath(TrackerCoreData.category.createdAt),
-            cacheName: nil)
-        trackerCoreDataFRC = fetchedResultsController
-        fetchedResultsController.delegate = self
-        do {
-            try fetchedResultsController.performFetch()
-        } catch {
-            let nserror = error as NSError
-            assertionFailure("Unresolved error \(nserror), \(nserror.userInfo)")
+    func fetchTrackers(for weekDay: Int, date: Date, filter: Filters) {
+        let predicate: NSPredicate
+        switch filter {
+        case .todayTrackers:
+            fallthrough
+        case .allTrackers:
+            predicate = NSPredicate(
+                format: """
+                (%K.@count = 0 AND (%K.@count > 0 AND ANY %K.%K = %@))
+                OR (%K.@count = 0 AND %K.@count = 0)
+                OR (%K.@count > 0 AND ANY %K = %ld)
+                """,
+                #keyPath(TrackerCoreData.weekdays),
+                #keyPath(TrackerCoreData.record),
+                #keyPath(TrackerCoreData.record),
+                #keyPath(TrackerRecordCoreData.date),
+                date as NSDate,
+                #keyPath(TrackerCoreData.weekdays),
+                #keyPath(TrackerCoreData.record),
+                #keyPath(TrackerCoreData.weekdays),
+                #keyPath(TrackerCoreData.weekdays.weekDay),
+                weekDay
+            )
+        case .doneTrackers:
+            predicate = NSPredicate(
+                format: """
+                ((%K.@count = 0 AND %K.@count > 0)
+                OR (%K.@count > 0 AND ANY %K = %ld)) AND ANY %K.%K = %@
+                """,
+                #keyPath(TrackerCoreData.weekdays),
+                #keyPath(TrackerCoreData.record),
+                #keyPath(TrackerCoreData.weekdays),
+                #keyPath(TrackerCoreData.weekdays.weekDay),
+                weekDay,
+                #keyPath(TrackerCoreData.record),
+                #keyPath(TrackerRecordCoreData.date),
+                date as NSDate
+            )
+        case .undoneTrackers:
+            predicate = NSPredicate(
+                format: """
+                (%K.@count = 0 AND %K.@count = 0)
+                OR ((%K.@count > 0 AND ANY %K = %ld) AND 
+                (SUBQUERY(record, $record, $record.date == %@).@count == 0) OR %K.@count = 0)
+                """,
+                #keyPath(TrackerCoreData.weekdays),
+                #keyPath(TrackerCoreData.record),
+                #keyPath(TrackerCoreData.weekdays),
+                #keyPath(TrackerCoreData.weekdays.weekDay),
+                weekDay,
+                date as NSDate,
+                #keyPath(TrackerCoreData.record)
+            )
         }
-    }
-    
-    func fetchTrackers(for weekDay: Int, date: Date) {
-        guard let trackerCoreDataFRC else { return }
-        let predicate = NSPredicate(
-            format: """
-            (%K.@count = 0 AND (%K.@count > 0 AND ANY %K.%K = %@))
-            OR (%K.@count = 0 AND %K.@count = 0)
-            OR (%K.@count > 0 AND ANY %K = %ld)
-            """,
-            #keyPath(TrackerCoreData.weekdays),
-            #keyPath(TrackerCoreData.record),
-            #keyPath(TrackerCoreData.record),
-            #keyPath(TrackerRecordCoreData.date),
-            date as CVarArg,
-            #keyPath(TrackerCoreData.weekdays),
-            #keyPath(TrackerCoreData.record),
-            #keyPath(TrackerCoreData.weekdays),
-            #keyPath(TrackerCoreData.weekdays.weekDay),
-            weekDay
-        )
         trackerCoreDataFRC.fetchRequest.predicate = predicate
         try? trackerCoreDataFRC.performFetch()
     }
@@ -137,11 +170,9 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         saveContext()
     }
     
-    func updateTrackerCoreData(_ tracker: Tracker, asNewTracker newTracker: Tracker, for category: String) {
-        let request = TrackerCoreData.fetchRequest()
-        request.predicate = NSPredicate(format: "id == %@", tracker.id as CVarArg)
-        guard let trackerCoreData = try? context.fetch(request).first,
-              let categoryCoreData =  delegate?.getCategoryCoreData(from: category),
+    func updateTrackerCoreData(_ indexPath: IndexPath, asNewTracker newTracker: Tracker, for category: String) {
+        let trackerCoreData = trackerCoreDataFRC.object(at: indexPath) as TrackerCoreData
+        guard let categoryCoreData =  delegate?.getCategoryCoreData(from: category),
               let weekdays = trackerCoreData.weekdays as? Set<TrackerWeekDayCoreData>
         else { return }
         trackerCoreData.title = newTracker.title
@@ -162,8 +193,7 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
     }
     
     func deleteTrackerCoreData(_ index: IndexPath) {
-        guard let trackerCoreData = trackerCoreDataFRC?.object(at: index) as? TrackerCoreData
-        else { return }
+        let trackerCoreData = trackerCoreDataFRC.object(at: index) as TrackerCoreData
         context.delete(trackerCoreData)
         saveContext()
     }

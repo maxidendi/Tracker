@@ -9,7 +9,8 @@ import Foundation
 
 protocol TrackersViewModelProtocol: AnyObject {
     var onUpdateTrackers: ((TrackerIndexes) -> Void)? { get set }
-    
+    var onSetDatePickerValue: ((Date) -> Void)? { get set }
+    var onReloadData: (() -> Void)? { get set }
     func updateTrackers(for date: Date)
     func updatePinnedTracker(_ index: IndexPath)
     func numberOfcategories() -> Int?
@@ -20,6 +21,7 @@ protocol TrackersViewModelProtocol: AnyObject {
     func trackerRecordChanged(_ id: UUID, isCompleted: Bool)
     func getDataProvider() -> DataProviderProtocol
     func setupNewTrackerViewModel(for indexPath: IndexPath) -> NewTrackerViewModelProtocol?
+    func setupFiltersViewController() -> FiltersViewController
 }
 
 final class TrackersViewModel: TrackersViewModelProtocol {
@@ -34,15 +36,39 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     //MARK: - Properties
     
     var onUpdateTrackers: ((TrackerIndexes) -> Void)?
+    var onSetDatePickerValue: ((Date) -> Void)?
+    var onReloadData: (() -> Void)?
     private var dataProvider: DataProviderProtocol
     private let calendar = Calendar.current
+    private var currentFilter: Filters = .allTrackers {
+        didSet {
+            dataProvider.fetchTrackersCoreData(for: currentDate, filter: currentFilter)
+            onReloadData?()
+        }
+    }
     private var currentDate: Date = Date() {
         didSet {
-            dataProvider.fetchTrackersCoreData(for: currentDate)
+            dataProvider.fetchTrackersCoreData(for: currentDate, filter: currentFilter)
+            onReloadData?()
         }
     }
     
     //MARK: - Methods
+    
+    private func updateFilter(_ filter: Filters) {
+        currentFilter = filter
+        switch filter {
+        case .allTrackers:
+            currentFilter = .allTrackers
+        case .todayTrackers:
+            currentFilter = .allTrackers
+            onSetDatePickerValue?(Date())
+        case .doneTrackers:
+            currentFilter = .doneTrackers
+        case .undoneTrackers:
+            currentFilter = .undoneTrackers
+        }
+    }
     
     func updateTrackers(for date: Date) {
         currentDate = calendar.onlyDate(from: date)
@@ -94,8 +120,12 @@ final class TrackersViewModel: TrackersViewModelProtocol {
         let isHabit = !trackerCellModel.tracker.schedule.isEmpty
         return NewTrackerViewModel(
             dataProvider: dataProvider,
-            viewType: .edit(trackerCellModel),
+            viewType: .edit(trackerCellModel, indexPath),
             isHabit: isHabit)
+    }
+    
+    func setupFiltersViewController() -> FiltersViewController {
+        FiltersViewController(filter: currentFilter, delegate: self)
     }
 }
 
@@ -104,5 +134,11 @@ final class TrackersViewModel: TrackersViewModelProtocol {
 extension TrackersViewModel: TrackersDelegate {
     func updateTrackers(_ indexes: TrackerIndexes) {
         onUpdateTrackers?(indexes)
+    }
+}
+
+extension TrackersViewModel: FiltersViewControllerDelegate {
+    func filtersViewController(didSelect filter: Filters) {
+        updateFilter(filter)
     }
 }
