@@ -11,6 +11,7 @@ protocol TrackersViewModelProtocol: AnyObject {
     var onUpdateTrackers: ((TrackerIndexes) -> Void)? { get set }
     var onSetDatePickerValue: ((Date) -> Void)? { get set }
     var onReloadData: (() -> Void)? { get set }
+    func isFilterActive() -> Bool
     func updateTrackers(for date: Date)
     func updatePinnedTracker(_ index: IndexPath)
     func numberOfcategories() -> Int?
@@ -68,6 +69,10 @@ final class TrackersViewModel: TrackersViewModelProtocol {
         case .undoneTrackers:
             currentFilter = .undoneTrackers
         }
+    }
+    
+    func isFilterActive() -> Bool {
+        currentFilter != .allTrackers
     }
     
     func updateTrackers(for date: Date) {

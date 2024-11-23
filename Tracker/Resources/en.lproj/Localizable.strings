@@ -47,7 +47,8 @@
 "trackers.title" = "Trackers";
 "trackers.searchBarPlaceholder" = "Search";
 "trackers.searchBarCancelButtonTitle" = "Cancel";
-"trackers.labelStubText" = "What are we going to track?";
+"trackers.labelStubNotFilteredText" = "What are we going to track?";
+"trackers.labelStubFilteredText" = "Nothing was found";
 "trackers.filterButtonTitle" = "Filters";
 "trackers.pinnedCategoryTitle" = "Pinned";
 

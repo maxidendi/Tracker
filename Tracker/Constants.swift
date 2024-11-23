@@ -70,7 +70,8 @@ enum Constants {
         static let title = NSLocalizedString("trackers.title", comment: "")
         static let searchBarPlaceholder = NSLocalizedString("trackers.searchBarPlaceholder", comment: "")
         static let searchBarCancelButtonTitle = NSLocalizedString("trackers.searchBarCancelButtonTitle", comment: "")
-        static let labelStubText = NSLocalizedString("trackers.labelStubText", comment: "")
+        static let labelStubNotFilteredText = NSLocalizedString("trackers.labelStubNotFilteredText", comment: "")
+        static let labelStubFilteredText = NSLocalizedString("trackers.labelStubFilteredText", comment: "")
         static let pinnedCategoryTitle = NSLocalizedString("trackers.pinnedCategoryTitle", comment: "")
         static let filterButtonTitle = NSLocalizedString("trackers.filterButtonTitle", comment: "")
         static let geometricParams = GeometricParams(

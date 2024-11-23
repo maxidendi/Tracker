@@ -47,7 +47,8 @@
 "trackers.title" = "Трекеры";
 "trackers.searchBarPlaceholder" = "Поиск";
 "trackers.searchBarCancelButtonTitle" = "Отменить";
-"trackers.labelStubText" = "Что будем отслеживать?";
+"trackers.labelStubNotFilteredText" = "Что будем отслеживать?";
+"trackers.labelStubFilteredText" = "Ничего не найдено";
 "trackers.filterButtonTitle" = "Фильтры";
 "trackers.pinnedCategoryTitle" = "Закрепленные";
 

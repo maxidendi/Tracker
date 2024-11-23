@@ -28,7 +28,7 @@ final class TrackersView: UIViewController {
         let collection = UICollectionView(
             frame: .zero,
             collectionViewLayout: UICollectionViewFlowLayout())
-        collection.contentInset = .init(top: .zero, left: .zero, bottom: 50, right: .zero)
+        collection.contentInset = .init(top: .zero, left: .zero, bottom: 40, right: .zero)
         collection.backgroundColor = .clear
         collection.delegate = self
         collection.dataSource = self
@@ -80,7 +80,7 @@ final class TrackersView: UIViewController {
     
     private lazy var labelStub: UILabel = {
         let label = UILabel()
-        label.text = constants.labelStubText
+        label.text = constants.labelStubNotFilteredText
         label.font = Constants.Typography.medium12
         label.textAlignment = .center
         return label
@@ -143,9 +143,18 @@ final class TrackersView: UIViewController {
     }
     
     private func stubsIsHidden(_ isHidden: Bool) {
-        labelStub.isHidden = isHidden
-        imageStubView.isHidden = isHidden
-        filtersButton.isHidden = !isHidden
+        if viewModel.isFilterActive() {
+            imageStubView.image = .trackersImageNotFound
+            imageStubView.isHidden = isHidden
+            labelStub.text = constants.labelStubFilteredText
+            labelStub.isHidden = isHidden
+        } else {
+            imageStubView.image = .trackersImageStub
+            imageStubView.isHidden = isHidden
+            labelStub.text = constants.labelStubNotFilteredText
+            labelStub.isHidden = isHidden
+            filtersButton.isHidden = !isHidden
+        }
     }
     
     //MARK: - Objc methods

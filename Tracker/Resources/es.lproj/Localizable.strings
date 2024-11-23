@@ -47,7 +47,8 @@
 "trackers.title" = "Rastreadores";
 "trackers.searchBarPlaceholder" = "Búsqueda";
 "trackers.searchBarCancelButtonTitle" = "Cancelar";
-"trackers.labelStubText" = "¿Qué vamos a seguir?";
+"trackers.labelStubNotFilteredText" = "¿Qué vamos a seguir?";
+"trackers.labelStubFilteredText" = "No se encontró nada";
 "trackers.filterButtonTitle" = "Filtros";
 "trackers.pinnedCategoryTitle" = "Consagrado";
 
