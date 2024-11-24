@@ -3,8 +3,18 @@ import CoreData
 
 final class TrackerStatisticStore: NSObject {
     
+    enum RecordAction {
+        case add
+        case remove
+    }
+    
+    //MARK: - Properties
+
     static let shared = TrackerStatisticStore()
     private let calendar = Calendar.current
+    
+    //MARK: - Init
+    
     private override init() {}
     
     //MARK: - Methods
@@ -29,11 +39,29 @@ final class TrackerStatisticStore: NSObject {
             trackerStatistic.date = date
             trackerStatistic.trackersCount = Int32(count)
             save(context)
+            print(trackerStatistic)
             return
         }
         trackerStatistic.trackersCount = Int32(count)
         save(context)
+        print(trackerStatistic)
     }
     
+    func updateCompletedTrackersCount(for date: Date, action: RecordAction, context: NSManagedObjectContext) {
+        let request = TrackerStatisticCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "date == %@", date as CVarArg)
+        guard let trackerStatistic = try? context.fetch(request).first
+        else {
+            return
+        }
+        switch action {
+        case .add:
+            trackerStatistic.completedTrackers += 1
+        case .remove:
+            trackerStatistic.completedTrackers -= 1
+        }
+        save(context)
+        print(trackerStatistic)
+    }
     
 }

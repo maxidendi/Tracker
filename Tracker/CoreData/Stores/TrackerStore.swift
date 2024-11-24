@@ -13,6 +13,7 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
     //MARK: - Properties
     
     weak var delegate: TrackerStoreDelegate?
+    private var currentDate: Date = Date()
     private let context: NSManagedObjectContext
     private var insertedSections = IndexSet()
     private var deletedSections = IndexSet()
@@ -56,6 +57,14 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
                 assertionFailure("Unresolved error \(nserror), \(nserror.userInfo)")
             }
         }
+    }
+    
+    private func updateStatisticTrackersCount() {
+        let trackerscount = trackerCoreDataFRC.fetchedObjects?.count ?? 0
+        TrackerStatisticStore.shared.saveOrUpdateTrackersCount(
+            for: currentDate,
+            count: trackerscount,
+            context: context)
     }
     
     private func clearChanges() {
@@ -125,11 +134,8 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         trackerCoreDataFRC.fetchRequest.predicate = predicate
         do {
             try trackerCoreDataFRC.performFetch()
-            let trackerscount = trackerCoreDataFRC.fetchedObjects?.count ?? 0
-            TrackerStatisticStore.shared.saveOrUpdateTrackersCount(
-                for: date,
-                count: trackerscount,
-                context: context)
+            currentDate = date
+            updateStatisticTrackersCount()
         } catch {
             assertionFailure("Error fetching trackers: \(error)")
         }
@@ -169,6 +175,7 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
             trackerCoreData.addToWeekdays(trackerWeekDay)
         }
         saveContext()
+        updateStatisticTrackersCount()
     }
     
     func updateTrackerCoreData(_ tracker: Tracker, asNewTracker newTracker: Tracker, for category: String) {
@@ -197,12 +204,21 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
             trackerCoreData.lastCategory = categoryCoreData.title
         }
         saveContext()
+        updateStatisticTrackersCount()
     }
     
     func deleteTrackerCoreData(_ index: IndexPath) {
         let trackerCoreData = trackerCoreDataFRC.object(at: index) as TrackerCoreData
+        if let records = trackerCoreData.record as? Set<TrackerRecordCoreData>,
+           records.contains(where: { $0.date == currentDate }) {
+            TrackerStatisticStore.shared.updateCompletedTrackersCount(
+                for: currentDate,
+                action: .remove,
+                context: context)
+        }
         context.delete(trackerCoreData)
         saveContext()
+        updateStatisticTrackersCount()
     }
 }
 
