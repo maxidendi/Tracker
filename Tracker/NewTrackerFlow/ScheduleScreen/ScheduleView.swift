@@ -1,10 +1,3 @@
-//
-//  ScheduleViewController.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 10.10.2024.
-//
-
 import UIKit
 
 final class ScheduleView: UIViewController, UITableViewDelegate {

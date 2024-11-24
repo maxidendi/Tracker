@@ -1,10 +1,3 @@
-//
-//  WeekDays.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 03.10.2024.
-//
-
 import Foundation
 
 enum WeekDay: CaseIterable, Codable {

@@ -1,10 +1,3 @@
-//
-//  NewCategoryViewController.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 09.10.2024.
-//
-
 import UIKit
 
 final class CategoriesView: UIViewController {
@@ -48,10 +41,11 @@ final class CategoriesView: UIViewController {
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
-        tableView.backgroundColor = .ypWhite
+        tableView.backgroundColor = .clear
         tableView.separatorColor = .ypGray
         tableView.isScrollEnabled = true
         tableView.clipsToBounds = false
+        tableView.layer.masksToBounds = true
         tableView.showsVerticalScrollIndicator = false
         tableView.dataSource = self
         tableView.delegate = self
@@ -184,10 +178,11 @@ extension CategoriesView: UITableViewDataSource {
         else { return UITableViewCell() }
         let categories = viewModel.categoriesList()
         let isMarked = viewModel.isCellMarked(at: indexPath)
-        cell.configure(category: categories[indexPath.row],
-                       isMarked: isMarked,
-                       indexPath: indexPath,
-                       rowsCount: categories.count)
+        cell.configure(
+            category: categories[indexPath.row],
+            isMarked: isMarked,
+            indexPath: indexPath,
+            rowsCount: categories.count)
         return cell
     }
     

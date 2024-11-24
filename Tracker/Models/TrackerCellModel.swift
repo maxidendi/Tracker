@@ -1,10 +1,3 @@
-//
-//  TrackerCellModel.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 04.11.2024.
-//
-
 import Foundation
 
 struct TrackerCellModel {

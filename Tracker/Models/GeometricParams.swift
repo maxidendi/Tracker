@@ -1,10 +1,3 @@
-//
-//  GeometricParams.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 02.10.2024.
-//
-
 import Foundation
 
 struct GeometricParams {

@@ -1,10 +1,3 @@
-//
-//  TrackerStore.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 22.10.2024.
-//
-
 import Foundation
 import CoreData
 
@@ -42,7 +35,6 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
             managedObjectContext: context,
             sectionNameKeyPath: #keyPath(TrackerCoreData.category.createdAt),
             cacheName: nil)
-        trackerCoreDataFRC = fetchedResultsController
         fetchedResultsController.delegate = self
         do {
             try fetchedResultsController.performFetch()
@@ -131,7 +123,16 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
             )
         }
         trackerCoreDataFRC.fetchRequest.predicate = predicate
-        try? trackerCoreDataFRC.performFetch()
+        do {
+            try trackerCoreDataFRC.performFetch()
+            let trackerscount = trackerCoreDataFRC.fetchedObjects?.count ?? 0
+            TrackerStatisticStore.shared.saveOrUpdateTrackersCount(
+                for: date,
+                count: trackerscount,
+                context: context)
+        } catch {
+            assertionFailure("Error fetching trackers: \(error)")
+        }
     }
 
     func getTracker(from trackerCoreData: TrackerCoreData) -> Tracker? {
@@ -170,8 +171,14 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         saveContext()
     }
     
-    func updateTrackerCoreData(_ indexPath: IndexPath, asNewTracker newTracker: Tracker, for category: String) {
-        let trackerCoreData = trackerCoreDataFRC.object(at: indexPath) as TrackerCoreData
+    func updateTrackerCoreData(_ tracker: Tracker, asNewTracker newTracker: Tracker, for category: String) {
+        let request = TrackerCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", tracker.id as CVarArg)
+        guard let trackerCoreData = try? context.fetch(request).first
+        else {
+            addTrackerCoreData(tracker, to: category)
+            return
+        }
         guard let categoryCoreData =  delegate?.getCategoryCoreData(from: category),
               let weekdays = trackerCoreData.weekdays as? Set<TrackerWeekDayCoreData>
         else { return }

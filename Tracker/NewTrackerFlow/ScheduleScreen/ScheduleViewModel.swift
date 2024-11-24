@@ -1,10 +1,3 @@
-//
-//  ScheduleViewModel.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 11.11.2024.
-//
-
 import Foundation
 
 protocol ScheduleViewModelProtocol {

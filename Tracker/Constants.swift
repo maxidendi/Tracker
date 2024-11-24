@@ -1,10 +1,3 @@
-//
-//  Constants.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 28.09.2024.
-//
-
 import UIKit
 
 enum Constants {
@@ -89,6 +82,16 @@ enum Constants {
     enum StatisticViewControllerConstants {
         static let title = NSLocalizedString("statistic.title", comment: "")
         static let labelStubText = NSLocalizedString("statistic.labelStubText", comment: "")
+        static let bestPeriodText = NSLocalizedString("statistic.bestPeriodText", comment: "")
+        static let perfectDaysText = NSLocalizedString("statistic.perfectDaysText", comment: "")
+        static let trackersDoneText = NSLocalizedString("statistic.trackersDoneText", comment: "")
+        static let averageValueText = NSLocalizedString("statistic.averageValueText", comment: "")
+        static let countLabelHeight: CGFloat = 41
+        static let titleLabelHeight: CGFloat = 18
+        static let subViewHeight: CGFloat = 90
+        static let subViewsSpacing: CGFloat = 12
+        static let viewInsets: UIEdgeInsets = .init(top: 12, left: 12, bottom: 12, right: 12)
+        static let stackViewSpacing: CGFloat = 7
         static let stubsSpacing: CGFloat = 8
     }
     enum FiltersViewControllerConstants {

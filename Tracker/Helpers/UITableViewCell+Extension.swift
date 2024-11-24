@@ -1,10 +1,3 @@
-//
-//  UITableViewCell+Extension.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 09.11.2024.
-//
-
 import UIKit
 
 extension UITableViewCell {

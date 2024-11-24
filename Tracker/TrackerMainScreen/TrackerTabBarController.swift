@@ -1,10 +1,3 @@
-//
-//  ViewController.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 27.09.2024.
-//
-
 import UIKit
 
 final class TrackerTabBarController: UITabBarController {

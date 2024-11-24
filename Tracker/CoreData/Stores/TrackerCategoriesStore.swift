@@ -1,10 +1,3 @@
-//
-//  TrackerCategoryStore.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 22.10.2024.
-//
-
 import Foundation
 import CoreData
 
@@ -16,17 +9,39 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
         self.context = context
         super.init()
         setupPinnedCategory()
-        configureFetchedResultsController()
     }
     
     //MARK: - Properties
     
     weak var delegate: TrackerCategoriesStoreDelegate?
     private let context: NSManagedObjectContext
-    var trackerCategoryCoreDataFRC: NSFetchedResultsController<TrackerCategoryCoreData>?
-    var insertedIndexes: Set<IndexPath> = []
-    var updatedIndexes: Set<IndexPath> = []
-    var deletedIndexes: Set<IndexPath> = []
+    private var insertedIndexes: Set<IndexPath> = []
+    private var deletedIndexes: Set<IndexPath> = []
+    private var updatedIndexes: Set<IndexPath> = []
+    private var movedIndexes: [(from: IndexPath, to: IndexPath)] = []
+    lazy var trackerCategoryCoreDataFRC: NSFetchedResultsController<TrackerCategoryCoreData> = {
+        let fetchedRequest = TrackerCategoryCoreData.fetchRequest()
+        fetchedRequest.sortDescriptors = [NSSortDescriptor(
+            keyPath: \TrackerCategoryCoreData.title,
+            ascending: true)]
+        fetchedRequest.predicate = NSPredicate(
+            format: "title != %@",
+            Constants.TrackersViewControllerConstants.pinnedCategoryTitle)
+        let fetchedResultsController = NSFetchedResultsController(
+            fetchRequest: fetchedRequest,
+            managedObjectContext: context,
+            sectionNameKeyPath: nil,
+            cacheName: nil)
+        fetchedResultsController.delegate = self
+        do {
+            try fetchedResultsController.performFetch()
+        } catch {
+            let nserror = error as NSError
+            assertionFailure("Unresolved error \(nserror), \(nserror.userInfo)")
+        }
+        return fetchedResultsController
+    } ()
+
     
     //MARK: - Methods
     
@@ -52,8 +67,9 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
     
     private func clearChanges() {
         insertedIndexes = []
-        updatedIndexes = []
         deletedIndexes = []
+        updatedIndexes = []
+        movedIndexes = []
     }
     
     private func configureFetchedResultsController() {
@@ -93,7 +109,7 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
     }
     
     func getCategoriesList() -> [String] {
-        trackerCategoryCoreDataFRC?.fetchedObjects?.compactMap(\.title) ?? []
+        trackerCategoryCoreDataFRC.fetchedObjects?.compactMap(\.title) ?? []
     }
     
     func addCategoryCoreData(_ category: String) {
@@ -121,7 +137,7 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
     }
     
     func deleteCategoryCoreData(_ index: IndexPath) {
-        guard let categoryCoreData = trackerCategoryCoreDataFRC?.fetchedObjects?[index.row] as? TrackerCategoryCoreData
+        guard let categoryCoreData = trackerCategoryCoreDataFRC.fetchedObjects?[index.row] as? TrackerCategoryCoreData
         else { return }
         let pinnedCategory = getTrackerCategoryCoreData(
             from: Constants.TrackersViewControllerConstants.pinnedCategoryTitle)
@@ -158,6 +174,10 @@ extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
             if let indexPath {
                 updatedIndexes.insert(indexPath)
             }
+        case .move:
+            if let indexPath, let newIndexPath {
+                movedIndexes.append((indexPath, newIndexPath))
+            }
         default:
             break
         }
@@ -167,7 +187,8 @@ extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
         let categoryIndexes = CategoryIndexes(
             insertedIndexes: insertedIndexes,
             updatedIndexes: updatedIndexes,
-            deletedIndexes: deletedIndexes)
+            deletedIndexes: deletedIndexes,
+            movedIndexes: movedIndexes)
         delegate?.didUpdateCategories(categoryIndexes)
         clearChanges()
     }

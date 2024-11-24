@@ -1,10 +1,3 @@
-//
-//  UIViewController+Extension.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 15.10.2024.
-//
-
 import UIKit
 
 extension UIViewController {

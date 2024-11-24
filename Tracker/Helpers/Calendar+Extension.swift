@@ -1,10 +1,3 @@
-//
-//  Calendar+Extension.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 05.10.2024.
-//
-
 import Foundation
 
 extension Calendar {

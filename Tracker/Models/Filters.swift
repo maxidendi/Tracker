@@ -1,10 +1,3 @@
-//
-//  Filters.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 22.11.2024.
-//
-
 import Foundation
 
 enum Filters: CaseIterable {

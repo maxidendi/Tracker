@@ -1,10 +1,3 @@
-//
-//  DataProviderProtocol.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 27.10.2024.
-//
-
 import Foundation
 
 protocol DataProviderProtocol {
@@ -21,7 +14,7 @@ protocol DataProviderProtocol {
     func removeCategory(_ index: IndexPath)
     func pinOrUnpinTracker(_ indexPath: IndexPath)
     func addTracker(_ tracker: Tracker, to category: String)
-    func updateTracker(_ indexPath: IndexPath, asNewTracker newTracker: Tracker, for category: String)
+    func updateTracker(_ tracker: Tracker, asNewTracker newTracker: Tracker, for category: String)
     func removeTracker(_ indexPath: IndexPath)
     func addTrackerRecord(_ record: TrackerRecord)
     func removeTrackerRecord(_ record: TrackerRecord)

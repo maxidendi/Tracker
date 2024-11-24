@@ -1,10 +1,3 @@
-//
-//  TrackersViewController.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 27.09.2024.
-//
-
 import UIKit
 
 final class TrackersView: UIViewController {
@@ -117,10 +110,10 @@ final class TrackersView: UIViewController {
                 indexes.movedIndexes.forEach{
                     self?.collectionView.moveItem(at: $0.from, to: $0.to)
                 }
-                self?.collectionView.reloadSections(indexes.updatedSections)
                 self?.collectionView.reloadItems(at: Array(indexes.updatedIndexes))
+                self?.collectionView.reloadSections(IndexSet(indexes.updatedIndexes.map{ $0.section }))
             }
-        }
+        } 
         viewModel.onSetDatePickerValue = { [weak self] date in
             self?.datePicker.date = date
         }
@@ -236,6 +229,7 @@ extension TrackersView: UICollectionViewDataSource {
         as? TrackersSupplementaryView else {
             return UICollectionReusableView()
         }
+        headerView.tag = indexPath.section
         headerView.setTitle(viewModel.titleForCategory(indexPath.section) ?? "")
         return headerView
     }
@@ -396,17 +390,19 @@ extension TrackersView: UICollectionViewDelegateFlowLayout {
         let indexPath = IndexPath(row: .zero, section: section)
         let headerView: UICollectionReusableView
         if #available(iOS 18.0, *) {
-            return CGSize(width: collectionView.bounds.width - 2 * Constants.General.supplementaryViewHorizontalPadding,
-                          height: Constants.General.labelTextHeight + 2)
+            return CGSize(
+                width: collectionView.bounds.width - 2 * Constants.General.supplementaryViewHorizontalPadding,
+                height: Constants.General.labelTextHeight + 2)
         } else {
             headerView = self.collectionView(collectionView,
                                              viewForSupplementaryElementOfKind: UICollectionView.elementKindSectionHeader,
                                              at: indexPath)
         }
-        return headerView.systemLayoutSizeFitting(CGSize(width: collectionView.frame.width,
-                                                         height: UIView.layoutFittingExpandedSize.height),
-                                                  withHorizontalFittingPriority: .required,
-                                                  verticalFittingPriority: .fittingSizeLevel)
+        return headerView.systemLayoutSizeFitting(
+            CGSize(width: collectionView.frame.width,
+                   height: UIView.layoutFittingExpandedSize.height),
+            withHorizontalFittingPriority: .required,
+            verticalFittingPriority: .fittingSizeLevel)
     }
 }
 

@@ -1,10 +1,3 @@
-//
-//  NewTrackerViewModel.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 10.11.2024.
-//
-
 import Foundation
 
 protocol NewTrackerViewModelProtocol: AnyObject {
@@ -128,9 +121,9 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
         case .add:
             dataProvider.addTracker(newTracker, to: newTrackerCategory)
             delegate?.dismissNewTrackerFlow()
-        case .edit(_, let indexPath):
+        case .edit(let trackerCelModel, _):
             dataProvider.updateTracker(
-                indexPath,
+                trackerCelModel.tracker,
                 asNewTracker: newTracker,
                 for: newTrackerCategory)
         }

@@ -55,6 +55,10 @@
 //StatisticViewControllerConstants
 "statistic.title" = "Estadísticas";
 "statistic.labelStubText" = "Todavía no hay nada que analizar";
+"statistic.bestPeriodText" = "Mejor periodo";
+"statistic.perfectDaysText" = "Días perfectos";
+"statistic.trackersDoneText" = "Rastreadores completados";
+"statistic.averageValueText" = "Valor medio";
 
 //FiltersViewController
 "filters.title" = "Filtros";

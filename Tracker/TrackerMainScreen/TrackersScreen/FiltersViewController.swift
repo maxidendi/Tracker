@@ -1,10 +1,3 @@
-//
-//  FilterViewController.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 22.11.2024.
-//
-
 import UIKit
 
 protocol FiltersViewControllerDelegate: AnyObject {

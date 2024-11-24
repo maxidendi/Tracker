@@ -1,10 +1,3 @@
-//
-//  PageModel.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 15.11.2024.
-//
-
 import UIKit
 
 enum PageModel {

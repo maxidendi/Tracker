@@ -1,10 +1,3 @@
-//
-//  CategoriesAndRecordsProvider.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 26.10.2024.
-//
-
 import Foundation
 import CoreData
 
@@ -62,9 +55,8 @@ final class DataProvider: DataProviderProtocol {
     }
     
     func titleForSection(_ section: Int) -> String? {
-        guard let trackerCoreData = trackerStore.trackerCoreDataFRC.sections?[section].objects?.first as? TrackerCoreData
-        else { return nil }
-        return trackerCoreData.category?.title
+        let tracker = trackerStore.trackerCoreDataFRC.sections?[section].objects?.first as? TrackerCoreData
+        return tracker?.category?.title
     }
     
     func numberOfTrackersInSection(_ section: Int) -> Int {
@@ -112,8 +104,8 @@ final class DataProvider: DataProviderProtocol {
         trackerStore.addTrackerCoreData(tracker, to: category)
     }
     
-    func updateTracker(_ indexPath: IndexPath, asNewTracker newTracker: Tracker, for category: String) {
-        trackerStore.updateTrackerCoreData(indexPath, asNewTracker: newTracker, for: category)
+    func updateTracker(_ tracker: Tracker, asNewTracker newTracker: Tracker, for category: String) {
+        trackerStore.updateTrackerCoreData(tracker, asNewTracker: newTracker, for: category)
     }
     
     func removeTracker(_ indexPath: IndexPath) {
