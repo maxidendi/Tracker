@@ -1,20 +1,15 @@
 import UIKit
 
-final class StatisticItemView: UIView {
+final class StatisticView: UIView {
     
     //MARK: - Init
     
-    init(
-        frame: CGRect,
-        count: Int = 0,
-        title: String
-    ) {
-        super.init(frame: frame)
-        backgroundColor = .red
+    init(count: Int = 0, title: String) {
+        super.init(frame: .zero)
         countLabel.text = "\(count)"
         titleLabel.text = title
         setupUI()
-        setupLayers()
+        addGradientBorder()
     }
     
     required init?(coder: NSCoder) {
@@ -23,7 +18,7 @@ final class StatisticItemView: UIView {
 
     //MARK: - Properties
     
-    private let gradientLayer = CAGradientLayer()
+    private var gradientLayer = CAGradientLayer()
     private var borderShapeLayer = CAShapeLayer()
     private let constants = Constants.StatisticViewControllerConstants.self
     private lazy var countLabel: UILabel = {
@@ -53,33 +48,32 @@ final class StatisticItemView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         gradientLayer.frame = bounds
-        let path = UIBezierPath(
+        borderShapeLayer.path = UIBezierPath(
             roundedRect: bounds,
             cornerRadius: Constants.General.radius16).cgPath
-        borderShapeLayer.path = path
-//        let maskLayer = CAShapeLayer()
-//        maskLayer.path = path
-//        layer.mask = maskLayer
-//        borderShapeLayer.path = path
     }
     
-    private func setupLayers() {
+    private func addGradientBorder() {
+        gradientLayer.startPoint = CGPoint(x: 1, y: 0.5)
+        gradientLayer.endPoint = CGPoint(x: 0, y: 0.5)
         gradientLayer.colors = [
-            UIColor.ypGradientColor1,
-            UIColor.ypGradientColor2,
-            UIColor.ypGradientColor3
+            UIColor.ypGradientColor1.cgColor,
+            UIColor.ypGradientColor2.cgColor,
+            UIColor.ypGradientColor3.cgColor
         ]
-        gradientLayer.startPoint = .init(x: 0, y: 0.5)
-        gradientLayer.endPoint = .init(x: 1, y: 0.5)
-        layer.insertSublayer(gradientLayer, at: 0)
+        gradientLayer.frame = bounds
+        layer.addSublayer(gradientLayer)
+        
+        borderShapeLayer.fillColor = UIColor.clear.cgColor
+        borderShapeLayer.strokeColor = UIColor.black.cgColor
         borderShapeLayer.lineWidth = 1
-        borderShapeLayer.strokeColor = UIColor.clear.cgColor
-        borderShapeLayer.fillColor = nil
-        layer.addSublayer(borderShapeLayer)
+        borderShapeLayer.frame = bounds
+        gradientLayer.mask = borderShapeLayer
     }
     
     
     private func setupUI() {
+        translatesAutoresizingMaskIntoConstraints = false
         let stackView = UIStackView(arrangedSubviews: [countLabel, titleLabel])
         stackView.axis = .vertical
         stackView.spacing = constants.stackViewSpacing

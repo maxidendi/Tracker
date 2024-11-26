@@ -59,26 +59,27 @@ final class TrackerRecordsStore: NSObject, RecordsStoreProtocol {
         recordCoreData.date = record.date
         let tracker = getTrackerFromId(record.id)
         recordCoreData.tracker = tracker
-        saveContext()
-        TrackerStatisticStore.shared.updateCompletedTrackersCount(
+        TrackerStatisticStore.shared.updateCompletedTrackersCountWithoutSave(
             for: record.date,
             action: .add,
             context: context)
+        saveContext()
     }
     
     func removeTrackerRecord(_ record: TrackerRecord) {
         let request = TrackerRecordCoreData.fetchRequest()
-        let predicate = NSPredicate(format: "id == %@ && date == %@",
-                                    record.id as CVarArg,
-                                    record.date as CVarArg)
+        let predicate = NSPredicate(
+            format: "id == %@ && date == %@",
+            record.id as CVarArg,
+            record.date as CVarArg)
         request.predicate = predicate
         guard let recordCoreData = try? context.fetch(request).first
         else { return }
         context.delete(recordCoreData)
-        saveContext()
-        TrackerStatisticStore.shared.updateCompletedTrackersCount(
+        TrackerStatisticStore.shared.updateCompletedTrackersCountWithoutSave(
             for: record.date,
-            action: .remove,
+            action: .remove(withTracker: false),
             context: context)
+        saveContext()
     }
 }

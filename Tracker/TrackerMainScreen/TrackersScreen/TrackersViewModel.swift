@@ -34,13 +34,8 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     var onReloadData: (() -> Void)?
     private var dataProvider: DataProviderProtocol
     private let calendar = Calendar.current
+    private var currentDate: Date = Date()
     private var currentFilter: Filters = .allTrackers {
-        didSet {
-            dataProvider.fetchTrackersCoreData(for: currentDate, filter: currentFilter)
-            onReloadData?()
-        }
-    }
-    private var currentDate: Date = Date() {
         didSet {
             dataProvider.fetchTrackersCoreData(for: currentDate, filter: currentFilter)
             onReloadData?()
@@ -70,6 +65,8 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     
     func updateTrackers(for date: Date) {
         currentDate = calendar.onlyDate(from: date)
+        dataProvider.fetchTrackersCoreData(for: currentDate, filter: currentFilter)
+        onReloadData?()
     }
     
     func updatePinnedTracker(_ index: IndexPath) {

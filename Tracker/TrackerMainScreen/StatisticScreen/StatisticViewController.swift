@@ -37,46 +37,8 @@ final class StatisticViewController: UIViewController {
         return scrollView
     } ()
     
-    private lazy var bestPeriodView: StatisticItemView = {
-        let view = StatisticItemView(frame: .zero, count: 0, title: constants.bestPeriodText)
-        view.backgroundColor = .clear
-        view.layer.masksToBounds = true
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    } ()
-    
-    private lazy var perfectDaysView: StatisticItemView = {
-        let view = StatisticItemView(frame: .zero, count: 0, title: constants.perfectDaysText)
-        view.backgroundColor = .clear
-        view.layer.masksToBounds = true
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    } ()
-    
-    private lazy var completedTrackersView: StatisticItemView = {
-        let view = StatisticItemView(frame: .zero, count: 0, title: constants.trackersDoneText)
-        view.backgroundColor = .clear
-        view.layer.masksToBounds = true
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    } ()
-    
-    private lazy var averageValueView: StatisticItemView = {
-        let view = StatisticItemView(frame: .zero, count: 0, title: constants.averageValueText)
-        view.backgroundColor = .clear
-        view.layer.masksToBounds = true
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    } ()
-
-    
     private lazy var stackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [
-            bestPeriodView,
-            perfectDaysView,
-            completedTrackersView,
-            averageValueView
-        ])
+        let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.spacing = constants.subViewsSpacing
         stackView.distribution = .fill
@@ -90,11 +52,21 @@ final class StatisticViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         guard let statistic = dataProvider.getStatistic()
-        else { return }
-        bestPeriodView.configure(with: statistic.bestPeriod)
-        perfectDaysView.configure(with: statistic.perfectDays)
-        completedTrackersView.configure(with: statistic.completedTrackers)
-        averageValueView.configure(with: statistic.averageValue)
+        else {
+            imageStubView.isHidden = false
+            labelStub.isHidden = false
+            return
+        }
+        imageStubView.isHidden = true
+        labelStub.isHidden = true
+        stackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        [StatisticView(count: statistic.bestPeriod, title: constants.bestPeriodText),
+         StatisticView(count: statistic.perfectDays, title: constants.perfectDaysText),
+         StatisticView(count: statistic.completedTrackers, title: constants.trackersDoneText),
+         StatisticView(count: statistic.averageValue, title: constants.averageValueText)
+        ].forEach {
+            stackView.addArrangedSubview($0)
+        }
     }
         
     override func viewDidLoad() {

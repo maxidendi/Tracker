@@ -118,6 +118,7 @@ final class TrackersView: UIViewController {
         }
         viewModel.onSetDatePickerValue = { [weak self] date in
             self?.datePicker.date = date
+            self?.viewModel.updateTrackers(for: date)
         }
         viewModel.onReloadData = { [weak self] in
             self?.collectionView.reloadData()

@@ -152,9 +152,9 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
             trackersCoreData.forEach{
                 if let records = $0.record as? Set<TrackerRecordCoreData> {
                     records.compactMap(\.date).forEach{
-                        TrackerStatisticStore.shared.updateCompletedTrackersCount(
+                        TrackerStatisticStore.shared.updateCompletedTrackersCountWithoutSave(
                             for: $0,
-                            action: .remove,
+                            action: .remove(withTracker: true),
                             context: context)
                     }
                 }

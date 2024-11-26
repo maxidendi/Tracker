@@ -14,18 +14,11 @@ final class TrackerStatisticStore: NSObject {
     
     //MARK: - Methods
     
-    private func save(_ context: NSManagedObjectContext) {
-        if context.hasChanges {
-            do {
-                try context.save()
-            } catch {
-                let nserror = error as NSError
-                assertionFailure("Unresolved error \(nserror), \(nserror.userInfo)")
-            }
-        }
-    }
-    
-    func saveOrUpdateTrackersCount(for date: Date, count: Int, context: NSManagedObjectContext) {
+    func saveOrUpdateTrackersCountWithoutSave(
+        for date: Date,
+        count: Int,
+        context: NSManagedObjectContext
+    ) {
         let request = TrackerStatisticCoreData.fetchRequest()
         request.predicate = NSPredicate(format: "date == %@", date as CVarArg)
         guard let trackerStatistic = try? context.fetch(request).first
@@ -33,16 +26,16 @@ final class TrackerStatisticStore: NSObject {
             let trackerStatistic = TrackerStatisticCoreData(context: context)
             trackerStatistic.date = date
             trackerStatistic.trackersCount = Int32(count)
-            save(context)
-            print(trackerStatistic)
             return
         }
         trackerStatistic.trackersCount = Int32(count)
-        save(context)
-        print(trackerStatistic)
     }
     
-    func updateCompletedTrackersCount(for date: Date, action: RecordAction, context: NSManagedObjectContext) {
+    func updateCompletedTrackersCountWithoutSave(
+        for date: Date,
+        action: StatisticRecordAction,
+        context: NSManagedObjectContext
+    ) {
         let request = TrackerStatisticCoreData.fetchRequest()
         request.predicate = NSPredicate(format: "date == %@", date as CVarArg)
         guard let trackerStatistic = try? context.fetch(request).first
@@ -52,11 +45,12 @@ final class TrackerStatisticStore: NSObject {
         switch action {
         case .add:
             trackerStatistic.completedTrackers += 1
-        case .remove:
+        case .remove(let withTracker):
             trackerStatistic.completedTrackers -= 1
+            if withTracker {
+                trackerStatistic.trackersCount -= 1
+            }
         }
-        save(context)
-        print(trackerStatistic)
     }
     
     func getStatistic(context: NSManagedObjectContext) -> StatisticModel? {
@@ -65,13 +59,15 @@ final class TrackerStatisticStore: NSObject {
             key: "date",
             ascending: true)]
         request.predicate = NSPredicate(
-            format: "%K > 0",
+            format: "%K > 0 ",
             #keyPath(TrackerStatisticCoreData.trackersCount))
-        guard let statisticsCoreData = try? context.fetch(request)
+        guard let statisticsCoreData = try? context.fetch(request),
+              statisticsCoreData.map({ $0.trackersCount }).reduce(0, +) > 0
         else { return nil }
-        let completedTrackers = statisticsCoreData.map(\.completedTrackers).reduce(0, +)
-        let averageValue = statisticsCoreData.count > 0 ?
-        (Double(completedTrackers) / Double(statisticsCoreData.count)).rounded(.toNearestOrAwayFromZero) : 0
+        let completedTrackers = Int(statisticsCoreData.map(\.completedTrackers).reduce(0, +))
+        let averageValueNotRounded = statisticsCoreData.count > 0 ?
+        (Double(completedTrackers) / Double(statisticsCoreData.count)) : 0
+        let averageValueRounded = Int((round(averageValueNotRounded * 10) / 10).rounded(.toNearestOrAwayFromZero))
         var perfectDays: Int = 0
         var bestPeriod: Int = 0
         var temporaryBestPeriod: Int = 0
@@ -81,15 +77,15 @@ final class TrackerStatisticStore: NSObject {
             }
             if statistic.completedTrackers > 0 {
                 temporaryBestPeriod += 1
-                bestPeriod = temporaryBestPeriod
             } else {
+                bestPeriod = temporaryBestPeriod
                 temporaryBestPeriod = 0
             }
         }
         return StatisticModel(
-            bestPeriod: bestPeriod,
+            bestPeriod: max(bestPeriod, temporaryBestPeriod),
             perfectDays: perfectDays,
-            completedTrackers: Int(completedTrackers),
-            averageValue: Int(averageValue))
+            completedTrackers: completedTrackers,
+            averageValue: averageValueRounded)
     }
 }

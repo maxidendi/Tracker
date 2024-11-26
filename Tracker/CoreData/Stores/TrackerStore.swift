@@ -61,10 +61,11 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
     
     private func updateStatisticTrackersCount() {
         let trackerscount = trackerCoreDataFRC.fetchedObjects?.count ?? 0
-        TrackerStatisticStore.shared.saveOrUpdateTrackersCount(
+        TrackerStatisticStore.shared.saveOrUpdateTrackersCountWithoutSave(
             for: currentDate,
             count: trackerscount,
             context: context)
+        saveContext()
     }
     
     private func clearChanges() {
@@ -213,10 +214,11 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         let trackerCoreData = trackerCoreDataFRC.object(at: index) as TrackerCoreData
         if let records = trackerCoreData.record as? Set<TrackerRecordCoreData>,
            !records.isEmpty {
-            records.compactMap(\.date).forEach{
-                TrackerStatisticStore.shared.updateCompletedTrackersCount(
-                    for: $0,
-                    action: .remove,
+            records.forEach{
+                guard let date = $0.date else { return }
+                TrackerStatisticStore.shared.updateCompletedTrackersCountWithoutSave(
+                    for: date,
+                    action: .remove(withTracker: true),
                     context: context)
             }
         }
