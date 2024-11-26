@@ -48,6 +48,14 @@ final class StatisticViewController: UIViewController {
     } ()
 
     //MARK: - Methods of lifecircle
+        
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .ypWhite
+        addSubviews()
+        layoutSubviews()
+        setupNavigationBar()
+    }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -68,13 +76,19 @@ final class StatisticViewController: UIViewController {
             stackView.addArrangedSubview($0)
         }
     }
-        
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .ypWhite
-        addSubviews()
-        layoutSubviews()
-        setupNavigationBar()
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        AnalyticsService.shared.trackEvent(
+            event: .open,
+            parameters: TrackersScreenParameters.openCloseStatsScreen)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        AnalyticsService.shared.trackEvent(
+            event: .close,
+            parameters: TrackersScreenParameters.openCloseStatsScreen)
     }
     
     //MARK: - Methods

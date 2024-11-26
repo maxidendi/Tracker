@@ -68,6 +68,20 @@ final class HabitOrEventViewController: UIViewController {
         layoutSubviews()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        AnalyticsService.shared.trackEvent(
+            event: .open,
+            parameters: TrackersScreenParameters.openCloseHabitOrEventScreen)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        AnalyticsService.shared.trackEvent(
+            event: .close,
+            parameters: TrackersScreenParameters.openCloseHabitOrEventScreen)
+    }
+    
     //MARK: - Methods
 
     @objc private func showHabitOrEventViewController(_ sender: UIButton) {

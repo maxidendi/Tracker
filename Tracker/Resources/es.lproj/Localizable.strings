@@ -21,6 +21,11 @@
 "emojiAndColors.emojiTitle" = "Emoji";
 "emojiAndColors.colorsTitle" = "Color";
 
+//OnboardingPages
+"onboardingPages.firstPageTitle" = "Rastrea solo lo que quieres";
+"onboardingPages.secondPageTitle" = "Incluso si no son litros de agua y yoga";
+"onboardingPages.buttonTitle" = "¡Qué tecnología!";
+
 //WeekdaySchedule
 "weekdaySchedule.monday" = "Lunes";
 "weekdaySchedule.tuesday" = "Martes";

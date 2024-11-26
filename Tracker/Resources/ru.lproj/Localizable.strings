@@ -21,6 +21,11 @@
 "emojiAndColors.emojiTitle" = "Emoji";
 "emojiAndColors.colorsTitle" = "Цвет";
 
+//OnboardingPages
+"onboardingPages.firstPageTitle" = "Отслеживайте только то, что хотите";
+"onboardingPages.secondPageTitle" = "Даже если это не литры воды и йога";
+"onboardingPages.buttonTitle" = "Вот это технологии!";
+
 //WeekdaySchedule
 "weekdaySchedule.monday" = "Понедельник";
 "weekdaySchedule.tuesday" = "Вторник";

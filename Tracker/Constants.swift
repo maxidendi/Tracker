@@ -37,6 +37,11 @@ enum Constants {
         static let emojiTitle = NSLocalizedString("emojiAndColors.emojiTitle", comment: "")
         static let colorsTitle = NSLocalizedString("emojiAndColors.colorsTitle", comment: "")
     }
+    enum OnboardingPages {
+        static let firstPageTitle = NSLocalizedString("onboardingPages.firstPageTitle", comment: "")
+        static let secondPageTitle = NSLocalizedString("onboardingPages.secondPageTitle", comment: "")
+        static let buttonTitle = NSLocalizedString("onboardingPages.buttonTitle", comment: "")
+    }
     enum WeekdaySchedule {
         static let monday = NSLocalizedString("weekdaySchedule.monday", comment: "")
         static let tuesday = NSLocalizedString("weekdaySchedule.tuesday", comment: "")

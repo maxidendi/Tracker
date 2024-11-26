@@ -56,6 +56,20 @@ final class FiltersViewController: UIViewController {
         addSubviews()
         layoutSubviews()
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        AnalyticsService.shared.trackEvent(
+            event: .open,
+            parameters: TrackersScreenParameters.openCloseFilterScreen)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        AnalyticsService.shared.trackEvent(
+            event: .close,
+            parameters: TrackersScreenParameters.openCloseFilterScreen)
+    }
 }
 
 //MARK: - Extensions

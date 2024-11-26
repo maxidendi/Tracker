@@ -112,6 +112,9 @@ final class TrackerCell: UICollectionViewCell {
     //MARK: - Private methods
         
     @objc private func counterButtonTapped() {
+        AnalyticsService.shared.trackEvent(
+            event: .click,
+            parameters: TrackersScreenParameters.clickCellCounterButton)
         guard let id else { return }
         delegate?.counterButtonTapped(with: id, isCompleted: !isCompleted)
     }

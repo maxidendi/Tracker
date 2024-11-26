@@ -98,6 +98,20 @@ final class TrackersView: UIViewController {
         datePickerValueChanged()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        AnalyticsService.shared.trackEvent(
+            event: .open,
+            parameters: TrackersScreenParameters.openCloseMainScreen)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        AnalyticsService.shared.trackEvent(
+            event: .close,
+            parameters: TrackersScreenParameters.openCloseMainScreen)
+    }
+    
     //MARK: - Methods
     
     private func bind() {
@@ -156,6 +170,9 @@ final class TrackersView: UIViewController {
     //MARK: - Objc methods
     
     @objc private func filterButtonTapped() {
+        AnalyticsService.shared.trackEvent(
+            event: .click,
+            parameters: TrackersScreenParameters.clickFilterButton)
         let filterViewController = viewModel.setupFiltersViewController()
         filterViewController.modalPresentationStyle = .popover
         present(filterViewController, animated: true)
@@ -167,6 +184,9 @@ final class TrackersView: UIViewController {
     }
     
     @objc private func didTapPlusButton() {
+        AnalyticsService.shared.trackEvent(
+            event: .click,
+            parameters: TrackersScreenParameters.clickPlusButton)
         let createTrackerViewController = HabitOrEventViewController()
         createTrackerViewController.delegate = self
         createTrackerViewController.modalPresentationStyle = .popover
@@ -250,66 +270,6 @@ extension TrackersView: UICollectionViewDataSource {
         return cell
     }
     
-    //Available context menu and preview for iOS 16.0 and higher
-    @available(iOS 16.0, *)
-    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
-        guard let indexPath = indexPaths.first else { return nil }
-        guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell else { return nil }
-        let pinActionTitle = cell.isPinned() ?
-            Constants.AlertModelConstants.unpinActionTitle :
-            Constants.AlertModelConstants.pinActionTitle
-        let alertModel = AlertModel(message: Constants.AlertModelConstants.trackersAlertMessage,
-                                    actionTitle: Constants.AlertModelConstants.deleteActionTitle)
-        return UIContextMenuConfiguration(
-            identifier: nil,
-            previewProvider: nil
-        ) { [weak self, weak cell] _ in
-            let pinAction = UIAction(
-                title: pinActionTitle
-            ) { _ in
-                    self?.viewModel.updatePinnedTracker(indexPath)
-                    cell?.toggleCellPin()
-                }
-            let editAction = UIAction(
-                title: Constants.AlertModelConstants.editActionTitle
-            ) { _ in
-                guard let model = self?.viewModel.setupNewTrackerViewModel(for: indexPath)
-                else { return }
-                let newTrackerView = NewTrackerView(viewModel: model)
-                newTrackerView.modalPresentationStyle = .popover
-                self?.present(newTrackerView, animated: true)
-            }
-            let deleteAction = UIAction(
-                title: Constants.AlertModelConstants.deleteActionTitle,
-                attributes: .destructive
-            ) { _ in
-                self?.showAlertWithCancel(
-                    with: alertModel,
-                    alertStyle: .actionSheet,
-                    actionStyle: .destructive
-                ) { _ in
-                    self?.viewModel.deleteTracker(indexPath)
-                }
-            }
-            return UIMenu(title: "", children: [pinAction, editAction, deleteAction])
-        }
-    }
-    
-    @available(iOS 16.0, *)
-    func collectionView(_ collectionView: UICollectionView, contextMenuConfiguration configuration: UIContextMenuConfiguration, highlightPreviewForItemAt indexPath: IndexPath) -> UITargetedPreview? {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell else { return nil }
-        let preview = UITargetedPreview(view: cell.topViewForPreview())
-        return preview
-    }
-    
-    @available(iOS 16.0, *)
-    func collectionView(_ collectionView: UICollectionView, contextMenuConfiguration configuration: UIContextMenuConfiguration, dismissalPreviewForItemAt indexPath: IndexPath) -> UITargetedPreview? {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell else { return nil }
-        let preview = UITargetedPreview(view: cell.topViewForPreview())
-        return preview
-    }
-    
-    //Available context menu and preview for iOS 13.4 - 16.0
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
         guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell else { return nil }
         let pinActionTitle = cell.isPinned() ?
@@ -332,6 +292,9 @@ extension TrackersView: UICollectionViewDataSource {
             ) { _ in
                 guard let model = self?.viewModel.setupNewTrackerViewModel(for: indexPath)
                 else { return }
+                AnalyticsService.shared.trackEvent(
+                    event: .click,
+                    parameters: TrackersScreenParameters.clickMenuEdit)
                 let newTrackerView = NewTrackerView(viewModel: model)
                 newTrackerView.modalPresentationStyle = .popover
                 self?.present(newTrackerView, animated: true)
@@ -340,6 +303,9 @@ extension TrackersView: UICollectionViewDataSource {
                 title: Constants.AlertModelConstants.deleteActionTitle,
                 attributes: .destructive
             ) { _ in
+                AnalyticsService.shared.trackEvent(
+                    event: .click,
+                    parameters: TrackersScreenParameters.clickMenuDelete)
                 self?.showAlertWithCancel(
                     with: alertModel,
                     alertStyle: .actionSheet,
@@ -355,14 +321,18 @@ extension TrackersView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, previewForHighlightingContextMenuWithConfiguration configuration: UIContextMenuConfiguration) -> UITargetedPreview? {
         guard let indexPath = configuration.identifier as? IndexPath else { return nil }
         guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell else { return nil }
-        let preview = UITargetedPreview(view: cell.topViewForPreview())
+        let parameters = UIPreviewParameters()
+        parameters.backgroundColor = .clear
+        let preview = UITargetedPreview(view: cell.topViewForPreview(), parameters: parameters)
         return preview
     }
     
     func collectionView(_ collectionView: UICollectionView, previewForDismissingContextMenuWithConfiguration configuration: UIContextMenuConfiguration) -> UITargetedPreview? {
         guard let indexPath = configuration.identifier as? IndexPath else { return nil }
         guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell else { return nil }
-        let preview = UITargetedPreview(view: cell.topViewForPreview())
+        let parameters = UIPreviewParameters()
+        parameters.backgroundColor = .clear
+        let preview = UITargetedPreview(view: cell.topViewForPreview(), parameters: parameters)
         return preview
     }
 }

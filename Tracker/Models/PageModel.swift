@@ -12,8 +12,8 @@ enum PageModel {
     }
     var text: String {
         switch self {
-        case .firstPage: return "Отслеживайте только то, что хотите"
-        case .secondPage: return "Даже если это не литры воды и йога"
+        case .firstPage: return Constants.OnboardingPages.firstPageTitle
+        case .secondPage: return Constants.OnboardingPages.secondPageTitle
         }
     }
 }
