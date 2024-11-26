@@ -61,12 +61,10 @@ final class StatisticViewController: UIViewController {
         super.viewWillAppear(animated)
         guard let statistic = dataProvider.getStatistic()
         else {
-            imageStubView.isHidden = false
-            labelStub.isHidden = false
+            stubsIsHidden(false)
             return
         }
-        imageStubView.isHidden = true
-        labelStub.isHidden = true
+        stubsIsHidden(true)
         stackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         [StatisticView(count: statistic.bestPeriod, title: constants.bestPeriodText),
          StatisticView(count: statistic.perfectDays, title: constants.perfectDaysText),
@@ -92,6 +90,12 @@ final class StatisticViewController: UIViewController {
     }
     
     //MARK: - Methods
+    
+    private func stubsIsHidden(_ isHidden: Bool) {
+        imageStubView.isHidden = isHidden
+        labelStub.isHidden = isHidden
+        stackView.isHidden = !isHidden
+    }
     
     private func setupNavigationBar() {
         navigationController?.navigationBar.prefersLargeTitles = true
