@@ -18,4 +18,5 @@ protocol DataProviderProtocol {
     func removeTracker(_ indexPath: IndexPath)
     func addTrackerRecord(_ record: TrackerRecord)
     func removeTrackerRecord(_ record: TrackerRecord)
+    func getStatistic() -> StatisticModel?
 }

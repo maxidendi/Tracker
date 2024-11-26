@@ -3,11 +3,6 @@ import CoreData
 
 final class TrackerStatisticStore: NSObject {
     
-    enum RecordAction {
-        case add
-        case remove
-    }
-    
     //MARK: - Properties
 
     static let shared = TrackerStatisticStore()
@@ -64,4 +59,37 @@ final class TrackerStatisticStore: NSObject {
         print(trackerStatistic)
     }
     
+    func getStatistic(context: NSManagedObjectContext) -> StatisticModel? {
+        let request = TrackerStatisticCoreData.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(
+            key: "date",
+            ascending: true)]
+        request.predicate = NSPredicate(
+            format: "%K > 0",
+            #keyPath(TrackerStatisticCoreData.trackersCount))
+        guard let statisticsCoreData = try? context.fetch(request)
+        else { return nil }
+        let completedTrackers = statisticsCoreData.map(\.completedTrackers).reduce(0, +)
+        let averageValue = statisticsCoreData.count > 0 ?
+        (Double(completedTrackers) / Double(statisticsCoreData.count)).rounded(.toNearestOrAwayFromZero) : 0
+        var perfectDays: Int = 0
+        var bestPeriod: Int = 0
+        var temporaryBestPeriod: Int = 0
+        for statistic in statisticsCoreData {
+            if statistic.trackersCount == statistic.completedTrackers {
+                perfectDays += 1
+            }
+            if statistic.completedTrackers > 0 {
+                temporaryBestPeriod += 1
+                bestPeriod = temporaryBestPeriod
+            } else {
+                temporaryBestPeriod = 0
+            }
+        }
+        return StatisticModel(
+            bestPeriod: bestPeriod,
+            perfectDays: perfectDays,
+            completedTrackers: Int(completedTrackers),
+            averageValue: Int(averageValue))
+    }
 }

@@ -135,7 +135,9 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         do {
             try trackerCoreDataFRC.performFetch()
             currentDate = date
-            updateStatisticTrackersCount()
+            if filter == .allTrackers || filter == .todayTrackers {
+                updateStatisticTrackersCount()
+            }
         } catch {
             assertionFailure("Error fetching trackers: \(error)")
         }
@@ -210,11 +212,13 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
     func deleteTrackerCoreData(_ index: IndexPath) {
         let trackerCoreData = trackerCoreDataFRC.object(at: index) as TrackerCoreData
         if let records = trackerCoreData.record as? Set<TrackerRecordCoreData>,
-           records.contains(where: { $0.date == currentDate }) {
-            TrackerStatisticStore.shared.updateCompletedTrackersCount(
-                for: currentDate,
-                action: .remove,
-                context: context)
+           !records.isEmpty {
+            records.compactMap(\.date).forEach{
+                TrackerStatisticStore.shared.updateCompletedTrackersCount(
+                    for: $0,
+                    action: .remove,
+                    context: context)
+            }
         }
         context.delete(trackerCoreData)
         saveContext()

@@ -48,6 +48,8 @@
 		3F3EDB692CF240A300128599 /* StatisticItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F3EDB682CF240A300128599 /* StatisticItemView.swift */; };
 		3F3EDC052CF393C300128599 /* CALayer+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F3EDC042CF393C300128599 /* CALayer+Extension.swift */; };
 		3F3EDCA12CF3A95D00128599 /* TrackerStatisticStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F3EDCA02CF3A95D00128599 /* TrackerStatisticStore.swift */; };
+		3F3EDCA32CF5066500128599 /* StatisticModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F3EDCA22CF5066500128599 /* StatisticModel.swift */; };
+		3F3EDCA52CF5181500128599 /* RecordAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F3EDCA42CF5181500128599 /* RecordAction.swift */; };
 		3F8C80B02CD802C9008C1DB3 /* TrackerCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F8C80AF2CD802C9008C1DB3 /* TrackerCellModel.swift */; };
 		3FA696922CDBCB6800C4F9D5 /* TrackerStoreDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA696912CDBCB6800C4F9D5 /* TrackerStoreDelegate.swift */; };
 		3FA696952CDBCEC000C4F9D5 /* OnboardingPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA696942CDBCEC000C4F9D5 /* OnboardingPageViewController.swift */; };
@@ -129,6 +131,8 @@
 		3F3EDB682CF240A300128599 /* StatisticItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticItemView.swift; sourceTree = "<group>"; };
 		3F3EDC042CF393C300128599 /* CALayer+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CALayer+Extension.swift"; sourceTree = "<group>"; };
 		3F3EDCA02CF3A95D00128599 /* TrackerStatisticStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerStatisticStore.swift; sourceTree = "<group>"; };
+		3F3EDCA22CF5066500128599 /* StatisticModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticModel.swift; sourceTree = "<group>"; };
+		3F3EDCA42CF5181500128599 /* RecordAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordAction.swift; sourceTree = "<group>"; };
 		3F8C80AF2CD802C9008C1DB3 /* TrackerCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCellModel.swift; sourceTree = "<group>"; };
 		3FA696912CDBCB6800C4F9D5 /* TrackerStoreDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerStoreDelegate.swift; sourceTree = "<group>"; };
 		3FA696942CDBCEC000C4F9D5 /* OnboardingPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPageViewController.swift; sourceTree = "<group>"; };
@@ -219,6 +223,7 @@
 		3F2438CA2CBE2D2C00CB0B4F /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				3F3EDCA42CF5181500128599 /* RecordAction.swift */,
 				3F2438BB2CBE2D2C00CB0B4F /* EmojiAndColors.swift */,
 				3F2438B92CBE2D2C00CB0B4F /* ColorsGategory.swift */,
 				3F2438BD2CBE2D2C00CB0B4F /* EmojiGategory.swift */,
@@ -233,6 +238,7 @@
 				3FA6970A2CDE9F3500C4F9D5 /* CategoryIndexes.swift */,
 				3FA697262CE7C9EB00C4F9D5 /* PageModel.swift */,
 				3F3EDB632CEFCBB600128599 /* Filters.swift */,
+				3F3EDCA22CF5066500128599 /* StatisticModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -512,6 +518,7 @@
 				3F2438F52CBE2D2C00CB0B4F /* ColorsGategory.swift in Sources */,
 				3FA697112CE11A0600C4F9D5 /* TrackerCategoriesStoreDelegate.swift in Sources */,
 				3F2438F72CBE2D2C00CB0B4F /* EmojiAndColors.swift in Sources */,
+				3F3EDCA52CF5181500128599 /* RecordAction.swift in Sources */,
 				3FB806852CC17FF4005A35AE /* ScheduleViewModelDelegate.swift in Sources */,
 				3F05FA4A2CC2D2100020C050 /* NewTrackerViewDelegate.swift in Sources */,
 				3FA696952CDBCEC000C4F9D5 /* OnboardingPageViewController.swift in Sources */,
@@ -521,6 +528,7 @@
 				3F2438F92CBE2D2C00CB0B4F /* EmojiGategory.swift in Sources */,
 				3F2438FB2CBE2D2C00CB0B4F /* GeometricParams.swift in Sources */,
 				3F2438FE2CBE2D2C00CB0B4F /* Tracker.swift in Sources */,
+				3F3EDCA32CF5066500128599 /* StatisticModel.swift in Sources */,
 				3F2439002CBE2D2C00CB0B4F /* TrackerCategory.swift in Sources */,
 				3FD7FF9A2CCEB10500D91C4D /* DataProviderProtocol.swift in Sources */,
 				3F2439022CBE2D2C00CB0B4F /* TrackerRecord.swift in Sources */,

@@ -2,8 +2,20 @@ import UIKit
 
 final class StatisticViewController: UIViewController {
     
+    //MARK: - Init
+    
+    init(dataProvider: DataProviderProtocol) {
+        self.dataProvider = dataProvider
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     //MARK: - Properties
     
+    private let dataProvider: DataProviderProtocol
     private let constants = Constants.StatisticViewControllerConstants.self
     private lazy var imageStubView: UIImageView = {
         let imageView = UIImageView(image: .statisticImageStub)
@@ -75,13 +87,16 @@ final class StatisticViewController: UIViewController {
 
     //MARK: - Methods of lifecircle
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        [bestPeriodView, perfectDaysView, completedTrackersView, averageValueView].forEach {
-            $0.setBorder()
-        }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        guard let statistic = dataProvider.getStatistic()
+        else { return }
+        bestPeriodView.configure(with: statistic.bestPeriod)
+        perfectDaysView.configure(with: statistic.perfectDays)
+        completedTrackersView.configure(with: statistic.completedTrackers)
+        averageValueView.configure(with: statistic.averageValue)
     }
-    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
@@ -132,8 +147,5 @@ extension StatisticViewController: SetupSubviewsProtocol {
             stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor, constant: -32)
         ])
-        [bestPeriodView, perfectDaysView, completedTrackersView, averageValueView].forEach {
-            $0.configure(with: 0)
-        }
     }
 }

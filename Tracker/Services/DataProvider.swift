@@ -141,6 +141,12 @@ final class DataProvider: DataProviderProtocol {
     private func getRecords(for tracker: Tracker) -> [TrackerRecord] {
         recordsStore.getTrackerRecords(for: tracker)
     }
+    
+    //StatisticStore
+    
+    func getStatistic() -> StatisticModel? {
+        TrackerStatisticStore.shared.getStatistic(context: DataProvider.persistentContainer.viewContext)
+    }
 }
 
 //MARK: - Extensions

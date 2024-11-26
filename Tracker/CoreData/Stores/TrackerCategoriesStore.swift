@@ -148,6 +148,18 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
                 context.delete(trackerCoreData)
             }
         }
+        if let trackersCoreData = categoryCoreData.trackers as? Set<TrackerCoreData> {
+            trackersCoreData.forEach{
+                if let records = $0.record as? Set<TrackerRecordCoreData> {
+                    records.compactMap(\.date).forEach{
+                        TrackerStatisticStore.shared.updateCompletedTrackersCount(
+                            for: $0,
+                            action: .remove,
+                            context: context)
+                    }
+                }
+            }
+        }
         context.delete(categoryCoreData)
         saveContext()
     }

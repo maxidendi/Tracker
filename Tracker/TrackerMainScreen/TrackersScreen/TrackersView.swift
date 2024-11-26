@@ -102,7 +102,7 @@ final class TrackersView: UIViewController {
     
     private func bind() {
         viewModel.onUpdateTrackers = { [weak self] indexes in
-            self?.collectionView.performBatchUpdates{
+            self?.collectionView.performBatchUpdates({
                 self?.collectionView.deleteItems(at: Array(indexes.deletedIndexes))
                 self?.collectionView.deleteSections(indexes.deletedSections)
                 self?.collectionView.insertSections(indexes.insertedSections)
@@ -112,8 +112,10 @@ final class TrackersView: UIViewController {
                 }
                 self?.collectionView.reloadItems(at: Array(indexes.updatedIndexes))
                 self?.collectionView.reloadSections(IndexSet(indexes.updatedIndexes.map{ $0.section }))
-            }
-        } 
+            }, completion: { _ in
+                self?.collectionView.reloadItems(at: indexes.movedIndexes.map{ $0.to })
+            })
+        }
         viewModel.onSetDatePickerValue = { [weak self] date in
             self?.datePicker.date = date
         }

@@ -15,7 +15,8 @@ final class TrackerTabBarController: UITabBarController {
     //MARK: - Methods
     
     private func setTabBarControllers() {
-        let trackersViewModel = TrackersViewModel(dataProvider: DataProvider())
+        let dataProvider = DataProvider()
+        let trackersViewModel = TrackersViewModel(dataProvider: dataProvider)
         let trackersView = TrackersView(viewModel: trackersViewModel)
         let navigationControllerTrack = UINavigationController(rootViewController: trackersView)
         trackersView.tabBarItem = UITabBarItem(
@@ -23,7 +24,7 @@ final class TrackerTabBarController: UITabBarController {
             image: .tabTrackersIcon,
             selectedImage: nil)
         
-        let statisticsViewController = StatisticViewController()
+        let statisticsViewController = StatisticViewController(dataProvider: dataProvider)
         let navigationControllerStat = UINavigationController(rootViewController: statisticsViewController)
         statisticsViewController.tabBarItem = UITabBarItem(
             title: Constants.StatisticViewControllerConstants.title,

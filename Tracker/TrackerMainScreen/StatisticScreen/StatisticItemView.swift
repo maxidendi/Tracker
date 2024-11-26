@@ -6,7 +6,7 @@ final class StatisticItemView: UIView {
     
     init(
         frame: CGRect,
-        count: Int,
+        count: Int = 0,
         title: String
     ) {
         super.init(frame: frame)
@@ -14,6 +14,7 @@ final class StatisticItemView: UIView {
         countLabel.text = "\(count)"
         titleLabel.text = title
         setupUI()
+        setupLayers()
     }
     
     required init?(coder: NSCoder) {
@@ -22,6 +23,8 @@ final class StatisticItemView: UIView {
 
     //MARK: - Properties
     
+    private let gradientLayer = CAGradientLayer()
+    private var borderShapeLayer = CAShapeLayer()
     private let constants = Constants.StatisticViewControllerConstants.self
     private lazy var countLabel: UILabel = {
         let label = UILabel()
@@ -47,18 +50,32 @@ final class StatisticItemView: UIView {
         countLabel.text = "\(count)"
     }
     
-    func setBorder() {
-        let gradientLayer = CALayer()
+    override func layoutSubviews() {
+        super.layoutSubviews()
         gradientLayer.frame = bounds
-        gradientLayer.addGradientBorder(
-            colors: [
-                UIColor.ypGradientColor1,
-                UIColor.ypGradientColor2,
-                UIColor.ypGradientColor3
-            ],
-            width: 1)
-        layer.addSublayer(gradientLayer)
-        layoutIfNeeded()
+        let path = UIBezierPath(
+            roundedRect: bounds,
+            cornerRadius: Constants.General.radius16).cgPath
+        borderShapeLayer.path = path
+//        let maskLayer = CAShapeLayer()
+//        maskLayer.path = path
+//        layer.mask = maskLayer
+//        borderShapeLayer.path = path
+    }
+    
+    private func setupLayers() {
+        gradientLayer.colors = [
+            UIColor.ypGradientColor1,
+            UIColor.ypGradientColor2,
+            UIColor.ypGradientColor3
+        ]
+        gradientLayer.startPoint = .init(x: 0, y: 0.5)
+        gradientLayer.endPoint = .init(x: 1, y: 0.5)
+        layer.insertSublayer(gradientLayer, at: 0)
+        borderShapeLayer.lineWidth = 1
+        borderShapeLayer.strokeColor = UIColor.clear.cgColor
+        borderShapeLayer.fillColor = nil
+        layer.addSublayer(borderShapeLayer)
     }
     
     
