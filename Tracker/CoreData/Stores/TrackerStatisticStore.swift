@@ -70,17 +70,28 @@ final class TrackerStatisticStore: NSObject {
         let averageValueRounded = Int((round(averageValueNotRounded * 10) / 10).rounded(.toNearestOrAwayFromZero))
         var perfectDays: Int = 0
         var bestPeriod: Int = 0
+        var previousDate: Date? = nil
         var temporaryBestPeriod: Int = 0
         for statistic in statisticsCoreData {
             if statistic.trackersCount == statistic.completedTrackers {
                 perfectDays += 1
             }
-            if statistic.completedTrackers > 0 {
-                temporaryBestPeriod += 1
+            if let temporaryDate = previousDate {
+                if statistic.completedTrackers > 0,
+                   let currentDate = statistic.date,
+                   let diffDays = Calendar.current.numberOfDaysBetween(temporaryDate, and: currentDate),
+                   diffDays == 1
+                {
+                    temporaryBestPeriod += 1
+                } else {
+                    bestPeriod = max(bestPeriod, temporaryBestPeriod)
+                    temporaryBestPeriod = 0
+                    previousDate = nil
+                }
             } else {
-                bestPeriod = temporaryBestPeriod
-                temporaryBestPeriod = 0
+                temporaryBestPeriod = 1
             }
+            previousDate = statistic.date
         }
         return StatisticModel(
             bestPeriod: max(bestPeriod, temporaryBestPeriod),
