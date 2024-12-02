@@ -1,10 +1,3 @@
-//
-//  TrackerCategoryStore.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 22.10.2024.
-//
-
 import Foundation
 import CoreData
 
@@ -15,6 +8,7 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
     init(context: NSManagedObjectContext) {
         self.context = context
         super.init()
+        setupPinnedCategory()
         configureFetchedResultsController()
     }
     
@@ -22,10 +16,11 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
     
     weak var delegate: TrackerCategoriesStoreDelegate?
     private let context: NSManagedObjectContext
-    var trackerCategoryCoreDataFRC: NSFetchedResultsController<TrackerCategoryCoreData>?
-    var insertedIndexes: Set<IndexPath> = []
-    var updatedIndexes: Set<IndexPath> = []
-    var deletedIndexes: Set<IndexPath> = []
+    private var insertedIndexes: Set<IndexPath> = []
+    private var deletedIndexes: Set<IndexPath> = []
+    private var updatedIndexes: Set<IndexPath> = []
+    private var movedIndexes: [(from: IndexPath, to: IndexPath)] = []
+    private var trackerCategoryCoreDataFRC: NSFetchedResultsController<TrackerCategoryCoreData>?
     
     //MARK: - Methods
     
@@ -40,17 +35,31 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
         }
     }
     
+    private func setupPinnedCategory() {
+        if !UserDefaultsService.shared.isPinnedCategoryExists() {
+            let pinnedCategory = TrackerCategoryCoreData(context: context)
+            pinnedCategory.title = Constants.TrackersViewControllerConstants.pinnedCategoryTitle
+            pinnedCategory.trackers = []
+            saveContext()
+        }
+    }
+    
     private func clearChanges() {
         insertedIndexes = []
-        updatedIndexes = []
         deletedIndexes = []
+        updatedIndexes = []
+        movedIndexes = []
     }
     
     private func configureFetchedResultsController() {
-        let fetchedRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
-        let sortDescriptorCategory = NSSortDescriptor(keyPath: \TrackerCategoryCoreData.title,
-                                                      ascending: true)
+        let fetchedRequest = TrackerCategoryCoreData.fetchRequest()
+        let sortDescriptorCategory = NSSortDescriptor(
+            keyPath: \TrackerCategoryCoreData.title,
+            ascending: true)
         fetchedRequest.sortDescriptors = [sortDescriptorCategory]
+        fetchedRequest.predicate = NSPredicate(
+            format: "title != %@",
+            Constants.TrackersViewControllerConstants.pinnedCategoryTitle)
         let fetchedResultsController = NSFetchedResultsController(
             fetchRequest: fetchedRequest,
             managedObjectContext: context,
@@ -68,12 +77,14 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
     
     func getTrackerCategoryCoreData(from category: String) -> TrackerCategoryCoreData? {
         let request = TrackerCategoryCoreData.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \TrackerCategoryCoreData.title, ascending: true)]
-        request.predicate = NSPredicate(format: "%K = %@",
-                                        #keyPath(TrackerCategoryCoreData.title),
-                                        category)
-        guard let categoryCoreData = try? context.fetch(request).first else { return nil }
-        return categoryCoreData
+        request.sortDescriptors = [NSSortDescriptor(
+            keyPath: \TrackerCategoryCoreData.title,
+            ascending: true)]
+        request.predicate = NSPredicate(
+            format: "%K = %@",
+            #keyPath(TrackerCategoryCoreData.title),
+            category)
+        return try? context.fetch(request).first
     }
     
     func getCategoriesList() -> [String] {
@@ -83,17 +94,45 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
     func addCategoryCoreData(_ category: String) {
         let categoryCoreData = TrackerCategoryCoreData(context: context)
         categoryCoreData.title = category
+        categoryCoreData.createdAt = Date()
         categoryCoreData.trackers = []
+        saveContext()
+    }
+    
+    func updateCategoryCoreData(_ category: String, withNewTitle title: String) {
+        guard let categoryCoreData = getTrackerCategoryCoreData(from: category)
+        else { return }
+        categoryCoreData.title = title
+        let pinnedCategory = getTrackerCategoryCoreData(
+            from: Constants.TrackersViewControllerConstants.pinnedCategoryTitle)
+        let pinnedTrackers = pinnedCategory?.trackers as? NSSet
+        pinnedTrackers?.forEach{
+            if let trackerCoreData = $0 as? TrackerCoreData,
+               trackerCoreData.lastCategory == category {
+                trackerCoreData.lastCategory = title
+            }
+        }
         saveContext()
     }
     
     func deleteCategoryCoreData(_ index: IndexPath) {
         guard let categoryCoreData = trackerCategoryCoreDataFRC?.fetchedObjects?[index.row] as? TrackerCategoryCoreData
         else { return }
+        let pinnedCategory = getTrackerCategoryCoreData(
+            from: Constants.TrackersViewControllerConstants.pinnedCategoryTitle)
+        let pinnedTrackers = pinnedCategory?.trackers as? NSSet
+        pinnedTrackers?.forEach{
+            if let trackerCoreData = $0 as? TrackerCoreData,
+               trackerCoreData.lastCategory == categoryCoreData.title {
+                context.delete(trackerCoreData)
+            }
+        }
         context.delete(categoryCoreData)
         saveContext()
     }
 }
+
+//MARK: - Extensions
 
 extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
     func controller(
@@ -105,17 +144,17 @@ extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
     ) {
         switch type {
         case .insert:
-            if let newIndexPath {
-                insertedIndexes.insert(newIndexPath)
-            }
+            guard let newIndexPath else { return }
+            insertedIndexes.insert(newIndexPath)
         case .delete:
-            if let indexPath {
-                deletedIndexes.insert(indexPath)
-            }
+            guard let indexPath else { return }
+            deletedIndexes.insert(indexPath)
         case .update:
-            if let indexPath {
-                updatedIndexes.insert(indexPath)
-            }
+            guard let indexPath else { return }
+            updatedIndexes.insert(indexPath)
+        case .move:
+            guard let indexPath, let newIndexPath else { return }
+            movedIndexes.append((indexPath, newIndexPath))
         default:
             break
         }
@@ -125,7 +164,8 @@ extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
         let categoryIndexes = CategoryIndexes(
             insertedIndexes: insertedIndexes,
             updatedIndexes: updatedIndexes,
-            deletedIndexes: deletedIndexes)
+            deletedIndexes: deletedIndexes,
+            movedIndexes: movedIndexes)
         delegate?.didUpdateCategories(categoryIndexes)
         clearChanges()
     }

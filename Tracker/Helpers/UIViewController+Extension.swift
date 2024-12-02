@@ -1,10 +1,3 @@
-//
-//  UIViewController+Extension.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 15.10.2024.
-//
-
 import UIKit
 
 extension UIViewController {
@@ -47,7 +40,7 @@ extension UIViewController {
         let action = UIAlertAction(title: model.actionTitle,
                                    style: actionStyle,
                                    handler: handler)
-        let cancelAction = UIAlertAction(title: "Отменить",
+        let cancelAction = UIAlertAction(title: Constants.AlertModelConstants.cancelActionTitle,
                                          style: .cancel,
                                          handler: nil)
         alert.addAction(action)

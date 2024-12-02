@@ -1,10 +1,3 @@
-//
-//  CategoryViewModel.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 07.11.2024.
-//
-
 import Foundation
 
 final class CategoriesViewModel: CategoryViewModelProtocol {
@@ -52,8 +45,8 @@ final class CategoriesViewModel: CategoryViewModelProtocol {
         dataProvider
     }
     
-    func setupAddCategoryViewModel() -> AddCategoryViewModelProtocol {
-        AddCategoryViewModel(dataProvider: dataProvider)
+    func setupAddCategoryViewModel(viewType: AddCategoryViewType) -> AddCategoryViewModelProtocol {
+        AddCategoryViewModel(dataProvider: dataProvider, viewType: viewType)
     }
 }
 

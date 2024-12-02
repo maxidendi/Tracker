@@ -1,10 +1,3 @@
-//
-//  UITableViewCell+Extension.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 09.11.2024.
-//
-
 import UIKit
 
 extension UITableViewCell {
@@ -12,8 +5,16 @@ extension UITableViewCell {
         guard let indexPath else { return }
         if rows == 1 {
             self.layer.cornerRadius = Constants.General.radius16
-            self.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner]
-            self.separatorInset = .init(top: .zero, left: .zero, bottom: .zero, right: self.bounds.width)
+            self.layer.maskedCorners = [
+                .layerMinXMinYCorner,
+                .layerMaxXMinYCorner,
+                .layerMinXMaxYCorner,
+                .layerMaxXMaxYCorner]
+            self.separatorInset = .init(
+                top: .zero,
+                left: .zero,
+                bottom: .zero,
+                right: self.bounds.width)
             return
         } else if indexPath.row == .zero {
             self.layer.cornerRadius = Constants.General.radius16
@@ -22,7 +23,11 @@ extension UITableViewCell {
         } else if indexPath.row == rows - 1 {
             self.layer.cornerRadius = Constants.General.radius16
             self.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
-            self.separatorInset = .init(top: .zero, left: .zero, bottom: .zero, right: self.bounds.width)
+            self.separatorInset = .init(
+                top: .zero,
+                left: .zero,
+                bottom: .zero,
+                right: self.bounds.width)
         } else {
             self.separatorInset = Constants.General.separatorInsets
             self.layer.maskedCorners = []

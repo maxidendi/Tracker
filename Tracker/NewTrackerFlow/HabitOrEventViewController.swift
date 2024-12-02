@@ -1,13 +1,12 @@
-//
-//  CreateTrackerViewController.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 05.10.2024.
-//
-
 import UIKit
 
 final class HabitOrEventViewController: UIViewController {
+    
+    //MARK: - Init
+    
+    deinit {
+        delegate?.needToReloadCollectionView()
+    }
     
     //MARK: - Properties
     
@@ -69,13 +68,27 @@ final class HabitOrEventViewController: UIViewController {
         layoutSubviews()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        AnalyticsService.shared.trackEvent(
+            event: .open,
+            parameters: TrackersScreenParameters.openCloseHabitOrEventScreen)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        AnalyticsService.shared.trackEvent(
+            event: .close,
+            parameters: TrackersScreenParameters.openCloseHabitOrEventScreen)
+    }
+    
     //MARK: - Methods
 
     @objc private func showHabitOrEventViewController(_ sender: UIButton) {
         guard let dataProvider = delegate?.getDataProvider() else { return }
         let viewModel = sender == habitTrackerButton ?
-                            NewTrackerViewModel(dataProvider: dataProvider, isHabit: true) :
-                            NewTrackerViewModel(dataProvider: dataProvider, isHabit: false)
+        NewTrackerViewModel(dataProvider: dataProvider, viewType: .add, isHabit: true) :
+        NewTrackerViewModel(dataProvider: dataProvider, viewType: .add, isHabit: false)
         viewModel.delegate = self
         let newTrackerView = NewTrackerView(viewModel: viewModel)
         newTrackerView.modalPresentationStyle = .popover

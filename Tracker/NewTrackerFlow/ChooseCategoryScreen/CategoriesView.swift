@@ -1,10 +1,3 @@
-//
-//  NewCategoryViewController.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 09.10.2024.
-//
-
 import UIKit
 
 final class CategoriesView: UIViewController {
@@ -48,10 +41,11 @@ final class CategoriesView: UIViewController {
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
-        tableView.backgroundColor = .ypWhite
+        tableView.backgroundColor = .clear
         tableView.separatorColor = .ypGray
         tableView.isScrollEnabled = true
         tableView.clipsToBounds = false
+        tableView.layer.masksToBounds = true
         tableView.showsVerticalScrollIndicator = false
         tableView.dataSource = self
         tableView.delegate = self
@@ -116,7 +110,7 @@ final class CategoriesView: UIViewController {
     }
     
     @objc private func addCategoryButtonTapped() {
-        let viewModel = viewModel.setupAddCategoryViewModel()
+        let viewModel = viewModel.setupAddCategoryViewModel(viewType: .add)
         let addCategoryView = AddCategoryView(viewModel: viewModel)
         addCategoryView.modalPresentationStyle = .popover
         present(addCategoryView, animated: true)
@@ -184,10 +178,11 @@ extension CategoriesView: UITableViewDataSource {
         else { return UITableViewCell() }
         let categories = viewModel.categoriesList()
         let isMarked = viewModel.isCellMarked(at: indexPath)
-        cell.configure(category: categories[indexPath.row],
-                       isMarked: isMarked,
-                       indexPath: indexPath,
-                       rowsCount: categories.count)
+        cell.configure(
+            category: categories[indexPath.row],
+            isMarked: isMarked,
+            indexPath: indexPath,
+            rowsCount: categories.count)
         return cell
     }
     
@@ -203,14 +198,27 @@ extension CategoriesView: UITableViewDelegate {
                    indexPath: IndexPath,
                    point: CGPoint
     ) -> UIContextMenuConfiguration? {
-        let alertModel = AlertModel(message: "Эта категория точно не нужна?",
-                                    actionTitle: "Удалить")
+        guard let cell = tableView.cellForRow(at: indexPath) as? CategoryCell,
+              let text = cell.textLabel?.text
+        else { return nil }
+        let alertModel = AlertModel(
+            message: Constants.AlertModelConstants.chooseCategoryAlertMessage,
+            actionTitle: Constants.AlertModelConstants.deleteActionTitle)
         return UIContextMenuConfiguration(
             identifier: nil,
             previewProvider: nil
         ) { [weak self] _ in
+            let editAction = UIAction(
+                title: Constants.AlertModelConstants.editActionTitle
+            ) { _ in
+                guard let model = self?.viewModel.setupAddCategoryViewModel(viewType: .edit(text))
+                else { return }
+                let addCategoryView = AddCategoryView(viewModel: model)
+                addCategoryView.modalPresentationStyle = .popover
+                self?.present(addCategoryView, animated: true)
+            }
             let deleteAction = UIAction(
-                title: "Удалить",
+                title: Constants.AlertModelConstants.deleteActionTitle,
                 image: nil,
                 attributes: .destructive
             ) { _ in
@@ -222,7 +230,7 @@ extension CategoriesView: UITableViewDelegate {
                     self?.viewModel.deleteCategory(at: indexPath)
                 }
             }
-            return UIMenu(title: "", children: [deleteAction])
+            return UIMenu(title: "", children: [editAction, deleteAction])
         }
     }
     

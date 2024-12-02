@@ -1,10 +1,3 @@
-//
-//  ScheduleViewController.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 10.10.2024.
-//
-
 import UIKit
 
 final class ScheduleView: UIViewController, UITableViewDelegate {
@@ -140,7 +133,7 @@ extension ScheduleView: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         cell.backgroundColor = .ypLightGray.withAlphaComponent(0.3)
         let weekDay = WeekDay.allCases
-        cell.textLabel?.text = weekDay[indexPath.row].rawValue
+        cell.textLabel?.text = weekDay[indexPath.row].fullName
         cell.selectionStyle = .none
         let switcher = UISwitch()
         switcher.tag = indexPath.row

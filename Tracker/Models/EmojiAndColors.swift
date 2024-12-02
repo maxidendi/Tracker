@@ -1,22 +1,15 @@
-//
-//  EmojiAndColors.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 07.10.2024.
-//
-
 import UIKit
 
 struct EmojiAndColors {
     static let emojiCategory = EmojiGategory(
-        title: "Emoji",
+        title: Constants.EmojiAndColors.emojiTitle,
         emoji: [
             "🙂", "😻", "🌺", "🐶", "❤️", "😱",
             "😇", "😡", "🥶", "🤔", "🙌", "🍔",
             "🥦", "🏓", "🥇", "🎸", "🏝", "😪"
         ])
     static let colorsCategory = ColorsGategory(
-        title: "Цвет",
+        title: Constants.EmojiAndColors.colorsTitle,
         colors: [
             UIColor.colorSelection1.codedString, UIColor.colorSelection2.codedString, UIColor.colorSelection3.codedString,
             UIColor.colorSelection4.codedString, UIColor.colorSelection5.codedString, UIColor.colorSelection6.codedString,

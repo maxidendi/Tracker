@@ -1,10 +1,3 @@
-//
-//  TrackerRecordStore.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 22.10.2024.
-//
-
 import Foundation
 import CoreData
 
@@ -67,9 +60,10 @@ final class TrackerRecordsStore: NSObject, RecordsStoreProtocol {
     
     func removeTrackerRecord(_ record: TrackerRecord) {
         let request = TrackerRecordCoreData.fetchRequest()
-        let predicate = NSPredicate(format: "id == %@ && date == %@",
-                                    record.id as CVarArg,
-                                    record.date as CVarArg)
+        let predicate = NSPredicate(
+            format: "id == %@ && date == %@",
+            record.id as CVarArg,
+            record.date as CVarArg)
         request.predicate = predicate
         guard let recordCoreData = try? context.fetch(request).first
         else { return }

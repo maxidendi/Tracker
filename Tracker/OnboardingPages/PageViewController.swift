@@ -1,10 +1,3 @@
-//
-//  FirstPageViewController.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 06.11.2024.
-//
-
 import UIKit
 
 final class PageViewController: UIViewController, SetupSubviewsProtocol {
@@ -34,7 +27,7 @@ final class PageViewController: UIViewController, SetupSubviewsProtocol {
     } ()
     private lazy var button: UIButton = {
         let button = UIButton()
-        button.setTitle("Вот это технологии!", for: .normal)
+        button.setTitle(Constants.OnboardingPages.buttonTitle, for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.textAlignment = .center
         button.backgroundColor = .black

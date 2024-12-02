@@ -1,16 +1,10 @@
-//
-//  Constants.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 28.09.2024.
-//
-
 import UIKit
 
 enum Constants {
     enum General {
         static let inset16: CGFloat = 16
         static let inset12: CGFloat = 12
+        static let inset4: CGFloat = 4
         static let labelTextHeight: CGFloat = 18
         static let radius8: CGFloat = 8
         static let radius16: CGFloat = 16
@@ -29,11 +23,55 @@ enum Constants {
         static let medium10: UIFont = .systemFont(ofSize: 10, weight: .medium)
     }
     enum AlertModelConstants {
-        static let actionTitleAddCategory = "Ok"
-        static let messageAddCategory = "Категория с таким наименованием уже существует"
+        static let actionTitleOk = NSLocalizedString("alert.actionTitleOk", comment: "")
+        static let trackersAlertMessage = NSLocalizedString("alert.trackersAlertMessage", comment: "")
+        static let addCategoryAlertMessage = NSLocalizedString("alert.addCategoryAlertMessage", comment: "")
+        static let chooseCategoryAlertMessage = NSLocalizedString("alert.chooseCategoryAlertMessage", comment: "")
+        static let deleteActionTitle = NSLocalizedString("alert.deleteActionTitle", comment: "")
+        static let cancelActionTitle = NSLocalizedString("alert.cancelActionTitle", comment: "")
+        static let pinActionTitle = NSLocalizedString("alert.pinActionTitle", comment: "")
+        static let unpinActionTitle = NSLocalizedString("alert.unpinActionTitle", comment: "")
+        static let editActionTitle = NSLocalizedString("alert.editActionTitle", comment: "")
+    }
+    enum EmojiAndColors {
+        static let emojiTitle = NSLocalizedString("emojiAndColors.emojiTitle", comment: "")
+        static let colorsTitle = NSLocalizedString("emojiAndColors.colorsTitle", comment: "")
+    }
+    enum OnboardingPages {
+        static let firstPageTitle = NSLocalizedString("onboardingPages.firstPageTitle", comment: "")
+        static let secondPageTitle = NSLocalizedString("onboardingPages.secondPageTitle", comment: "")
+        static let buttonTitle = NSLocalizedString("onboardingPages.buttonTitle", comment: "")
+    }
+    enum WeekdaySchedule {
+        static let monday = NSLocalizedString("weekdaySchedule.monday", comment: "")
+        static let tuesday = NSLocalizedString("weekdaySchedule.tuesday", comment: "")
+        static let wednesday = NSLocalizedString("weekdaySchedule.wednesday", comment: "")
+        static let thursday = NSLocalizedString("weekdaySchedule.thursday", comment: "")
+        static let friday = NSLocalizedString("weekdaySchedule.friday", comment: "")
+        static let saturday = NSLocalizedString("weekdaySchedule.saturday", comment: "")
+        static let sunday = NSLocalizedString("weekdaySchedule.sunday", comment: "")
+        static let shortMonday = NSLocalizedString("weekdaySchedule.shortMonday", comment: "")
+        static let shortTuesday = NSLocalizedString("weekdaySchedule.shortTuesday", comment: "")
+        static let shortWednesday = NSLocalizedString("weekdaySchedule.shortWednesday", comment: "")
+        static let shortThursday = NSLocalizedString("weekdaySchedule.shortThursday", comment: "")
+        static let shortFriday = NSLocalizedString("weekdaySchedule.shortFriday", comment: "")
+        static let shortSaturday = NSLocalizedString("weekdaySchedule.shortSaturday", comment: "")
+        static let shortSunday = NSLocalizedString("weekdaySchedule.shortSunday", comment: "")
+    }
+    enum Filters {
+        static let allTrackers = NSLocalizedString("filters.allTrackers", comment: "")
+        static let todayTrackers = NSLocalizedString("filters.todayTrackers", comment: "")
+        static let doneTrackers = NSLocalizedString("filters.doneTrackers", comment: "")
+        static let undoneTrackers = NSLocalizedString("filters.undoneTrackers", comment: "")
     }
     enum TrackersViewControllerConstants {
-        static let title = "Трекеры"
+        static let title = NSLocalizedString("trackers.title", comment: "")
+        static let searchBarPlaceholder = NSLocalizedString("trackers.searchBarPlaceholder", comment: "")
+        static let searchBarCancelButtonTitle = NSLocalizedString("trackers.searchBarCancelButtonTitle", comment: "")
+        static let labelStubNotFilteredText = NSLocalizedString("trackers.labelStubNotFilteredText", comment: "")
+        static let labelStubFilteredText = NSLocalizedString("trackers.labelStubFilteredText", comment: "")
+        static let pinnedCategoryTitle = NSLocalizedString("trackers.pinnedCategoryTitle", comment: "")
+        static let filterButtonTitle = NSLocalizedString("trackers.filterButtonTitle", comment: "")
         static let geometricParams = GeometricParams(
             cellCount: 2,
             topInset: 8,
@@ -41,26 +79,52 @@ enum Constants {
             rightInset: 16,
             bottomInset: 16,
             cellSpacing: 9)
-        static let searchBarPlaceholder = "Поиск"
-        static let searchBarCancelButtonTitle = "Отменить"
-        static let labelStubText = "Что будем отслеживать?"
         static let datePickerWidth: CGFloat = 100
         static let collectionViewCellHeight: CGFloat = 148
+        static let filterButtonHeight: CGFloat = 50
+        static let filterButtonWidth: CGFloat = 114
     }
     enum StatisticViewControllerConstants {
-        static let title = "Статистика"
-        static let labelStubText = "Анализировать пока нечего?"
+        static let title = NSLocalizedString("statistic.title", comment: "")
+        static let labelStubText = NSLocalizedString("statistic.labelStubText", comment: "")
+        static let bestPeriodText = NSLocalizedString("statistic.bestPeriodText", comment: "")
+        static let perfectDaysText = NSLocalizedString("statistic.perfectDaysText", comment: "")
+        static let trackersDoneText = NSLocalizedString("statistic.trackersDoneText", comment: "")
+        static let averageValueText = NSLocalizedString("statistic.averageValueText", comment: "")
+        static let countLabelHeight: CGFloat = 41
+        static let titleLabelHeight: CGFloat = 18
+        static let subViewHeight: CGFloat = 90
+        static let subViewsSpacing: CGFloat = 12
+        static let viewInsets: UIEdgeInsets = .init(top: 12, left: 12, bottom: 12, right: 12)
+        static let stackViewSpacing: CGFloat = 7
         static let stubsSpacing: CGFloat = 8
+    }
+    enum FiltersViewControllerConstants {
+        static let title = NSLocalizedString("filters.title", comment: "")
+        static let titleHeigth: CGFloat = 50
+        static let titleTopInset: CGFloat = 14
+        static let verticalSpacing: CGFloat = 24
     }
     enum TrackerCellConstants {
         static let topViewHeight: CGFloat = 90
         static let bottomViewHeight: CGFloat = 58
-        static let emojiLabelDiameter: CGFloat = 24
+        static let emojiAndPinSides: CGFloat = 24
         static let counterButtonDiameter: CGFloat = 34
         static let counterButtonTopInset: CGFloat = 8
         static let insets: UIEdgeInsets = .init(top: 12, left: 12, bottom: 12, right: 12)
     }
     enum NewTrackerViewControllerConstants {
+        static let newHabitTitle = NSLocalizedString("newTracker.newHabitTitle", comment: "")
+        static let newEventTitle = NSLocalizedString("newTracker.newEventTitle", comment: "")
+        static let createHabitTitle = NSLocalizedString("newTracker.createHabitTitle", comment: "")
+        static let createEventTitle = NSLocalizedString("newTracker.createEventTitle", comment: "")
+        static let warningText = NSLocalizedString("newTracker.warningText", comment: "")
+        static let placeholderText = NSLocalizedString("newTracker.placeholderText", comment: "")
+        static let cancelButtonTitle = NSLocalizedString("newTracker.cancelButtonTitle", comment: "")
+        static let createButtonTitle = NSLocalizedString("newTracker.createButtonTitle", comment: "")
+        static let categoryTitle = NSLocalizedString("newTracker.categoryTitle", comment: "")
+        static let scheduleTitle = NSLocalizedString("newTracker.scheduleTitle", comment: "")
+        static let scheduleEverydayTitle = NSLocalizedString("newTracker.scheduleEverydayTitle", comment: "")
         static let geometricParams = GeometricParams(
             cellCount: 6,
             topInset: 24,
@@ -68,15 +132,6 @@ enum Constants {
             rightInset: 0,
             bottomInset: 40,
             cellSpacing: 0)
-        static let newHabitTitle = "Новая привычка"
-        static let newEventTitle = "Новое нерегулярное событие"
-        static let warningText = "Ограничение 38 символов"
-        static let placeholderText = "Введите название трекера"
-        static let cancelButtonTitle = "Отменить"
-        static let createButtonTitle = "Создать"
-        static let categoryTitle = "Категория"
-        static let scheduleTitle = "Расписание"
-        static let scheduleEverydayTitle = "Каждый день"
         static let textFieldCharacterLimit: Int = 38
         static let warningLabelHeight: CGFloat = 38
         static let buttonsSpacing: CGFloat = 8
@@ -89,9 +144,9 @@ enum Constants {
         static let colorCellBorderWidth: CGFloat = 3
     }
     enum HabitOrEventViewControllerConstants {
-        static let habitButtonTitle = "Привычка"
-        static let eventButtonTitle = "Нерегулярное событие"
-        static let title = "Создание трекера"
+        static let habitButtonTitle = NSLocalizedString("habitOrEvent.habitButtonTitle", comment: "")
+        static let eventButtonTitle = NSLocalizedString("habitOrEvent.eventButtonTitle", comment: "")
+        static let title = NSLocalizedString("habitOrEvent.title", comment: "")
         static let titleHeigth: CGFloat = 50
         static let titleTopInset: CGFloat = 14
         static let buttonHeight: CGFloat = 60
@@ -100,9 +155,9 @@ enum Constants {
         static let stackViewYInset: CGFloat = 32
     }
     enum CategoryViewControllerConstants {
-        static let title = "Категория"
-        static let labelStubText = "Привычки и события можно \nобъединить по смыслу"
-        static let addCategoryButtonTitle = "Добавить категорию"
+        static let title = NSLocalizedString("category.title", comment: "")
+        static let labelStubText = NSLocalizedString("category.labelStubText", comment: "")
+        static let addCategoryButtonTitle = NSLocalizedString("category.addCategoryButtonTitle", comment: "")
         static let titleHeigth: CGFloat = 50
         static let titleTopInset: CGFloat = 14
         static let buttonHeight: CGFloat = 60
@@ -110,9 +165,10 @@ enum Constants {
         static let verticalSpacing: CGFloat = 24
     }
     enum AddCategoryViewControllerConstants {
-        static let title = "Новая категория"
-        static let textFieldPlaceholderText = "Введите название категории"
-        static let doneButtonTitle = "Готово"
+        static let addTitle = NSLocalizedString("addCategory.addTitle", comment: "")
+        static let editTitle = NSLocalizedString("addCategory.editTitle", comment: "")
+        static let textFieldPlaceholderText = NSLocalizedString("addCategory.textFieldPlaceholderText", comment: "")
+        static let doneButtonTitle = NSLocalizedString("addCategory.doneButtonTitle", comment: "")
         static let titleHeigth: CGFloat = 50
         static let titleTopInset: CGFloat = 14
         static let buttonHeight: CGFloat = 60
@@ -120,8 +176,8 @@ enum Constants {
         static let verticalSpacing: CGFloat = 24
     }
     enum ScheduleViewControllerConstants {
-        static let title = "Расписание"
-        static let doneButtonTitle = "Готово"
+        static let title = NSLocalizedString("schedule.title", comment: "")
+        static let doneButtonTitle = NSLocalizedString("schedule.doneButtonTitle", comment: "")
         static let titleHeigth: CGFloat = 50
         static let titleTopInset: CGFloat = 14
         static let buttonHeight: CGFloat = 60

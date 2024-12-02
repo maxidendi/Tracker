@@ -1,0 +1,103 @@
+/* 
+  Localizable.strings
+  Tracker
+
+  Created by Денис Максимов on 16.11.2024.
+  
+*/
+
+//AlertModelConstants
+"alert.actionTitleOk" = "Ok";
+"alert.trackersAlertMessage" = "Уверены что хотите удалить трекер?";
+"alert.addCategoryAlertMessage" = "Категория с таким наименованием уже существует";
+"alert.chooseCategoryAlertMessage" = "Эта категория точно не нужна?";
+"alert.deleteActionTitle" = "Удалить";
+"alert.cancelActionTitle" = "Отменить";
+"alert.pinActionTitle" = "Закрепить";
+"alert.unpinActionTitle" = "Открепить";
+"alert.editActionTitle" = "Редактировать";
+
+//EmojiAndColors
+"emojiAndColors.emojiTitle" = "Emoji";
+"emojiAndColors.colorsTitle" = "Цвет";
+
+//OnboardingPages
+"onboardingPages.firstPageTitle" = "Отслеживайте только то, что хотите";
+"onboardingPages.secondPageTitle" = "Даже если это не литры воды и йога";
+"onboardingPages.buttonTitle" = "Вот это технологии!";
+
+//WeekdaySchedule
+"weekdaySchedule.monday" = "Понедельник";
+"weekdaySchedule.tuesday" = "Вторник";
+"weekdaySchedule.wednesday" = "Среда";
+"weekdaySchedule.thursday" = "Четверг";
+"weekdaySchedule.friday" = "Пятница";
+"weekdaySchedule.saturday" = "Суббота";
+"weekdaySchedule.sunday" = "Воскресенье";
+"weekdaySchedule.shortMonday" = "Пн";
+"weekdaySchedule.shortTuesday" = "Вт";
+"weekdaySchedule.shortWednesday" = "Ср";
+"weekdaySchedule.shortThursday" = "Чт";
+"weekdaySchedule.shortFriday" = "Пт";
+"weekdaySchedule.shortSaturday" = "Сб";
+"weekdaySchedule.shortSunday" = "Вс";
+
+//Filters
+"filters.allTrackers" = "Все трекеры";
+"filters.todayTrackers" = "Трекеры на сегодня";
+"filters.doneTrackers" = "Завершенные";
+"filters.undoneTrackers" = "Не завершенные";
+
+//TrackersViewControllerConstants
+"trackers.title" = "Трекеры";
+"trackers.searchBarPlaceholder" = "Поиск";
+"trackers.searchBarCancelButtonTitle" = "Отменить";
+"trackers.labelStubNotFilteredText" = "Что будем отслеживать?";
+"trackers.labelStubFilteredText" = "Ничего не найдено";
+"trackers.filterButtonTitle" = "Фильтры";
+"trackers.pinnedCategoryTitle" = "Закрепленные";
+
+//StatisticViewControllerConstants
+"statistic.title" = "Статистика";
+"statistic.labelStubText" = "Анализировать пока нечего";
+"statistic.bestPeriodText" = "Лучший период";
+"statistic.perfectDaysText" = "Идеальные дни";
+"statistic.trackersDoneText" = "Трекеров завершено";
+"statistic.averageValueText" = "Среднее значение";
+
+//FiltersViewController
+"filters.title" = "Фильтры";
+
+//NewTrackerViewControllerConstants
+"newTracker.newHabitTitle" = "Новая привычка";
+"newTracker.newEventTitle" = "Новое нерегулярное событие";
+"newTracker.createHabitTitle" = "Создание привычки";
+"newTracker.createEventTitle" = "Создание нерегулярного события";
+"newTracker.warningText" = "Ограничение 38 символов";
+"newTracker.placeholderText" = "Введите название трекера";
+"newTracker.cancelButtonTitle" = "Отменить";
+"newTracker.createButtonTitle" = "Создать";
+"newTracker.categoryTitle" = "Категория";
+"newTracker.scheduleTitle" = "Расписание";
+"newTracker.scheduleEverydayTitle" = "Каждый день";
+
+//HabitOrEventViewControllerConstants
+"habitOrEvent.habitButtonTitle" = "Привычка";
+"habitOrEvent.eventButtonTitle" = "Нерегулярное событие";
+"habitOrEvent.title" = "Создание трекера";
+
+//CategoryViewControllerConstants
+"category.title" = "Категория";
+"category.labelStubText" = "Привычки и события можно \nобъединить по смыслу";
+"category.addCategoryButtonTitle" = "Добавить категорию";
+
+//AddCategoryViewControllerConstants
+"addCategory.addTitle" = "Новая категория";
+"addCategory.editTitle" = "Редактирование категории";
+"addCategory.textFieldPlaceholderText" = "Введите название категории";
+"addCategory.doneButtonTitle" = "Готово";
+
+//ScheduleViewControllerConstants
+"schedule.title" = "Расписание";
+"schedule.doneButtonTitle" = "Готово";
+

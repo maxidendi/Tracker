@@ -1,16 +1,11 @@
-//
-//  AppDelegate.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 27.09.2024.
-//
-
 import UIKit
+import AppMetricaCore
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        AnalyticsService.shared.activate()
         return true
     }
 

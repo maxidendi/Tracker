@@ -1,10 +1,3 @@
-//
-//  SupplementaryView.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 02.10.2024.
-//
-
 import UIKit
 
 final class TrackersSupplementaryView: UICollectionReusableView {
@@ -36,7 +29,7 @@ final class TrackersSupplementaryView: UICollectionReusableView {
         let label = UILabel()
         label.font = Constants.Typography.bold19
         label.textColor = .ypBlack
-        label.numberOfLines = 2
+        label.numberOfLines = 0
         return label
     } ()
     

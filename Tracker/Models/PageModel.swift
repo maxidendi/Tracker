@@ -1,10 +1,3 @@
-//
-//  PageModel.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 15.11.2024.
-//
-
 import UIKit
 
 enum PageModel {
@@ -19,8 +12,8 @@ enum PageModel {
     }
     var text: String {
         switch self {
-        case .firstPage: return "Отслеживайте только то, что хотите"
-        case .secondPage: return "Даже если это не литры воды и йога"
+        case .firstPage: return Constants.OnboardingPages.firstPageTitle
+        case .secondPage: return Constants.OnboardingPages.secondPageTitle
         }
     }
 }

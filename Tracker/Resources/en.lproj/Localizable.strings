@@ -1,0 +1,102 @@
+/* 
+  Localizable.strings
+  Tracker
+
+  Created by Денис Максимов on 16.11.2024.
+  
+*/
+
+//AlertModelConstants
+"alert.actionTitleOk" = "Ok";
+"alert.trackersAlertMessage" = "Are you sure you want to delete the tracker?";
+"alert.addCategoryAlertMessage" = "A category with this name already exists";
+"alert.chooseCategoryAlertMessage" = "Are you sure you don't need this category?";
+"alert.deleteActionTitle" = "Delete";
+"alert.cancelActionTitle" = "Cancel";
+"alert.pinActionTitle" = "Pin";
+"alert.unpinActionTitle" = "Unpin";
+"alert.editActionTitle" = "Edit";
+
+//EmojiAndColors
+"emojiAndColors.emojiTitle" = "Emoji";
+"emojiAndColors.colorsTitle" = "Color";
+
+//OnboardingPages
+"onboardingPages.firstPageTitle" = "Track only what you want";
+"onboardingPages.secondPageTitle" = "Даже если это не литры воды и йога";
+"onboardingPages.buttonTitle" = "Wow, what the technology!";
+
+//WeekdaySchedule
+"weekdaySchedule.monday" = "Monday";
+"weekdaySchedule.tuesday" = "Tuesday";
+"weekdaySchedule.wednesday" = "Wednesday";
+"weekdaySchedule.thursday" = "Thursday";
+"weekdaySchedule.friday" = "Friday";
+"weekdaySchedule.saturday" = "Saturday";
+"weekdaySchedule.sunday" = "Sunday";
+"weekdaySchedule.shortMonday" = "Mon";
+"weekdaySchedule.shortTuesday" = "Tue";
+"weekdaySchedule.shortWednesday" = "Wed";
+"weekdaySchedule.shortThursday" = "Thu";
+"weekdaySchedule.shortFriday" = "Fri";
+"weekdaySchedule.shortSaturday" = "Sat";
+"weekdaySchedule.shortSunday" = "Sun";
+
+//Filters
+"filters.allTrackers" = "All trackers";
+"filters.todayTrackers" = "Trackers for today";
+"filters.doneTrackers" = "Done trackers";
+"filters.undoneTrackers" = "Undone trackers";
+
+//TrackersViewControllerConstants
+"trackers.title" = "Trackers";
+"trackers.searchBarPlaceholder" = "Search";
+"trackers.searchBarCancelButtonTitle" = "Cancel";
+"trackers.labelStubNotFilteredText" = "What are we going to track?";
+"trackers.labelStubFilteredText" = "Nothing was found";
+"trackers.filterButtonTitle" = "Filters";
+"trackers.pinnedCategoryTitle" = "Pinned";
+
+//StatisticViewControllerConstants
+"statistic.title" = "Statistics";
+"statistic.labelStubText" = "There is nothing to analyze yet";
+"statistic.bestPeriodText" = "The best period";
+"statistic.perfectDaysText" = "Perfect days";
+"statistic.trackersDoneText" = "Trackers completed";
+"statistic.averageValueText" = "The average value";
+
+//FiltersViewController
+"filters.title" = "Filters";
+
+//NewTrackerViewControllerConstants
+"newTracker.newHabitTitle" = "New habit";
+"newTracker.newEventTitle" = "New event";
+"newTracker.createHabitTitle" = "Creating a habit";
+"newTracker.createEventTitle" = "Creating a event";
+"newTracker.warningText" = "The limit is 38 characters";
+"newTracker.placeholderText" = "Enter the name of the tracker";
+"newTracker.cancelButtonTitle" = "Cancel";
+"newTracker.createButtonTitle" = "Create";
+"newTracker.categoryTitle" = "Category";
+"newTracker.scheduleTitle" = "Schedule";
+"newTracker.scheduleEverydayTitle" = "Every day";
+
+//HabitOrEventViewControllerConstants
+"habitOrEvent.habitButtonTitle" = "Habit";
+"habitOrEvent.eventButtonTitle" = "Event";
+"habitOrEvent.title" = "Tracker creation";
+
+//CategoryViewControllerConstants
+"category.title" = "Category";
+"category.labelStubText" = "Habits and events can be \ncombined in meaning";
+"category.addCategoryButtonTitle" = "Add category";
+
+//AddCategoryViewControllerConstants
+"addCategory.addTitle" = "New category";
+"addCategory.editTitle" = "Editing a category";
+"addCategory.textFieldPlaceholderText" = "Enter the name of the category";
+"addCategory.doneButtonTitle" = "Done";
+
+//ScheduleViewControllerConstants
+"schedule.title" = "Schedule";
+"schedule.doneButtonTitle" = "Done";

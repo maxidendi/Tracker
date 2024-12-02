@@ -1,10 +1,3 @@
-//
-//  TrackerCell.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 01.10.2024.
-//
-
 import UIKit
 
 final class TrackerCell: UICollectionViewCell {
@@ -28,9 +21,13 @@ final class TrackerCell: UICollectionViewCell {
     weak var delegate: TrackerCellDelegate?
     private var id: UUID? = nil
     private var isCompleted: Bool = false
-    private var counter: Int = .zero
-    private var counterTitle: String {
-        counter.toString()
+    private var counter: Int = .zero {
+        didSet {
+            counterLabel.text = String.localizedStringWithFormat(
+                NSLocalizedString("numberOfDays", comment: ""),
+                counter
+            )
+        }
     }
     
     private lazy var counterButton: UIButton = {
@@ -45,7 +42,6 @@ final class TrackerCell: UICollectionViewCell {
     private lazy var counterLabel: UILabel = {
         let label = UILabel()
         label.font = Constants.Typography.medium12
-        label.text = counterTitle
         label.textColor = .ypBlack
         return label
     } ()
@@ -54,7 +50,7 @@ final class TrackerCell: UICollectionViewCell {
         let label = UILabel()
         label.font = .systemFont(ofSize: 13)
         label.textAlignment = .center
-        label.layer.cornerRadius = constants.emojiLabelDiameter / 2
+        label.layer.cornerRadius = constants.emojiAndPinSides / 2
         label.layer.masksToBounds = true
         label.backgroundColor = .ypWhite.withAlphaComponent(0.3)
         return label
@@ -66,6 +62,13 @@ final class TrackerCell: UICollectionViewCell {
         label.numberOfLines = 2
         label.textColor = .ypWhite
         return label
+    } ()
+    
+    private lazy var pinImageView: UIImageView = {
+        let imageView = UIImageView(image: .pin)
+        imageView.tintColor = .white
+        imageView.isHidden = true
+        return imageView
     } ()
     
     private lazy var topView: UIView = {
@@ -87,20 +90,31 @@ final class TrackerCell: UICollectionViewCell {
         self.id = model.tracker.id
         self.isCompleted = model.isCompleted
         self.counter = model.count
-        counterLabel.text = counterTitle
+        pinImageView.isHidden = !model.tracker.isPinned
         trackerTitleLabel.text = model.tracker.title
         emojiLabel.text = model.tracker.emoji
         topView.backgroundColor = UIColor.fromCodedString(model.tracker.color) 
         switchCounterButtonImage(isCompleted)
     }
     
+    func toggleCellPin() {
+        pinImageView.isHidden.toggle()
+    }
+    
     func topViewForPreview() -> UIView {
         return topView
+    }
+    
+    func isPinned() -> Bool {
+        return !pinImageView.isHidden
     }
     
     //MARK: - Private methods
         
     @objc private func counterButtonTapped() {
+        AnalyticsService.shared.trackEvent(
+            event: .click,
+            parameters: TrackersScreenParameters.clickCellCounterButton)
         guard let id else { return }
         delegate?.counterButtonTapped(with: id, isCompleted: !isCompleted)
     }
@@ -129,6 +143,7 @@ extension TrackerCell: SetupSubviewsProtocol {
          counterLabel,
          counterButton,
          emojiLabel,
+         pinImageView,
          trackerTitleLabel].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
@@ -136,6 +151,7 @@ extension TrackerCell: SetupSubviewsProtocol {
         contentView.addSubview(bottomView)
         topView.addSubview(emojiLabel)
         topView.addSubview(trackerTitleLabel)
+        topView.addSubview(pinImageView)
         bottomView.addSubview(counterLabel)
         bottomView.addSubview(counterButton)
     }
@@ -148,12 +164,16 @@ extension TrackerCell: SetupSubviewsProtocol {
             bottomView.topAnchor.constraint(equalTo: topView.bottomAnchor),
             bottomView.widthAnchor.constraint(equalTo: contentView.widthAnchor),
             bottomView.heightAnchor.constraint(equalToConstant: constants.bottomViewHeight),
-            emojiLabel.heightAnchor.constraint(equalToConstant: constants.emojiLabelDiameter),
-            emojiLabel.widthAnchor.constraint(equalToConstant: constants.emojiLabelDiameter),
+            emojiLabel.heightAnchor.constraint(equalToConstant: constants.emojiAndPinSides),
+            emojiLabel.widthAnchor.constraint(equalToConstant: constants.emojiAndPinSides),
             emojiLabel.topAnchor.constraint(equalTo: topView.topAnchor,
                                             constant: constants.insets.top),
             emojiLabel.leadingAnchor.constraint(equalTo: topView.leadingAnchor,
                                                 constant: constants.insets.left),
+            pinImageView.topAnchor.constraint(equalTo: topView.topAnchor, constant: constants.insets.top),
+            pinImageView.trailingAnchor.constraint(equalTo: topView.trailingAnchor, constant: -Constants.General.inset4),
+            pinImageView.widthAnchor.constraint(equalToConstant: constants.emojiAndPinSides),
+            pinImageView.heightAnchor.constraint(equalToConstant: constants.emojiAndPinSides),
             trackerTitleLabel.leadingAnchor.constraint(equalTo: topView.leadingAnchor,
                                                        constant: constants.insets.left),
             trackerTitleLabel.trailingAnchor.constraint(equalTo: topView.trailingAnchor,

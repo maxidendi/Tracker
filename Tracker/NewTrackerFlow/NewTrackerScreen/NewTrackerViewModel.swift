@@ -1,55 +1,38 @@
-//
-//  NewTrackerViewModel.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 10.11.2024.
-//
-
 import Foundation
-
-protocol NewTrackerViewModelProtocol: AnyObject {
-    var onChangeCreateButtonState: ((Bool) -> Void)? { get set }
-    var onChangeSelectedEmojiCell: ((_ from: IndexPath?, _ to: IndexPath) -> Void)? { get set }
-    var onChangeSelectedColorCell: ((_ from: IndexPath?, _ to: IndexPath) -> Void)? { get set }
-    var onSelectSchedule: ((Set<WeekDay>) -> Void)? { get set }
-    var onSelectCategory: ((String?, _ isSelected: Bool) -> Void)? { get set }
-    var isHabit: Bool { get }
-    func createTracker()
-    func cancelButtonTapped()
-    func getEmojiCategory() -> (emoji: [String], title: String)
-    func getColorCategory() -> (colors: [String], title: String)
-    func selectEmoji(at indexPath: IndexPath)
-    func selectColor(at indexPath: IndexPath)
-    func setNewTrackerTitle(_ title: String?)
-    func setupCategoryViewModel() -> CategoriesViewModel
-    func setupScheduleViewModel() -> ScheduleViewModel
-}
 
 final class NewTrackerViewModel: NewTrackerViewModelProtocol {
     
     //MARK: - Init
     
-    init(dataProvider: DataProviderProtocol, isHabit: Bool) {
+    init(dataProvider: DataProviderProtocol,
+         viewType: NewTrackerViewType,
+         isHabit: Bool
+    ) {
         self.dataProvider = dataProvider
+        self.viewType = viewType
         self.isHabit = isHabit
+        setupForEditViewType()
     }
 
     //MARK: - Properties
     
     weak var delegate: NewTrackerViewModelDelegate?
+    var onChangeTitle: ((String) -> Void)?
     var onChangeCreateButtonState: ((Bool) -> Void)?
     var onChangeSelectedEmojiCell: ((_ from: IndexPath?, _ to: IndexPath) -> Void)?
     var onChangeSelectedColorCell: ((_ from: IndexPath?, _ to: IndexPath) -> Void)?
     var onSelectCategory: ((String?, _ isSelected: Bool) -> Void)?
-    var onSelectSchedule: ((Set<WeekDay>) -> Void)?
+    var onSelectSchedule: (([WeekDay], _ isSelected: Bool) -> Void)?
     let isHabit: Bool
+    let viewType: NewTrackerViewType
+    private(set) var defaultCellModel: TrackerCellModel?
     private var dataProvider: DataProviderProtocol
     private var newTracker: Tracker?
     private var newTrackerCategory: String?
     private var newTrackerTitle: String?
     private var newTrackerColor: String?
     private var newTrackerEmoji: String?
-    private var newTrackerSchedule: Set<WeekDay> = []
+    private var newTrackerSchedule: [WeekDay] = []
     private var selectedEmojiIndexPath: IndexPath?
     private var selectedColorIndexPath: IndexPath?
     private let emojiCategory: EmojiGategory = EmojiAndColors.emojiCategory
@@ -67,27 +50,49 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
             onChangeCreateButtonState?(false)
             return
         }
-        if isHabit && !newTrackerSchedule.isEmpty {
-            newTracker = Tracker(id: UUID(),
-                                 title: title,
-                                 color: color,
-                                 emoji: emoji,
-                                 schedule: Array(newTrackerSchedule))
-            onChangeCreateButtonState?(true)
-        } else if !isHabit {
-            newTracker = Tracker(id: UUID(),
-                                 title: title,
-                                 color: color,
-                                 emoji: emoji,
-                                 schedule: [])
-            onChangeCreateButtonState?(true)
+        let schedule = isHabit && !newTrackerSchedule.isEmpty ? newTrackerSchedule : []
+        newTracker = Tracker(
+            id: UUID(),
+            title: title,
+            color: color,
+            emoji: emoji,
+            isPinned: false,
+            schedule: schedule)
+        onChangeCreateButtonState?(true)
+    }
+
+    private func setupForEditViewType() {
+        switch viewType {
+        case .add:
+            return
+        case .edit(let trackerCellModel, _):
+            defaultCellModel = trackerCellModel
+            newTracker = trackerCellModel.tracker
+            newTrackerCategory = trackerCellModel.category
+            newTrackerTitle = trackerCellModel.tracker.title
+            newTrackerColor = trackerCellModel.tracker.color
+            newTrackerEmoji = trackerCellModel.tracker.emoji
+            newTrackerSchedule = trackerCellModel.tracker.schedule
+            guard let colorIndex = colorsCategory.colors.firstIndex(of: trackerCellModel.tracker.color),
+                  let emojiIndex = emojiCategory.emoji.firstIndex(of: trackerCellModel.tracker.emoji)
+            else { return }
+            selectedColorIndexPath = IndexPath(row: colorIndex, section: 1)
+            selectedEmojiIndexPath = IndexPath(row: emojiIndex, section: 0)
         }
     }
 
     func createTracker() {
         guard let newTracker, let newTrackerCategory else { return }
-        dataProvider.addTracker(newTracker, to: newTrackerCategory)
-        delegate?.dismissNewTrackerFlow()
+        switch viewType {
+        case .add:
+            dataProvider.addTracker(newTracker, to: newTrackerCategory)
+            delegate?.dismissNewTrackerFlow()
+        case .edit(let trackerCelModel, _):
+            dataProvider.updateTracker(
+                trackerCelModel.tracker,
+                asNewTracker: newTracker,
+                for: newTrackerCategory)
+        }
     }
     
     func cancelButtonTapped() {
@@ -102,6 +107,12 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
         (colors: colorsCategory.colors, title: colorsCategory.title)
     }
     
+    func setNewTrackerTitle(_ title: String?) {
+        newTrackerTitle = title
+        defaultCellModel = nil
+        isReadyToCreateTracker()
+    }
+    
     func selectEmoji(at indexPath: IndexPath) {
         if let selectedEmojiIndexPath {
             self.selectedEmojiIndexPath = indexPath
@@ -111,6 +122,7 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
             onChangeSelectedEmojiCell?(nil, indexPath)
         }
         newTrackerEmoji = emojiCategory.emoji[indexPath.row]
+        defaultCellModel = nil
         isReadyToCreateTracker()
     }
     
@@ -123,11 +135,7 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
             onChangeSelectedColorCell?(nil, indexPath)
         }
         newTrackerColor = colorsCategory.colors[indexPath.row]
-        isReadyToCreateTracker()
-    }
-    
-    func setNewTrackerTitle(_ title: String?) {
-        newTrackerTitle = title
+        defaultCellModel = nil
         isReadyToCreateTracker()
     }
     
@@ -139,18 +147,19 @@ final class NewTrackerViewModel: NewTrackerViewModelProtocol {
     }
     
     func setupScheduleViewModel() -> ScheduleViewModel {
-        let scheduleViewModel = ScheduleViewModel(schedule: newTrackerSchedule)
+        let scheduleViewModel = ScheduleViewModel(schedule: Set(newTrackerSchedule))
         scheduleViewModel.delegate = self
         return scheduleViewModel
     }
 }
 
 
-//Extension
+//MARK: - Extensions
 
 extension NewTrackerViewModel: CategoryViewModelDelegate {
     func didSelectCategory(_ category: String?, isSelected: Bool) {
         newTrackerCategory = category
+        defaultCellModel = nil
         isReadyToCreateTracker()
         onSelectCategory?(newTrackerCategory, isSelected)
     }
@@ -158,8 +167,9 @@ extension NewTrackerViewModel: CategoryViewModelDelegate {
 
 extension NewTrackerViewModel: ScheduleViewModelDelegate {
     func didRecieveSchedule(_ schedule: Set<WeekDay>) {
-        newTrackerSchedule = schedule
+        newTrackerSchedule = Array(schedule).sorted(by: { $0.toIntRussian < $1.toIntRussian } )
+        defaultCellModel = nil
         isReadyToCreateTracker()
-        onSelectSchedule?(newTrackerSchedule)
+        onSelectSchedule?(newTrackerSchedule, true)
     }
 }

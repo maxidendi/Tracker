@@ -1,0 +1,102 @@
+/* 
+  Localizable.strings
+  Tracker
+
+  Created by Денис Максимов on 16.11.2024.
+  
+*/
+
+//AlertModelConstants
+"alert.actionTitleOk" = "Ok";
+"alert.trackersAlertMessage" = "¿Estás seguro de que quieres eliminar el rastreador?";
+"alert.addCategoryAlertMessage" = "La categoría con esta denominación ya existe";
+"alert.chooseCategoryAlertMessage" = "¿Esta categoría no es necesaria?";
+"alert.deleteActionTitle" = "Eliminar";
+"alert.cancelActionTitle" = "Cancelar";
+"alert.pinActionTitle" = "Atar";
+"alert.unpinActionTitle" = "Desatar";
+"alert.editActionTitle" = "Corregir";
+
+//EmojiAndColors
+"emojiAndColors.emojiTitle" = "Emoji";
+"emojiAndColors.colorsTitle" = "Color";
+
+//OnboardingPages
+"onboardingPages.firstPageTitle" = "Rastrea solo lo que quieres";
+"onboardingPages.secondPageTitle" = "Incluso si no son litros de agua y yoga";
+"onboardingPages.buttonTitle" = "¡Qué tecnología!";
+
+//WeekdaySchedule
+"weekdaySchedule.monday" = "Lunes";
+"weekdaySchedule.tuesday" = "Martes";
+"weekdaySchedule.wednesday" = "Entorno";
+"weekdaySchedule.thursday" = "Jueves";
+"weekdaySchedule.friday" = "Viernes";
+"weekdaySchedule.saturday" = "Sábado";
+"weekdaySchedule.sunday" = "Domingo";
+"weekdaySchedule.shortMonday" = "Lun";
+"weekdaySchedule.shortTuesday" = "Mar";
+"weekdaySchedule.shortWednesday" = "Mié";
+"weekdaySchedule.shortThursday" = "Jue";
+"weekdaySchedule.shortFriday" = "Vie";
+"weekdaySchedule.shortSaturday" = "Sáb";
+"weekdaySchedule.shortSunday" = "Dom";
+
+//Filters
+"filters.allTrackers" = "Todos los rastreadores";
+"filters.todayTrackers" = "Rastreadores para hoy";
+"filters.doneTrackers" = "Completo";
+"filters.undoneTrackers" = "Pendientes";
+
+//TrackersViewControllerConstants
+"trackers.title" = "Rastreadores";
+"trackers.searchBarPlaceholder" = "Búsqueda";
+"trackers.searchBarCancelButtonTitle" = "Cancelar";
+"trackers.labelStubNotFilteredText" = "¿Qué vamos a seguir?";
+"trackers.labelStubFilteredText" = "No se encontró nada";
+"trackers.filterButtonTitle" = "Filtros";
+"trackers.pinnedCategoryTitle" = "Consagrado";
+
+//StatisticViewControllerConstants
+"statistic.title" = "Estadísticas";
+"statistic.labelStubText" = "Todavía no hay nada que analizar";
+"statistic.bestPeriodText" = "Mejor periodo";
+"statistic.perfectDaysText" = "Días perfectos";
+"statistic.trackersDoneText" = "Rastreadores completados";
+"statistic.averageValueText" = "Valor medio";
+
+//FiltersViewController
+"filters.title" = "Filtros";
+
+//NewTrackerViewControllerConstants
+"newTracker.newHabitTitle" = "Un nuevo hábito";
+"newTracker.newEventTitle" = "Nuevo evento";
+"newTracker.createHabitTitle" = "Сreando un hábito";
+"newTracker.createEventTitle" = "Сrear un evento irregular";
+"newTracker.warningText" = "Límite de 38 caracteres";
+"newTracker.placeholderText" = "Introduzca el nombre del rastreador";
+"newTracker.cancelButtonTitle" = "Cancelar";
+"newTracker.createButtonTitle" = "Crear";
+"newTracker.categoryTitle" = "Categoría";
+"newTracker.scheduleTitle" = "Horario";
+"newTracker.scheduleEverydayTitle" = "Cada día";
+
+//HabitOrEventViewControllerConstants
+"habitOrEvent.habitButtonTitle" = "Hábito";
+"habitOrEvent.eventButtonTitle" = "Evento";
+"habitOrEvent.title" = "Crear un rastreador";
+
+//CategoryViewControllerConstants
+"category.title" = "Categoría";
+"category.labelStubText" = "Los hábitos y eventos se pueden combinar de \nacuerdo con el significado";
+"category.addCategoryButtonTitle" = "Añadir categoría";
+
+//AddCategoryViewControllerConstants
+"addCategory.addTitle" = "Nueva categoría";
+"addCategory.editTitle" = "Editar categoría";
+"addCategory.textFieldPlaceholderText" = "Introduzca el nombre de la categoría";
+"addCategory.doneButtonTitle" = "Listo";
+
+//ScheduleViewControllerConstants
+"schedule.title" = "Horario";
+"schedule.doneButtonTitle" = "Listo";

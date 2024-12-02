@@ -1,10 +1,3 @@
-//
-//  UserDefaultsService.swift
-//  Tracker
-//
-//  Created by Денис Максимов on 15.11.2024.
-//
-
 import Foundation
 
 final class UserDefaultsService {
@@ -16,6 +9,7 @@ final class UserDefaultsService {
     //MARK: - Properties
     private enum Keys: String {
         case isFirstLaunch
+        case pinnedCategory
     }
     
     //MARK: - Methods
@@ -26,5 +20,13 @@ final class UserDefaultsService {
             return true
         }
         return false
+    }
+    
+    func isPinnedCategoryExists() -> Bool {
+        guard UserDefaults.standard.bool(forKey: Keys.pinnedCategory.rawValue) else {
+            UserDefaults.standard.set(true, forKey: Keys.pinnedCategory.rawValue)
+            return false
+        }
+        return true
     }
 }
