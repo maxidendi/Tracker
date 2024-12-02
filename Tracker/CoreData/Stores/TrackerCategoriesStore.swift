@@ -9,6 +9,7 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
         self.context = context
         super.init()
         setupPinnedCategory()
+        configureFetchedResultsController()
     }
     
     //MARK: - Properties
@@ -19,29 +20,7 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
     private var deletedIndexes: Set<IndexPath> = []
     private var updatedIndexes: Set<IndexPath> = []
     private var movedIndexes: [(from: IndexPath, to: IndexPath)] = []
-    lazy var trackerCategoryCoreDataFRC: NSFetchedResultsController<TrackerCategoryCoreData> = {
-        let fetchedRequest = TrackerCategoryCoreData.fetchRequest()
-        fetchedRequest.sortDescriptors = [NSSortDescriptor(
-            keyPath: \TrackerCategoryCoreData.title,
-            ascending: true)]
-        fetchedRequest.predicate = NSPredicate(
-            format: "title != %@",
-            Constants.TrackersViewControllerConstants.pinnedCategoryTitle)
-        let fetchedResultsController = NSFetchedResultsController(
-            fetchRequest: fetchedRequest,
-            managedObjectContext: context,
-            sectionNameKeyPath: nil,
-            cacheName: nil)
-        fetchedResultsController.delegate = self
-        do {
-            try fetchedResultsController.performFetch()
-        } catch {
-            let nserror = error as NSError
-            assertionFailure("Unresolved error \(nserror), \(nserror.userInfo)")
-        }
-        return fetchedResultsController
-    } ()
-
+    private var trackerCategoryCoreDataFRC: NSFetchedResultsController<TrackerCategoryCoreData>?
     
     //MARK: - Methods
     
@@ -109,7 +88,7 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
     }
     
     func getCategoriesList() -> [String] {
-        trackerCategoryCoreDataFRC.fetchedObjects?.compactMap(\.title) ?? []
+        trackerCategoryCoreDataFRC?.fetchedObjects?.compactMap(\.title) ?? []
     }
     
     func addCategoryCoreData(_ category: String) {
@@ -137,7 +116,7 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
     }
     
     func deleteCategoryCoreData(_ index: IndexPath) {
-        guard let categoryCoreData = trackerCategoryCoreDataFRC.fetchedObjects?[index.row] as? TrackerCategoryCoreData
+        guard let categoryCoreData = trackerCategoryCoreDataFRC?.fetchedObjects?[index.row] as? TrackerCategoryCoreData
         else { return }
         let pinnedCategory = getTrackerCategoryCoreData(
             from: Constants.TrackersViewControllerConstants.pinnedCategoryTitle)
@@ -148,22 +127,12 @@ final class TrackerCategoryStore: NSObject, CategoryStoreProtocol {
                 context.delete(trackerCoreData)
             }
         }
-        if let trackersCoreData = categoryCoreData.trackers as? Set<TrackerCoreData> {
-            trackersCoreData.forEach{
-                if let records = $0.record as? Set<TrackerRecordCoreData> {
-                    records.compactMap(\.date).forEach{
-                        TrackerStatisticStore.shared.updateCompletedTrackersCountWithoutSave(
-                            for: $0,
-                            action: .remove(withTracker: true),
-                            context: context)
-                    }
-                }
-            }
-        }
         context.delete(categoryCoreData)
         saveContext()
     }
 }
+
+//MARK: - Extensions
 
 extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
     func controller(
@@ -175,21 +144,17 @@ extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
     ) {
         switch type {
         case .insert:
-            if let newIndexPath {
-                insertedIndexes.insert(newIndexPath)
-            }
+            guard let newIndexPath else { return }
+            insertedIndexes.insert(newIndexPath)
         case .delete:
-            if let indexPath {
-                deletedIndexes.insert(indexPath)
-            }
+            guard let indexPath else { return }
+            deletedIndexes.insert(indexPath)
         case .update:
-            if let indexPath {
-                updatedIndexes.insert(indexPath)
-            }
+            guard let indexPath else { return }
+            updatedIndexes.insert(indexPath)
         case .move:
-            if let indexPath, let newIndexPath {
-                movedIndexes.append((indexPath, newIndexPath))
-            }
+            guard let indexPath, let newIndexPath else { return }
+            movedIndexes.append((indexPath, newIndexPath))
         default:
             break
         }

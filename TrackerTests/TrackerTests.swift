@@ -5,7 +5,6 @@ import SnapshotTesting
 final class TrackerTests: XCTestCase {
 
     func testTrackersViewController() throws {
-//        isRecording = true
         let dataProvider = DataProviderMock()
         let trackersViewModel = TrackersViewModel(dataProvider: dataProvider)
         

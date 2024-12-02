@@ -8,6 +8,7 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
     init(context: NSManagedObjectContext) {
         self.context = context
         super.init()
+        configureFetchedResultsController()
     }
     
     //MARK: - Properties
@@ -22,29 +23,7 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
     private var deletedIndexes: Set<IndexPath> = []
     private var updatedIndexes: Set<IndexPath> = []
     private var movedIndexes: [(from: IndexPath, to: IndexPath)] = []
-    lazy var trackerCoreDataFRC: NSFetchedResultsController<TrackerCoreData> = {
-        let fetchedRequest = TrackerCoreData.fetchRequest()
-        let sortDescriptorCategoryTitle = NSSortDescriptor(
-            keyPath: \TrackerCoreData.title,
-            ascending: true)
-        let sortDescriptorCategoryDate = NSSortDescriptor(
-            keyPath: \TrackerCoreData.category?.createdAt,
-            ascending: false)
-        fetchedRequest.sortDescriptors = [sortDescriptorCategoryDate, sortDescriptorCategoryTitle]
-        let fetchedResultsController = NSFetchedResultsController(
-            fetchRequest: fetchedRequest,
-            managedObjectContext: context,
-            sectionNameKeyPath: #keyPath(TrackerCoreData.category.createdAt),
-            cacheName: nil)
-        fetchedResultsController.delegate = self
-        do {
-            try fetchedResultsController.performFetch()
-        } catch {
-            let nserror = error as NSError
-            assertionFailure("Unresolved error \(nserror), \(nserror.userInfo)")
-        }
-        return fetchedResultsController
-    } ()
+    private var trackerCoreDataFRC: NSFetchedResultsController<TrackerCoreData>?
 
     //MARK: - Methods
     
@@ -59,15 +38,6 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         }
     }
     
-    private func updateStatisticTrackersCount() {
-        let trackerscount = trackerCoreDataFRC.fetchedObjects?.count ?? 0
-        TrackerStatisticStore.shared.saveOrUpdateTrackersCountWithoutSave(
-            for: currentDate,
-            count: trackerscount,
-            context: context)
-        saveContext()
-    }
-    
     private func clearChanges() {
         insertedIndexes = []
         updatedIndexes = []
@@ -78,8 +48,32 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         updatedSections = IndexSet()
     }
     
-    func fetchTrackers(for weekDay: Int, date: Date, filter: Filters) {
-        let predicate: NSPredicate
+    private func configureFetchedResultsController() {
+        let fetchedRequest = TrackerCoreData.fetchRequest()
+        let sortDescriptorCategoryTitle = NSSortDescriptor(
+            keyPath: \TrackerCoreData.title,
+            ascending: true)
+        let sortDescriptorCategoryDate = NSSortDescriptor(
+            keyPath: \TrackerCoreData.category?.createdAt,
+            ascending: false)
+        fetchedRequest.sortDescriptors = [sortDescriptorCategoryDate, sortDescriptorCategoryTitle]
+        let fetchedResultsController = NSFetchedResultsController(
+            fetchRequest: fetchedRequest,
+            managedObjectContext: context,
+            sectionNameKeyPath: #keyPath(TrackerCoreData.category.createdAt),
+            cacheName: nil)
+        trackerCoreDataFRC = fetchedResultsController
+        fetchedResultsController.delegate = self
+        do {
+            try fetchedResultsController.performFetch()
+        } catch {
+            let nserror = error as NSError
+            assertionFailure("Unresolved error \(nserror), \(nserror.userInfo)")
+        }
+    }
+    
+    func fetchTrackers(for weekDay: Int, date: Date, filter: Filters, searchText: String?) {
+        var predicate: NSPredicate
         switch filter {
         case .todayTrackers:
             fallthrough
@@ -132,16 +126,35 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
                 #keyPath(TrackerCoreData.record)
             )
         }
-        trackerCoreDataFRC.fetchRequest.predicate = predicate
+        if let searchText {
+            let searchPredicate = NSPredicate(
+                format: "ANY title CONTAINS[cd] %@", searchText.lowercased())
+            predicate = NSCompoundPredicate(
+                andPredicateWithSubpredicates: [predicate, searchPredicate])
+        }
+        trackerCoreDataFRC?.fetchRequest.predicate = predicate
         do {
-            try trackerCoreDataFRC.performFetch()
-            currentDate = date
-            if filter == .allTrackers || filter == .todayTrackers {
-                updateStatisticTrackersCount()
-            }
+            try trackerCoreDataFRC?.performFetch()
         } catch {
             assertionFailure("Error fetching trackers: \(error)")
         }
+    }
+    
+    func getFRCSectionsCount() -> Int {
+        trackerCoreDataFRC?.sections?.count ?? 0
+    }
+    
+    func getFRCSectionTitle(at index: Int) -> String? {
+        let trackerCoreData = trackerCoreDataFRC?.sections?[index].objects?.first as? TrackerCoreData
+        return trackerCoreData?.category?.title
+    }
+    
+    func getFRCSectionObjectsCount(at index: Int) -> Int {
+        trackerCoreDataFRC?.sections?[index].numberOfObjects ?? 0
+    }
+    
+    func getTrackerCoreData(at index: IndexPath) -> TrackerCoreData? {
+        trackerCoreDataFRC?.object(at: index) as TrackerCoreData?
     }
 
     func getTracker(from trackerCoreData: TrackerCoreData) -> Tracker? {
@@ -178,7 +191,6 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
             trackerCoreData.addToWeekdays(trackerWeekDay)
         }
         saveContext()
-        updateStatisticTrackersCount()
     }
     
     func updateTrackerCoreData(_ tracker: Tracker, asNewTracker newTracker: Tracker, for category: String) {
@@ -207,26 +219,23 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
             trackerCoreData.lastCategory = categoryCoreData.title
         }
         saveContext()
-        updateStatisticTrackersCount()
     }
     
     func deleteTrackerCoreData(_ index: IndexPath) {
-        let trackerCoreData = trackerCoreDataFRC.object(at: index) as TrackerCoreData
+        guard let trackerCoreData = trackerCoreDataFRC?.object(at: index) as? TrackerCoreData
+        else { return }
         if let records = trackerCoreData.record as? Set<TrackerRecordCoreData>,
            !records.isEmpty {
             records.forEach{
-                guard let date = $0.date else { return }
-                TrackerStatisticStore.shared.updateCompletedTrackersCountWithoutSave(
-                    for: date,
-                    action: .remove(withTracker: true),
-                    context: context)
+                context.delete($0)
             }
         }
         context.delete(trackerCoreData)
         saveContext()
-        updateStatisticTrackersCount()
     }
 }
+
+//MARK: - Extensions
 
 extension TrackerStore: NSFetchedResultsControllerDelegate {
     
@@ -257,21 +266,17 @@ extension TrackerStore: NSFetchedResultsControllerDelegate {
     ) {
         switch type {
         case .insert:
-            if let newIndexPath {
-                insertedIndexes.insert(newIndexPath)
-            }
+            guard let newIndexPath else { return }
+            insertedIndexes.insert(newIndexPath)
         case .delete:
-            if let indexPath {
-                deletedIndexes.insert(indexPath)
-            }
+            guard let indexPath else { return }
+            deletedIndexes.insert(indexPath)
         case .update:
-            if let indexPath {
-                updatedIndexes.insert(indexPath)
-            }
+            guard let indexPath else { return }
+            updatedIndexes.insert(indexPath)
         case .move:
-            if let indexPath, let newIndexPath {
-                movedIndexes.append((indexPath, newIndexPath))
-            }
+            guard let indexPath, let newIndexPath else { return }
+            movedIndexes.append((indexPath, newIndexPath))
         default:
             break
         }

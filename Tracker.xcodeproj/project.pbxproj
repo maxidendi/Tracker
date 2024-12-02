@@ -78,11 +78,13 @@
 		3FA697272CE7C9EB00C4F9D5 /* PageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA697262CE7C9EB00C4F9D5 /* PageModel.swift */; };
 		3FA6972B2CE7D4DE00C4F9D5 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3FA697292CE7D4DE00C4F9D5 /* Localizable.strings */; };
 		3FA697322CE872A600C4F9D5 /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 3FA697302CE872A600C4F9D5 /* Localizable.stringsdict */; };
-		3FA697372CE8790F00C4F9D5 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3FA697352CE8790F00C4F9D5 /* InfoPlist.strings */; };
+		3FB0BF632CFCD6A500A7237F /* NewTrackerViewModelProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB0BF622CFCD6A500A7237F /* NewTrackerViewModelProtocol.swift */; };
+		3FB0BF652CFCD6C800A7237F /* NewTrackerViewType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB0BF642CFCD6C800A7237F /* NewTrackerViewType.swift */; };
 		3FB806832CC175F4005A35AE /* SetupSubviewsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB806822CC175F4005A35AE /* SetupSubviewsProtocol.swift */; };
 		3FB806852CC17FF4005A35AE /* ScheduleViewModelDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB806842CC17FF4005A35AE /* ScheduleViewModelDelegate.swift */; };
 		3FB806872CC1803E005A35AE /* HabitOrEventViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB806862CC1803E005A35AE /* HabitOrEventViewControllerDelegate.swift */; };
 		3FB806892CC1808F005A35AE /* TrackerCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB806882CC1808F005A35AE /* TrackerCellDelegate.swift */; };
+		3FBF80FF2CFDFDB800CF46A6 /* TrackersViewModelProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FBF80FE2CFDFDB800CF46A6 /* TrackersViewModelProtocol.swift */; };
 		3FD7FF932CCD126600D91C4D /* RecordsStoreDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FD7FF922CCD126600D91C4D /* RecordsStoreDelegate.swift */; };
 		3FD7FF952CCD127A00D91C4D /* CategoriesStoreDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FD7FF942CCD127A00D91C4D /* CategoriesStoreDelegate.swift */; };
 		3FD7FF982CCD5D1600D91C4D /* DataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FD7FF972CCD5D1600D91C4D /* DataProvider.swift */; };
@@ -180,13 +182,13 @@
 		3FA697312CE872A600C4F9D5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = en.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		3FA697332CE8740900C4F9D5 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = ru; path = ru.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		3FA697342CE8740A00C4F9D5 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = es; path = es.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
-		3FA697362CE8790F00C4F9D5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		3FA697382CE8791B00C4F9D5 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		3FA697392CE8791E00C4F9D5 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		3FB0BF622CFCD6A500A7237F /* NewTrackerViewModelProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTrackerViewModelProtocol.swift; sourceTree = "<group>"; };
+		3FB0BF642CFCD6C800A7237F /* NewTrackerViewType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTrackerViewType.swift; sourceTree = "<group>"; };
 		3FB806822CC175F4005A35AE /* SetupSubviewsProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupSubviewsProtocol.swift; sourceTree = "<group>"; };
 		3FB806842CC17FF4005A35AE /* ScheduleViewModelDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleViewModelDelegate.swift; sourceTree = "<group>"; };
 		3FB806862CC1803E005A35AE /* HabitOrEventViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitOrEventViewControllerDelegate.swift; sourceTree = "<group>"; };
 		3FB806882CC1808F005A35AE /* TrackerCellDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCellDelegate.swift; sourceTree = "<group>"; };
+		3FBF80FE2CFDFDB800CF46A6 /* TrackersViewModelProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackersViewModelProtocol.swift; sourceTree = "<group>"; };
 		3FD7FF922CCD126600D91C4D /* RecordsStoreDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordsStoreDelegate.swift; sourceTree = "<group>"; };
 		3FD7FF942CCD127A00D91C4D /* CategoriesStoreDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesStoreDelegate.swift; sourceTree = "<group>"; };
 		3FD7FF972CCD5D1600D91C4D /* DataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProvider.swift; sourceTree = "<group>"; };
@@ -260,6 +262,7 @@
 		3F2438CA2CBE2D2C00CB0B4F /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				3FB0BF642CFCD6C800A7237F /* NewTrackerViewType.swift */,
 				3F3EDCA42CF5181500128599 /* StatisticRecordAction.swift */,
 				3F2438BB2CBE2D2C00CB0B4F /* EmojiAndColors.swift */,
 				3F2438B92CBE2D2C00CB0B4F /* ColorsGategory.swift */,
@@ -368,6 +371,8 @@
 		3F3EDC022CF359E500128599 /* CoreDataProtocols */ = {
 			isa = PBXGroup;
 			children = (
+				3FD7FF942CCD127A00D91C4D /* CategoriesStoreDelegate.swift */,
+				3FD7FF922CCD126600D91C4D /* RecordsStoreDelegate.swift */,
 				3FD7FFA12CCEB65B00D91C4D /* CategoryStoreProtocol.swift */,
 				3FD7FF9F2CCEB64600D91C4D /* RecordsStoreProtocol.swift */,
 				3FD7FFA32CCEB66A00D91C4D /* TrackerStoreProtocol.swift */,
@@ -380,7 +385,11 @@
 		3F3EDC032CF35F6800128599 /* TrackerViewModelsProtocols */ = {
 			isa = PBXGroup;
 			children = (
+				3FBF80FE2CFDFDB800CF46A6 /* TrackersViewModelProtocol.swift */,
+				3FB0BF622CFCD6A500A7237F /* NewTrackerViewModelProtocol.swift */,
 				3FA6969F2CDD389B00C4F9D5 /* CategoryViewModelProtocol.swift */,
+				3F05FA472CC2D15A0020C050 /* CategoryViewModelDelegate.swift */,
+				3FB806842CC17FF4005A35AE /* ScheduleViewModelDelegate.swift */,
 			);
 			path = TrackerViewModelsProtocols;
 			sourceTree = "<group>";
@@ -468,7 +477,6 @@
 				3F2438E42CBE2D2C00CB0B4F /* Assets.xcassets */,
 				3FA697292CE7D4DE00C4F9D5 /* Localizable.strings */,
 				3FA697302CE872A600C4F9D5 /* Localizable.stringsdict */,
-				3FA697352CE8790F00C4F9D5 /* InfoPlist.strings */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -481,14 +489,10 @@
 				3FA697122CE11A1600C4F9D5 /* CategoriesDelegate.swift */,
 				3FD7FF9B2CCEB11800D91C4D /* DataProviderDelegate.swift */,
 				3FD7FF992CCEB10500D91C4D /* DataProviderProtocol.swift */,
-				3FD7FF942CCD127A00D91C4D /* CategoriesStoreDelegate.swift */,
-				3FD7FF922CCD126600D91C4D /* RecordsStoreDelegate.swift */,
 				3F05FA492CC2D2100020C050 /* NewTrackerViewDelegate.swift */,
-				3F05FA472CC2D15A0020C050 /* CategoryViewModelDelegate.swift */,
 				3FB806882CC1808F005A35AE /* TrackerCellDelegate.swift */,
 				3FB806862CC1803E005A35AE /* HabitOrEventViewControllerDelegate.swift */,
 				3FB806822CC175F4005A35AE /* SetupSubviewsProtocol.swift */,
-				3FB806842CC17FF4005A35AE /* ScheduleViewModelDelegate.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -613,7 +617,6 @@
 				3FA697322CE872A600C4F9D5 /* Localizable.stringsdict in Resources */,
 				3FA6972B2CE7D4DE00C4F9D5 /* Localizable.strings in Resources */,
 				3F2438ED2CBE2D2C00CB0B4F /* LaunchScreen.storyboard in Resources */,
-				3FA697372CE8790F00C4F9D5 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -745,11 +748,13 @@
 				3FA697132CE11A1600C4F9D5 /* CategoriesDelegate.swift in Sources */,
 				3F2439132CBE2D2C00CB0B4F /* ScheduleView.swift in Sources */,
 				3FA697232CE482CC00C4F9D5 /* AddCategoryViewModel.swift in Sources */,
+				3FB0BF652CFCD6C800A7237F /* NewTrackerViewType.swift in Sources */,
 				3FD7FFA02CCEB64600D91C4D /* RecordsStoreProtocol.swift in Sources */,
 				3F2439142CBE2D2C00CB0B4F /* StatisticViewController.swift in Sources */,
 				3F8C80B02CD802C9008C1DB3 /* TrackerCellModel.swift in Sources */,
 				3F2439152CBE2D2C00CB0B4F /* TrackerCell.swift in Sources */,
 				3FA6970F2CE1157E00C4F9D5 /* NewTrackerViewModel.swift in Sources */,
+				3FBF80FF2CFDFDB800CF46A6 /* TrackersViewModelProtocol.swift in Sources */,
 				3FD7FF932CCD126600D91C4D /* RecordsStoreDelegate.swift in Sources */,
 				3F2439172CBE2D2C00CB0B4F /* TrackersSupplementaryView.swift in Sources */,
 				3F2439192CBE2D2C00CB0B4F /* TrackersView.swift in Sources */,
@@ -769,6 +774,7 @@
 				3F3EDB662CEFD06100128599 /* FiltersCell.swift in Sources */,
 				3F24391D2CBE2D2C00CB0B4F /* SceneDelegate.swift in Sources */,
 				3FA697162CE235E800C4F9D5 /* ScheduleViewModel.swift in Sources */,
+				3FB0BF632CFCD6A500A7237F /* NewTrackerViewModelProtocol.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -818,16 +824,6 @@
 				3FA697342CE8740A00C4F9D5 /* es */,
 			);
 			name = Localizable.stringsdict;
-			sourceTree = "<group>";
-		};
-		3FA697352CE8790F00C4F9D5 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				3FA697362CE8790F00C4F9D5 /* en */,
-				3FA697382CE8791B00C4F9D5 /* ru */,
-				3FA697392CE8791E00C4F9D5 /* es */,
-			);
-			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

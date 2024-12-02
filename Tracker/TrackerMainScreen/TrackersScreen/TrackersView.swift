@@ -52,6 +52,7 @@ final class TrackersView: UIViewController {
         searchBarController.searchBar.placeholder = constants.searchBarPlaceholder
         searchBarController.hidesNavigationBarDuringPresentation = false
         searchBarController.searchBar.searchTextField.clearButtonMode = .never
+        searchBarController.searchResultsUpdater = self
         return searchBarController
     } ()
     
@@ -361,21 +362,16 @@ extension TrackersView: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         let indexPath = IndexPath(row: .zero, section: section)
-        let headerView: UICollectionReusableView
-        if #available(iOS 18.0, *) {
-            return CGSize(
+        let text = viewModel.titleForCategory(indexPath.section)
+        let label = UILabel()
+        label.text = text
+        label.font = Constants.Typography.bold19
+        label.numberOfLines = 0
+        let size = label.sizeThatFits(
+            .init(
                 width: collectionView.bounds.width - 2 * Constants.General.supplementaryViewHorizontalPadding,
-                height: Constants.General.labelTextHeight + 2)
-        } else {
-            headerView = self.collectionView(collectionView,
-                                             viewForSupplementaryElementOfKind: UICollectionView.elementKindSectionHeader,
-                                             at: indexPath)
-        }
-        return headerView.systemLayoutSizeFitting(
-            CGSize(width: collectionView.frame.width,
-                   height: UIView.layoutFittingExpandedSize.height),
-            withHorizontalFittingPriority: .required,
-            verticalFittingPriority: .fittingSizeLevel)
+                height: .greatestFiniteMagnitude))
+        return size
     }
 }
 
@@ -394,5 +390,21 @@ extension TrackersView: HabitOrEventViewControllerDelegate {
     
     func needToReloadCollectionView() {
         dismiss(animated: true)
+    }
+}
+
+//MARK: - SearchController Delegate
+
+extension TrackersView: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        guard let searchText = searchController.searchBar.text,
+              !searchText.isEmpty
+        else {
+            viewModel.searchTrackers(with: nil)
+            collectionView.reloadData()
+            return
+        }
+        viewModel.searchTrackers(with: searchText)
+        collectionView.reloadData()
     }
 }

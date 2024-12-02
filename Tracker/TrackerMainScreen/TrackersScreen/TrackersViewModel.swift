@@ -1,23 +1,5 @@
 import Foundation
 
-protocol TrackersViewModelProtocol: AnyObject {
-    var onUpdateTrackers: ((TrackerIndexes) -> Void)? { get set }
-    var onSetDatePickerValue: ((Date) -> Void)? { get set }
-    var onReloadData: (() -> Void)? { get set }
-    func isFilterActive() -> Bool
-    func updateTrackers(for date: Date)
-    func updatePinnedTracker(_ index: IndexPath)
-    func numberOfcategories() -> Int?
-    func numberOfTrackers(for category: Int) -> Int
-    func titleForCategory(_ category: Int) -> String?
-    func getTrackerCellModel(at index: IndexPath) -> TrackerCellModel?
-    func deleteTracker(_ index: IndexPath)
-    func trackerRecordChanged(_ id: UUID, isCompleted: Bool)
-    func getDataProvider() -> DataProviderProtocol
-    func setupNewTrackerViewModel(for indexPath: IndexPath) -> NewTrackerViewModelProtocol?
-    func setupFiltersViewController() -> FiltersViewController
-}
-
 final class TrackersViewModel: TrackersViewModelProtocol {
     
     //MARK: - Init
@@ -35,9 +17,10 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     private var dataProvider: DataProviderProtocol
     private let calendar = Calendar.current
     private var currentDate: Date = Date()
+    private var searchText: String?
     private var currentFilter: Filters = .allTrackers {
         didSet {
-            dataProvider.fetchTrackersCoreData(for: currentDate, filter: currentFilter)
+            dataProvider.fetchTrackersCoreData(for: currentDate, filter: currentFilter, searchText: searchText)
             onReloadData?()
         }
     }
@@ -65,7 +48,7 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     
     func updateTrackers(for date: Date) {
         currentDate = calendar.onlyDate(from: date)
-        dataProvider.fetchTrackersCoreData(for: currentDate, filter: currentFilter)
+        dataProvider.fetchTrackersCoreData(for: currentDate, filter: currentFilter, searchText: searchText)
         onReloadData?()
     }
     
@@ -121,6 +104,12 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     
     func setupFiltersViewController() -> FiltersViewController {
         FiltersViewController(filter: currentFilter, delegate: self)
+    }
+    
+    func searchTrackers(with text: String?) {
+        searchText = text
+        dataProvider.fetchTrackersCoreData(for: currentDate, filter: currentFilter, searchText: searchText)
+        onReloadData?()
     }
 }
 

@@ -10,7 +10,7 @@ final class NewTrackerSupplementaryView: UICollectionReusableView {
         addSubview(titleLabel)
         NSLayoutConstraint.activate([
             titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Constants.General.inset12),
-            titleLabel.heightAnchor.constraint(equalToConstant: Constants.General.labelTextHeight),
+//            titleLabel.heightAnchor.constraint(equalToConstant: Constants.General.labelTextHeight),
             titleLabel.topAnchor.constraint(equalTo: topAnchor),
             titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor),
             titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Constants.General.inset12)

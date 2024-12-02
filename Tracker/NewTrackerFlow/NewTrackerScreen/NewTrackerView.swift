@@ -227,7 +227,7 @@ final class NewTrackerView: UIViewController {
         switch viewModel.viewType {
         case .add:
             viewModel.cancelButtonTapped()
-        case .edit(_, _):
+        case .edit:
             dismiss(animated: true)
         }
     }
@@ -236,7 +236,7 @@ final class NewTrackerView: UIViewController {
         switch viewModel.viewType {
         case .add:
             viewModel.createTracker()
-        case .edit(_, _):
+        case .edit:
             viewModel.createTracker()
             dismiss(animated: true)
         }
@@ -423,21 +423,21 @@ extension NewTrackerView: UICollectionViewDelegateFlowLayout {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        let indexPath = IndexPath(row: 0, section: section)
-        let headerView: UICollectionReusableView
-        if #available(iOS 18.0, *) {
-            return CGSize(width: collectionView.bounds.width - Constants.General.supplementaryViewHorizontalPadding * 2,
-                          height: Constants.General.labelTextHeight)
-        } else {
-            headerView = self.collectionView(collectionView,
-                                                 viewForSupplementaryElementOfKind: UICollectionView.elementKindSectionHeader,
-                                                 at: indexPath)
+        let label = UILabel()
+        switch section {
+        case 0:
+            label.text = viewModel.getEmojiCategory().title
+        case 1:
+            label.text = viewModel.getColorCategory().title
+        default: break
         }
-        return headerView.systemLayoutSizeFitting(CGSize(
-            width: collectionView.frame.width,
-            height: UIView.layoutFittingExpandedSize.height),
-            withHorizontalFittingPriority: .required,
-            verticalFittingPriority: .fittingSizeLevel)
+        label.font = Constants.Typography.bold19
+        label.numberOfLines = 0
+        let size = label.sizeThatFits(
+            .init(
+                width: collectionView.bounds.width - 2 * Constants.General.inset12,
+                height: .greatestFiniteMagnitude))
+        return size
     }
 }
 

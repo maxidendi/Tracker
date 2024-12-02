@@ -31,6 +31,7 @@ final class DataProvider: DataProviderProtocol {
     private let categoryStore: CategoryStoreProtocol
     private let recordsStore: RecordsStoreProtocol
     private let trackerStore: TrackerStoreProtocol
+    private let context = DataProvider.persistentContainer.viewContext
     static let persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "Trackers")
         container.loadPersistentStores(completionHandler: { _, error in
@@ -45,27 +46,26 @@ final class DataProvider: DataProviderProtocol {
     //MARK: - Methods
     
     //TrackerStore FRC to TrackersVC collectionView
-    func fetchTrackersCoreData(for currentDate: Date, filter: Filters) {
+    func fetchTrackersCoreData(for currentDate: Date, filter: Filters, searchText: String?) {
         let weekDay = calendar.component(.weekday, from: currentDate)
-        trackerStore.fetchTrackers(for: weekDay, date: currentDate, filter: filter)
+        trackerStore.fetchTrackers(for: weekDay, date: currentDate, filter: filter, searchText: searchText)
     }
     
-    func numberOfCategories() -> Int? {
-        trackerStore.trackerCoreDataFRC.sections?.count
+    func numberOfCategories() -> Int {
+        trackerStore.getFRCSectionsCount()
     }
     
     func titleForSection(_ section: Int) -> String? {
-        let tracker = trackerStore.trackerCoreDataFRC.sections?[section].objects?.first as? TrackerCoreData
-        return tracker?.category?.title
+        trackerStore.getFRCSectionTitle(at: section)
     }
     
     func numberOfTrackersInSection(_ section: Int) -> Int {
-        trackerStore.trackerCoreDataFRC.sections?[section].numberOfObjects ?? 0
+        trackerStore.getFRCSectionObjectsCount(at: section)
     }
     
     func getTracker(at indexPath: IndexPath, currentDate: Date) -> TrackerCellModel? {
-        let trackerCoreData = trackerStore.trackerCoreDataFRC.object(at: indexPath) as TrackerCoreData
-        guard let tracker = trackerStore.getTracker(from: trackerCoreData),
+        guard let trackerCoreData = trackerStore.getTrackerCoreData(at: indexPath),
+              let tracker = trackerStore.getTracker(from: trackerCoreData),
               let categoryTitle = trackerCoreData.lastCategory != nil ?
               trackerCoreData.lastCategory :
               trackerCoreData.category?.title
@@ -83,20 +83,21 @@ final class DataProvider: DataProviderProtocol {
     }
     
     func pinOrUnpinTracker(_ indexPath: IndexPath) {
-        let trackerCoreData = trackerStore.trackerCoreDataFRC.object(at: indexPath)
+        guard let trackerCoreData = trackerStore.getTrackerCoreData(at: indexPath)
+        else { return }
         if trackerCoreData.isPinned, let lastCategoryTitle = trackerCoreData.lastCategory {
             trackerCoreData.isPinned = false
             let newCategoryCoreData = categoryStore.getTrackerCategoryCoreData(from: lastCategoryTitle)
             trackerCoreData.category = newCategoryCoreData
             trackerCoreData.lastCategory = nil
-            try? DataProvider.persistentContainer.viewContext.save()
+            try? context.save()
         } else {
             trackerCoreData.isPinned = true
             let lastCategoryCoreData = trackerCoreData.category
             trackerCoreData.lastCategory = lastCategoryCoreData?.title
             trackerCoreData.category = categoryStore.getTrackerCategoryCoreData(
                 from: Constants.TrackersViewControllerConstants.pinnedCategoryTitle)
-            try? DataProvider.persistentContainer.viewContext.save()
+            try? context.save()
         }
     }
     
@@ -145,7 +146,7 @@ final class DataProvider: DataProviderProtocol {
     //StatisticStore
     
     func getStatistic() -> StatisticModel? {
-        TrackerStatisticStore.shared.getStatistic(context: DataProvider.persistentContainer.viewContext)
+        TrackerStatisticStore.shared.getStatistic(context: context)
     }
 }
 

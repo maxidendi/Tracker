@@ -3,8 +3,8 @@ import Foundation
 protocol DataProviderProtocol {
     var categoriesDelegate: CategoriesDelegate? { get set }
     var trackersDelegate: TrackersDelegate? { get set }
-    func fetchTrackersCoreData(for currentDate: Date, filter: Filters)
-    func numberOfCategories() -> Int?
+    func fetchTrackersCoreData(for currentDate: Date, filter: Filters, searchText: String?)
+    func numberOfCategories() -> Int
     func titleForSection(_ section: Int) -> String?
     func numberOfTrackersInSection(_ section: Int) -> Int
     func getTracker(at indexPath: IndexPath, currentDate: Date) -> TrackerCellModel?

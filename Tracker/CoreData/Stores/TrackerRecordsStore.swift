@@ -27,10 +27,6 @@ final class TrackerRecordsStore: NSObject, RecordsStoreProtocol {
         }
     }
     
-    private func updateStatisticRecordsCount() {
-        
-    }
-    
     private func getTrackerRecord(from recordCoreData: TrackerRecordCoreData) -> TrackerRecord? {
         guard let id = recordCoreData.id,
               let date = recordCoreData.date
@@ -59,10 +55,6 @@ final class TrackerRecordsStore: NSObject, RecordsStoreProtocol {
         recordCoreData.date = record.date
         let tracker = getTrackerFromId(record.id)
         recordCoreData.tracker = tracker
-        TrackerStatisticStore.shared.updateCompletedTrackersCountWithoutSave(
-            for: record.date,
-            action: .add,
-            context: context)
         saveContext()
     }
     
@@ -76,10 +68,6 @@ final class TrackerRecordsStore: NSObject, RecordsStoreProtocol {
         guard let recordCoreData = try? context.fetch(request).first
         else { return }
         context.delete(recordCoreData)
-        TrackerStatisticStore.shared.updateCompletedTrackersCountWithoutSave(
-            for: record.date,
-            action: .remove(withTracker: false),
-            context: context)
         saveContext()
     }
 }
